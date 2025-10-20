@@ -252,59 +252,60 @@ export function Atlas3DTrackerEnhanced({
           {/* Starfield Background */}
           <Starfield count={3000} radius={80} depth={40} />
 
-          {/* Sun */}
-          <Sun radius={0.15} />
+          {/* Sun - Compressed scale: ~5x Jupiter for visibility */}
+          <Sun radius={2.0} />
 
           {/* Planets */}
-          {/* Mercury */}
+          {/* Planets - Compressed scale relative to Jupiter=0.4 */}
+          {/* Mercury - 0.38× Earth */}
           {trajectoryData.mercury && trajectoryData.mercury.length > 0 && (
             <Planet
               name="Mercury"
               trajectoryData={trajectoryData.mercury}
               currentIndex={currentIndex / 4}
-              radius={0.03}
+              radius={0.012}
               color="#8c7853"
               showOrbit={true}
             />
           )}
 
-          {/* Venus */}
+          {/* Venus - 0.95× Earth */}
           {trajectoryData.venus && trajectoryData.venus.length > 0 && (
             <Planet
               name="Venus"
               trajectoryData={trajectoryData.venus}
               currentIndex={currentIndex / 4}
-              radius={0.055}
+              radius={0.034}
               color="#ffc649"
               showOrbit={true}
             />
           )}
 
-          {/* Earth */}
+          {/* Earth - Reference: 0.09× Jupiter */}
           {trajectoryData.earth.length > 0 && (
             <Planet
               name="Earth"
               trajectoryData={trajectoryData.earth}
               currentIndex={currentIndex / 4}
-              radius={0.06}
+              radius={0.036}
               color="#00aaff"
               showOrbit={true}
             />
           )}
 
-          {/* Mars */}
+          {/* Mars - 0.53× Earth */}
           {trajectoryData.mars.length > 0 && (
             <Planet
               name="Mars"
               trajectoryData={trajectoryData.mars}
               currentIndex={currentIndex / 4}
-              radius={0.04}
+              radius={0.019}
               color="#ff6666"
               showOrbit={true}
             />
           )}
 
-          {/* Jupiter */}
+          {/* Jupiter - Largest planet, base scale */}
           {trajectoryData.jupiter.length > 0 && (
             <Planet
               name="Jupiter"
@@ -316,49 +317,49 @@ export function Atlas3DTrackerEnhanced({
             />
           )}
 
-          {/* Saturn */}
+          {/* Saturn - 0.84× Jupiter */}
           {trajectoryData.saturn && trajectoryData.saturn.length > 0 && (
             <Planet
               name="Saturn"
               trajectoryData={trajectoryData.saturn}
               currentIndex={currentIndex / 8}
-              radius={0.35}
+              radius={0.34}
               color="#fad5a5"
               showOrbit={true}
             />
           )}
 
-          {/* Uranus */}
+          {/* Uranus - 0.36× Jupiter */}
           {trajectoryData.uranus && trajectoryData.uranus.length > 0 && (
             <Planet
               name="Uranus"
               trajectoryData={trajectoryData.uranus}
               currentIndex={currentIndex / 16}
-              radius={0.2}
+              radius={0.14}
               color="#4fd0e0"
               showOrbit={true}
             />
           )}
 
-          {/* Neptune */}
+          {/* Neptune - 0.35× Jupiter */}
           {trajectoryData.neptune && trajectoryData.neptune.length > 0 && (
             <Planet
               name="Neptune"
               trajectoryData={trajectoryData.neptune}
               currentIndex={currentIndex / 16}
-              radius={0.19}
+              radius={0.14}
               color="#4166f5"
               showOrbit={true}
             />
           )}
 
-          {/* Pluto */}
+          {/* Pluto - 0.18× Earth (dwarf planet) */}
           {trajectoryData.pluto && trajectoryData.pluto.length > 0 && (
             <Planet
               name="Pluto"
               trajectoryData={trajectoryData.pluto}
               currentIndex={currentIndex / 16}
-              radius={0.02}
+              radius={0.007}
               color="#b8a793"
               showOrbit={true}
             />
