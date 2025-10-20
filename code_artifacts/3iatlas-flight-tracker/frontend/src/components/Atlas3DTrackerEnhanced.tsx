@@ -293,6 +293,18 @@ export function Atlas3DTrackerEnhanced({
             />
           )}
 
+          {/* Ceres - Largest asteroid, 0.27× Earth (dwarf planet) */}
+          {trajectoryData.ceres && trajectoryData.ceres.length > 0 && (
+            <Planet
+              name="Ceres"
+              trajectoryData={trajectoryData.ceres}
+              currentIndex={currentIndex / 8}
+              radius={0.01}
+              color="#a89f91"
+              showOrbit={true}
+            />
+          )}
+
           {/* Mars - 0.53× Earth */}
           {trajectoryData.mars.length > 0 && (
             <Planet

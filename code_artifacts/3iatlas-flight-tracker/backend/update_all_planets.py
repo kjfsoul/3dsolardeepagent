@@ -34,12 +34,13 @@ CONFIG = {
     "end_date": "2026-03-31",
     "current_date": "2025-10-20",
 
-    # Objects to fetch (SPK-ID: name, step_size)
+    # Objects to fetch (SPK-ID or name: config)
     "objects": {
         "1004083": {"name": "3I/ATLAS", "step": "6h", "color": "#00ffff"},
         "199": {"name": "Mercury", "step": "1d", "color": "#8c7853"},
         "299": {"name": "Venus", "step": "1d", "color": "#ffc649"},
         "399": {"name": "Earth", "step": "1d", "color": "#4a90e2"},
+        "Ceres": {"name": "Ceres", "step": "2d", "color": "#a89f91"},  # Largest asteroid (dwarf planet)
         "499": {"name": "Mars", "step": "1d", "color": "#e27b58"},
         "599": {"name": "Jupiter", "step": "2d", "color": "#c88b3a"},
         "699": {"name": "Saturn", "step": "2d", "color": "#fad5a5"},
