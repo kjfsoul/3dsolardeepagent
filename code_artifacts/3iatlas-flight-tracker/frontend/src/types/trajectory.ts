@@ -27,7 +27,7 @@ export interface TrajectoryData {
       end: string;
       current: string;
     };
-    step_size: string;
+    step_size?: string;
     units: {
       distance: string;
       velocity: string;
@@ -35,10 +35,16 @@ export interface TrajectoryData {
     };
     source: string;
   };
-  atlas: VectorData[];
+  '3iatlas'?: VectorData[];
+  atlas?: VectorData[];
+  mercury?: VectorData[];
+  venus?: VectorData[];
   earth: VectorData[];
   mars: VectorData[];
   jupiter: VectorData[];
+  saturn?: VectorData[];
+  uranus?: VectorData[];
+  neptune?: VectorData[];
 }
 
 export interface TimelineEvent {

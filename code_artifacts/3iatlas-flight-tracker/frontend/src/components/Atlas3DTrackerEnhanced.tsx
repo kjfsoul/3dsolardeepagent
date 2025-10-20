@@ -92,7 +92,11 @@ export function Atlas3DTrackerEnhanced({
 
   // Animation loop
   useEffect(() => {
-    if (!isPlaying || !trajectoryData || trajectoryData.atlas.length === 0) {
+    if (!isPlaying || !trajectoryData) {
+      return;
+    }
+    const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'];
+    if (!atlasData || atlasData.length === 0) {
       return;
     }
 
@@ -106,7 +110,7 @@ export function Atlas3DTrackerEnhanced({
         const nextIndex = prevIndex + increment;
 
         // Loop back to start if we reach the end
-        if (nextIndex >= trajectoryData.atlas.length - 1) {
+        if (nextIndex >= atlasData.length - 1) {
           return 0;
         }
 
@@ -128,9 +132,12 @@ export function Atlas3DTrackerEnhanced({
 
   // Get current frame data
   const currentFrame = useMemo(() => {
-    if (!trajectoryData || trajectoryData.atlas.length === 0) return null;
+    if (!trajectoryData) return null;
+    // Handle both 'atlas' and '3iatlas' keys from the data
+    const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'];
+    if (!atlasData || atlasData.length === 0) return null;
     const index = Math.floor(currentIndex);
-    return trajectoryData.atlas[index] || null;
+    return atlasData[index] || null;
   }, [trajectoryData, currentIndex]);
 
   // Calculate comet position and velocity for 3D scene
@@ -164,7 +171,8 @@ export function Atlas3DTrackerEnhanced({
 
     // Find the index corresponding to the event date
     const eventDate = new Date(event.date);
-    const eventIndex = trajectoryData.atlas.findIndex((frame) => {
+    const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'] || [];
+    const eventIndex = atlasData.findIndex((frame) => {
       const frameDate = new Date(frame.date);
       return frameDate >= eventDate;
     });
@@ -361,7 +369,7 @@ export function Atlas3DTrackerEnhanced({
 
           {/* Trajectory Trail */}
           <TrajectoryTrail
-            trajectoryData={trajectoryData.atlas}
+            trajectoryData={trajectoryData.atlas || trajectoryData['3iatlas'] || []}
             currentIndex={currentIndex}
             color="#00ff88"
             opacity={0.8}
@@ -369,7 +377,7 @@ export function Atlas3DTrackerEnhanced({
 
           {/* Full Trajectory (dimmer, for context) */}
           <FullTrajectoryLine
-            trajectoryData={trajectoryData.atlas}
+            trajectoryData={trajectoryData.atlas || trajectoryData['3iatlas'] || []}
             color="#00ff88"
             opacity={0.15}
           />
@@ -419,7 +427,7 @@ export function Atlas3DTrackerEnhanced({
         isPlaying={isPlaying}
         speed={speed}
         currentIndex={currentIndex}
-        maxIndex={trajectoryData.atlas.length - 1}
+        maxIndex={(trajectoryData.atlas || trajectoryData['3iatlas'] || []).length - 1}
         followMode={followMode}
         onPlayPause={() => setIsPlaying(!isPlaying)}
         onReset={() => setCurrentIndex(0)}
