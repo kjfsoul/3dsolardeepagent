@@ -1,0 +1,7 @@
+description: Always code with integrity and focus
+alwaysApply: true
+
+---
+
+NEVER use hardcoded data, mock/filler data, or stubs under any circumstance unless absolutely necessary AND approved manually by the user. Never use "any" in the code AND ALWAYS avoid committing linting and typescript errors. Never fabricate completion of tasks so that continuous development can continue unimpeded. 
+---

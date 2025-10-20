@@ -1,0 +1,380 @@
+{
+  "start": {
+    "id": "start",
+    "category": "introduction",
+    "question": "You are Analyst designation ALT-7, newly assigned to The ATLAS Directive. The object designated 3I/ATLAS was discovered July 1, 2025, approaching our solar system. Initial trajectory analysis confirms:",
+    "choices": [
+      {
+        "text": "Hyperbolic orbit - proving interstellar origin",
+        "nextStage": "trajectory_confirmed",
+        "traits": ["pragmatist", "analyst"],
+        "reasoning": "Evidence-based conclusion from orbital mechanics"
+      },
+      {
+        "text": "Elliptical orbit - indicating solar system origin",
+        "nextStage": "fatal_trajectory_error", 
+        "traits": ["cautious"],
+        "reasoning": "Conservative interpretation lacking analysis"
+      }
+    ]
+  },
+  
+  "fatal_trajectory_error": {
+    "id": "fatal_trajectory_error",
+    "isFatal": true,
+    "category": "skill_check",
+    "question": "DIRECTIVE FAILURE: An elliptical orbit would indicate 3I/ATLAS is bound to our solar system. This contradicts its interstellar classification. Your clearance is suspended.",
+    "explanation": "3I/ATLAS follows a hyperbolic trajectory with eccentricity >1.0, confirming interstellar origin and escape velocity.",
+    "choices": [
+      {
+        "text": "Access refresher materials and restart analysis",
+        "nextStage": "start",
+        "traits": [],
+        "reasoning": "Learning from error"
+      }
+    ]
+  },
+  
+  "trajectory_confirmed": {
+    "id": "trajectory_confirmed", 
+    "category": "skill_check",
+    "question": "Correct. 3I/ATLAS follows a hyperbolic path with eccentricity >1.0. Preliminary size estimates place its nucleus diameter between:",
+    "choices": [
+      {
+        "text": "440 meters to 5.6 kilometers",
+        "nextStage": "size_confirmed",
+        "traits": ["analyst"],
+        "reasoning": "Accurate observational constraints"
+      },
+      {
+        "text": "10-50 kilometers",
+        "nextStage": "fatal_size_error",
+        "traits": ["risk_taker"],
+        "reasoning": "Overestimation without data support"
+      }
+    ]
+  },
+
+  "size_confirmed": {
+    "id": "size_confirmed",
+    "category": "skill_check",
+    "question": "Analysis proceeds. JWST spectroscopic analysis detected volatile compounds in 3I/ATLAS's coma. Which combination was confirmed?",
+    "choices": [
+      {
+        "text": "Water ice (H₂O), Carbon monoxide (CO), Methane (CH₄)",
+        "nextStage": "volatiles_confirmed",
+        "traits": ["analyst"],
+        "reasoning": "Standard cometary volatiles detected"
+      },
+      {
+        "text": "Only exotic silicon-based compounds",
+        "nextStage": "fatal_volatiles_error",
+        "traits": ["mystic"],
+        "reasoning": "Speculative without evidence"
+      }
+    ]
+  },
+
+  "volatiles_confirmed": {
+    "id": "volatiles_confirmed",
+    "category": "path_selection",
+    "question": "Confirmed volatiles analysis complete. Command assigns your specialization focus:",
+    "choices": [
+      {
+        "text": "Scientific Analysis Path - Deep composition and physics study",
+        "nextStage": "path_scientific_entry",
+        "traits": ["analyst", "pragmatist"],
+        "reasoning": "Systematic scientific methodology"
+      },
+      {
+        "text": "Anomaly Investigation Path - Examine unusual behavioral patterns", 
+        "nextStage": "path_anomaly_entry",
+        "traits": ["mystic", "risk_taker"],
+        "reasoning": "Open to extraordinary phenomena"
+      },
+      {
+        "text": "Geopolitical Assessment Path - Global response implications",
+        "nextStage": "path_geopolitical_entry",
+        "traits": ["leader", "pragmatist"],
+        "reasoning": "Focus on human systems and cooperation"
+      },
+      {
+        "text": "Intervention Planning Path - Active engagement protocols",
+        "nextStage": "path_intervention_entry",
+        "traits": ["risk_taker", "leader"],
+        "reasoning": "Direct action and contact scenarios"
+      }
+    ]
+  },
+
+  "path_scientific_entry": {
+    "id": "path_scientific_entry",
+    "category": "scientific_analysis",
+    "question": "SCIENTIFIC ANALYSIS PATH: Deep scan analysis reveals 3I/ATLAS exhibits characteristics distinct from previous interstellar visitors. Its estimated age exceeds:",
+    "choices": [
+      {
+        "text": "7 billion years - older than our solar system",
+        "nextStage": "scientific_age_confirmed",
+        "traits": ["analyst"],
+        "reasoning": "Accurate understanding of thick disk origin"
+      },
+      {
+        "text": "4.6 billion years - same age as our solar system",
+        "nextStage": "fatal_age_error",
+        "traits": ["cautious"],
+        "reasoning": "Incorrect assumption about formation timing"
+      }
+    ]
+  },
+
+  "scientific_age_confirmed": {
+    "id": "scientific_age_confirmed",
+    "category": "situational_dilemma",
+    "question": "Confirmed. 3I/ATLAS represents ancient galactic material. During approach, a Class X solar flare threatens sensitive instruments but could reveal magnetic interactions. Your directive:",
+    "choices": [
+      {
+        "text": "Protect equipment - preserve billions in telescope infrastructure",
+        "nextStage": "scientific_safe_choice",
+        "traits": ["cautious", "pragmatist"],
+        "reasoning": "Risk mitigation and resource protection"
+      },
+      {
+        "text": "Risk observation - capture unprecedented magnetic field data",
+        "nextStage": "scientific_risk_choice",
+        "traits": ["risk_taker", "idealist"],
+        "reasoning": "Scientific opportunity outweighs equipment risk"
+      }
+    ]
+  },
+
+  "path_anomaly_entry": {
+    "id": "path_anomaly_entry", 
+    "category": "anomaly_investigation",
+    "question": "ANOMALY INVESTIGATION PATH: Analysis reveals 3I/ATLAS exhibits non-gravitational acceleration similar to 1I/'Oumuamua. Additionally, periodic radio signals detected. Pattern suggests:",
+    "choices": [
+      {
+        "text": "Natural rotation emissions - physics-based phenomenon",
+        "nextStage": "anomaly_natural_explanation",
+        "traits": ["analyst", "pragmatist"],
+        "reasoning": "Conventional scientific interpretation"
+      },
+      {
+        "text": "Artificial signal modulation - structured communication attempt",
+        "nextStage": "anomaly_artificial_theory",
+        "traits": ["mystic", "risk_taker"],
+        "reasoning": "Open to extraordinary possibilities"
+      },
+      {
+        "text": "Equipment interference - terrestrial contamination",
+        "nextStage": "anomaly_skeptical_analysis",
+        "traits": ["cynic", "cautious"],
+        "reasoning": "Skeptical of anomalous claims"
+      }
+    ]
+  },
+
+  "path_geopolitical_entry": {
+    "id": "path_geopolitical_entry",
+    "category": "geopolitical_assessment", 
+    "question": "GEOPOLITICAL PATH: International tensions rise as 3I/ATLAS approaches. ESA proposes emergency collaboration, but classified briefings suggest strategic implications. Your assessment:",
+    "choices": [
+      {
+        "text": "Recommend full cooperation - science benefits all humanity",
+        "nextStage": "geo_cooperation_path",
+        "traits": ["idealist", "leader"],
+        "reasoning": "Believes in international scientific collaboration"
+      },
+      {
+        "text": "Advise selective sharing - protect sensitive discoveries",
+        "nextStage": "geo_security_path", 
+        "traits": ["pragmatist", "cautious"],
+        "reasoning": "Balanced approach to information sharing"
+      },
+      {
+        "text": "Oppose data sharing - maintain strategic advantage",
+        "nextStage": "geo_isolation_path",
+        "traits": ["cynic", "leader"],
+        "reasoning": "Nationalist approach to cosmic discovery"
+      }
+    ]
+  },
+
+  "path_intervention_entry": {
+    "id": "path_intervention_entry",
+    "category": "intervention_planning",
+    "question": "INTERVENTION PATH: Engineering proposes ambitious intercept mission using modified spacecraft. Success probability: 15%. Mission failure could damage 3I/ATLAS or contaminate it. Authorization decision:",
+    "choices": [
+      {
+        "text": "Approve high-risk mission - historic contact opportunity",
+        "nextStage": "intervention_approved",
+        "traits": ["risk_taker", "idealist"],
+        "reasoning": "Willing to accept risk for breakthrough potential"
+      },
+      {
+        "text": "Recommend remote observation - preserve pristine state",
+        "nextStage": "intervention_passive",
+        "traits": ["cautious", "analyst"],
+        "reasoning": "Scientific preservation over intervention"
+      },
+      {
+        "text": "Demand improved success probability before approval",
+        "nextStage": "intervention_conditional",
+        "traits": ["pragmatist", "leader"],
+        "reasoning": "Evidence-based risk management"
+      }
+    ]
+  },
+
+  "dilemma_resource_allocation": {
+    "id": "dilemma_resource_allocation",
+    "category": "situational_dilemma",
+    "question": "RESOURCE CRISIS: Multiple critical observations compete for limited telescope time during 3I/ATLAS's optimal viewing window. You must prioritize ONE observation type:",
+    "choices": [
+      {
+        "text": "Spectroscopic analysis - determine exact chemical composition",
+        "nextStage": "resource_spectroscopy_outcome",
+        "traits": ["analyst", "pragmatist"],
+        "reasoning": "Systematic scientific approach"
+      },
+      {
+        "text": "High-resolution imaging - map surface features and structure",
+        "nextStage": "resource_imaging_outcome", 
+        "traits": ["cautious", "pragmatist"],
+        "reasoning": "Visual confirmation reduces uncertainty"
+      },
+      {
+        "text": "Radio monitoring - listen for artificial signals",
+        "nextStage": "resource_radio_outcome",
+        "traits": ["mystic", "risk_taker"],
+        "reasoning": "Open to extraordinary possibilities"
+      },
+      {
+        "text": "Gravitational measurement - precise trajectory determination",
+        "nextStage": "resource_gravity_outcome",
+        "traits": ["analyst", "cautious"], 
+        "reasoning": "Fundamental physics data priority"
+      }
+    ]
+  },
+
+  "philosophy_cosmic_significance": {
+    "id": "philosophy_cosmic_significance",
+    "category": "philosophical_probe",
+    "question": "The discovery of 3I/ATLAS - a 7-billion-year-old messenger from the galaxy's ancient past - fundamentally alters humanity's cosmic perspective. Does this make humanity's existence feel:",
+    "choices": [
+      {
+        "text": "More significant - we are conscious witnesses to a vast cosmic story",
+        "nextStage": "philosophy_significant_outcome",
+        "traits": ["idealist", "mystic"],
+        "reasoning": "Finds meaning in cosmic connection",
+        "worldview": "Finds meaning in cosmic connection"
+      },
+      {
+        "text": "Less significant - we are brief sparks in an incomprehensibly old universe",
+        "nextStage": "philosophy_insignificant_outcome",
+        "traits": ["cynic", "pragmatist"],
+        "reasoning": "Humbled by cosmic scale",
+        "worldview": "Humbled by cosmic scale"
+      },
+      {
+        "text": "Equally significant - significance comes from our choices, not cosmic age",
+        "nextStage": "philosophy_self_determined_outcome",
+        "traits": ["leader", "analyst"],
+        "reasoning": "Self-determined meaning creation",
+        "worldview": "Self-determined meaning creation"
+      }
+    ]
+  },
+
+  "final_convergence": {
+    "id": "final_convergence",
+    "category": "climax",
+    "question": "FINAL PHASE: 3I/ATLAS reaches perihelion. All systems focused on closest approach. Multiple scenarios unfold simultaneously. Your ultimate directive as lead analyst:",
+    "choices": [
+      {
+        "text": "Maintain scientific objectivity - document all phenomena for posterity",
+        "nextStage": "ending_the_messenger",
+        "traits": ["analyst", "pragmatist"],
+        "reasoning": "Systematic documentation approach"
+      },
+      {
+        "text": "Attempt emergency first contact - humanity's chance for communication",
+        "nextStage": "ending_first_contact",
+        "traits": ["risk_taker", "idealist"],
+        "reasoning": "Bold leap toward cosmic connection"
+      },
+      {
+        "text": "Prepare defensive protocols - assume potential threat scenarios",
+        "nextStage": "ending_the_warning", 
+        "traits": ["cautious", "cynic"],
+        "reasoning": "Precautionary threat assessment"
+      },
+      {
+        "text": "Trust in cosmic harmony - embrace the mystical implications",
+        "nextStage": "ending_the_transcendent",
+        "traits": ["mystic", "idealist"],
+        "reasoning": "Spiritual acceptance of cosmic mystery"
+      }
+    ]
+  },
+
+  "ending_the_messenger": {
+    "id": "ending_the_messenger",
+    "category": "outcome",
+    "question": "OUTCOME ACHIEVED: The Messenger",
+    "choices": [],
+    "outcome": {
+      "title": "The Messenger",
+      "narrative": "3I/ATLAS departs our solar system having delivered its ancient message through the universal language of science. Humanity's careful observation and analysis revealed invaluable insights about galactic evolution, stellar formation, and the deep history of our cosmic neighborhood. The data collected will advance astrophysics for generations, and the international cooperation forged during the mission creates lasting bonds between Earth's nations. You have helped humanity take its place as a mature, scientifically curious member of the cosmic community.",
+      "trajectoryType": "departure-documented",
+      "animationKey": "messenger_departure",
+      "rarity": "Common",
+      "artDirection": "A serene view of 3I/ATLAS departing the solar system against a backdrop of stars, with Earth and other planets visible as points of light. Scientific observation stations and telescopes are highlighted on Earth. The overall mood is contemplative and hopeful, emphasizing humanity's growth through scientific discovery."
+    }
+  },
+
+  "ending_first_contact": {
+    "id": "ending_first_contact", 
+    "category": "outcome",
+    "question": "OUTCOME ACHIEVED: First Contact",
+    "choices": [],
+    "outcome": {
+      "title": "First Contact",
+      "narrative": "Your bold communication attempts succeed beyond all expectations. 3I/ATLAS responds with complex mathematical sequences, confirming artificial intelligence within its ancient structure. The exchange that follows represents humanity's first confirmed dialogue with non-terrestrial intelligence. Ancient wisdom encoded in prime numbers and geometric proofs flows between species separated by billions of years. SETI protocols activate worldwide as humanity begins its first conversation with a visitor from the stars. The universe is no longer silent.",
+      "trajectoryType": "communication-established",
+      "animationKey": "first_contact_success", 
+      "rarity": "Rare",
+      "artDirection": "Dramatic visualization of communication beams flowing between Earth's radio telescopes and 3I/ATLAS. Mathematical symbols and equations appear as streams of light connecting the two entities. The scene pulses with energy and discovery, showing humanity's leap into galactic communication."
+    }
+  },
+
+  "ending_the_warning": {
+    "id": "ending_the_warning",
+    "category": "outcome", 
+    "question": "OUTCOME ACHIEVED: The Warning",
+    "choices": [],
+    "outcome": {
+      "title": "The Warning",
+      "narrative": "Your cautious approach proves prescient. Analysis reveals that 3I/ATLAS's passage through our solar system has gravitationally perturbed several asteroid belt objects, setting one large asteroid on a collision course with Earth's orbital path—though still decades away. What initially appeared to be a cosmic messenger becomes an inadvertent herald of future danger. Your early warning allows humanity to begin developing planetary defense systems generations ahead of schedule. Sometimes the greatest discoveries are about preparing for challenges yet to come.",
+      "trajectoryType": "gravitational-disruption",
+      "animationKey": "warning_cascade",
+      "rarity": "Epic", 
+      "artDirection": "Ominous visualization showing 3I/ATLAS's gravitational effects on the asteroid belt, with one large asteroid highlighted on a threatening trajectory toward Earth. Warning systems and early defense preparations are visible. The color scheme emphasizes caution and preparation, with amber and red warning tones."
+    }
+  },
+
+  "ending_the_transcendent": {
+    "id": "ending_the_transcendent",
+    "category": "outcome",
+    "question": "OUTCOME ACHIEVED: The Transcendent", 
+    "choices": [],
+    "outcome": {
+      "title": "The Transcendent",
+      "narrative": "Your openness to cosmic mystery reveals 3I/ATLAS's true nature as a catalyst for consciousness expansion. As it approaches perihelion, the ancient object begins emitting harmonic frequencies that resonate with human neural patterns, triggering a species-wide elevation in awareness and intuition. Astronomers worldwide report unprecedented insights, artists create works of impossible beauty, and philosophers grasp truths about existence that have eluded humanity for millennia. 3I/ATLAS departs having awakened something profound in the human spirit—a connection to the cosmic consciousness that pervades the universe.",
+      "trajectoryType": "consciousness-awakening", 
+      "animationKey": "transcendent_harmony",
+      "rarity": "Rare",
+      "artDirection": "Ethereal visualization of 3I/ATLAS surrounded by waves of harmonic energy reaching Earth. Human figures are shown in states of enlightenment and cosmic awareness. The imagery blends scientific and spiritual elements with flowing, organic patterns and transcendent light effects in purples, golds, and cosmic blues."
+    }
+  }
+}
