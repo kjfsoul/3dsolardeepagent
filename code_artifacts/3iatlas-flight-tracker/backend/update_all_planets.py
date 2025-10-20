@@ -45,6 +45,7 @@ CONFIG = {
         "699": {"name": "Saturn", "step": "2d", "color": "#fad5a5"},
         "799": {"name": "Uranus", "step": "4d", "color": "#4fd0e0"},
         "899": {"name": "Neptune", "step": "4d", "color": "#4166f5"},
+        "999": {"name": "Pluto", "step": "4d", "color": "#b8a793"},
     },
 
     # Output file paths

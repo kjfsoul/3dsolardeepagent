@@ -45,6 +45,7 @@ export interface TrajectoryData {
   saturn?: VectorData[];
   uranus?: VectorData[];
   neptune?: VectorData[];
+  pluto?: VectorData[];
 }
 
 export interface TimelineEvent {

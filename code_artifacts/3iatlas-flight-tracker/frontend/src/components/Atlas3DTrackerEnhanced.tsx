@@ -352,6 +352,18 @@ export function Atlas3DTrackerEnhanced({
             />
           )}
 
+          {/* Pluto */}
+          {trajectoryData.pluto && trajectoryData.pluto.length > 0 && (
+            <Planet
+              name="Pluto"
+              trajectoryData={trajectoryData.pluto}
+              currentIndex={currentIndex / 16}
+              radius={0.02}
+              color="#b8a793"
+              showOrbit={true}
+            />
+          )}
+
           {/* 3I/ATLAS Comet */}
           <Comet3D
             position={cometPosition}
@@ -382,14 +394,21 @@ export function Atlas3DTrackerEnhanced({
             opacity={0.15}
           />
 
-          {/* Camera Controls */}
+          {/* Camera Controls - Free Cam Mode */}
           {!followMode && !cinematicActive && (
             <OrbitControls
               enableDamping
               dampingFactor={0.05}
-              minDistance={1}
-              maxDistance={100}
+              enableZoom={true}
+              zoomSpeed={1.2}
+              minDistance={0.5}
+              maxDistance={150}
               target={cometPositionVec}
+              mouseButtons={{
+                LEFT: THREE.MOUSE.ROTATE,
+                MIDDLE: THREE.MOUSE.DOLLY,
+                RIGHT: THREE.MOUSE.PAN
+              }}
             />
           )}
 
@@ -420,6 +439,18 @@ export function Atlas3DTrackerEnhanced({
 
       {/* UI Overlays */}
       <TelemetryHUD currentFrame={currentFrame} />
+
+      {/* Controls Help - Show when in Free Cam mode */}
+      {!followMode && (
+        <div className="absolute top-20 right-4 bg-black/70 text-white text-xs p-3 rounded border border-cyan-500/30 backdrop-blur-sm">
+          <div className="font-bold text-cyan-400 mb-2">🎮 Free Cam Controls</div>
+          <div className="space-y-1">
+            <div><span className="text-cyan-300">Left Click + Drag:</span> Rotate</div>
+            <div><span className="text-cyan-300">Scroll Wheel:</span> Zoom In/Out</div>
+            <div><span className="text-cyan-300">Right Click + Drag:</span> Pan</div>
+          </div>
+        </div>
+      )}
 
       <TimelinePanel events={events} onEventClick={handleEventClick} />
 
