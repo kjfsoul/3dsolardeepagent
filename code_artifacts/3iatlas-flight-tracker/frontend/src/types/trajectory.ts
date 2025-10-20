@@ -41,6 +41,8 @@ export interface TrajectoryData {
   venus?: VectorData[];
   earth: VectorData[];
   ceres?: VectorData[];
+  vesta?: VectorData[];
+  pallas?: VectorData[];
   mars: VectorData[];
   jupiter: VectorData[];
   saturn?: VectorData[];

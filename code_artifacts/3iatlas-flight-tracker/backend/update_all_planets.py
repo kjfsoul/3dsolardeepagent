@@ -35,18 +35,31 @@ CONFIG = {
     "current_date": "2025-10-20",
 
     # Objects to fetch (SPK-ID or name: config)
+    # 💡 TIP: Comment out any line with # to exclude that object
     "objects": {
+        # === Interstellar Visitor ===
         "1004083": {"name": "3I/ATLAS", "step": "6h", "color": "#00ffff"},
+        
+        # === Planets ===
         "199": {"name": "Mercury", "step": "1d", "color": "#8c7853"},
         "299": {"name": "Venus", "step": "1d", "color": "#ffc649"},
         "399": {"name": "Earth", "step": "1d", "color": "#4a90e2"},
-        "Ceres": {"name": "Ceres", "step": "2d", "color": "#a89f91"},  # Largest asteroid (dwarf planet)
         "499": {"name": "Mars", "step": "1d", "color": "#e27b58"},
         "599": {"name": "Jupiter", "step": "2d", "color": "#c88b3a"},
         "699": {"name": "Saturn", "step": "2d", "color": "#fad5a5"},
         "799": {"name": "Uranus", "step": "4d", "color": "#4fd0e0"},
         "899": {"name": "Neptune", "step": "4d", "color": "#4166f5"},
         "999": {"name": "Pluto", "step": "4d", "color": "#b8a793"},
+        
+        # === Major Asteroids (dwarf planets & largest asteroids) ===
+        "Ceres": {"name": "Ceres", "step": "2d", "color": "#a89f91"},
+        "20000004": {"name": "Vesta", "step": "2d", "color": "#b5a88f"},
+        "20000002": {"name": "Pallas", "step": "2d", "color": "#9d9589"},
+        
+        # === Famous Comets ===
+        # Uncomment these to add (may be far from Sun during this period):
+        # "20002688": {"name": "Halley", "step": "4d", "color": "#88ccff"},
+        # "900118": {"name": "Encke", "step": "2d", "color": "#99ddff"},
     },
 
     # Output file paths

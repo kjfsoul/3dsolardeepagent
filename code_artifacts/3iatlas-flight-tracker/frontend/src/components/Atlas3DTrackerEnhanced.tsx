@@ -305,6 +305,30 @@ export function Atlas3DTrackerEnhanced({
             />
           )}
 
+          {/* Vesta - 2nd largest asteroid, ~0.15× Earth */}
+          {trajectoryData.vesta && trajectoryData.vesta.length > 0 && (
+            <Planet
+              name="Vesta"
+              trajectoryData={trajectoryData.vesta}
+              currentIndex={currentIndex / 8}
+              radius={0.006}
+              color="#b5a88f"
+              showOrbit={true}
+            />
+          )}
+
+          {/* Pallas - 3rd largest asteroid, ~0.15× Earth */}
+          {trajectoryData.pallas && trajectoryData.pallas.length > 0 && (
+            <Planet
+              name="Pallas"
+              trajectoryData={trajectoryData.pallas}
+              currentIndex={currentIndex / 8}
+              radius={0.006}
+              color="#9d9589"
+              showOrbit={true}
+            />
+          )}
+
           {/* Mars - 0.53× Earth */}
           {trajectoryData.mars.length > 0 && (
             <Planet
