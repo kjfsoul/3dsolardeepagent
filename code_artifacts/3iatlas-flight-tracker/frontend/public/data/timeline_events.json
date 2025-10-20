@@ -5,8 +5,7 @@
       "name": "Discovery",
       "date": "2025-07-01",
       "description": "3I/ATLAS discovered by ATLAS telescope in Chile",
-      "type": "milestone",
-      "educational_content": "3I/ATLAS discovered by ATLAS telescope in Chile"
+      "type": "milestone"
     },
     {
       "id": "mars_flyby",
@@ -14,8 +13,7 @@
       "date": "2025-10-03",
       "distance_au": 0.19,
       "description": "Close approach to Mars at 0.19 AU",
-      "type": "encounter",
-      "educational_content": "Close approach to Mars at 0.19 AU"
+      "type": "encounter"
     },
     {
       "id": "perihelion",
@@ -23,9 +21,8 @@
       "date": "2025-10-29",
       "distance_au": 1.356,
       "max_velocity_kms": 68.0,
-      "description": "Closest approach to the Sun at 1.356 AU, maximum velocity 68 km/s",
-      "type": "milestone",
-      "educational_content": "Closest approach to the Sun at 1.356 AU, maximum velocity 68 km/s"
+      "description": "Closest approach to the Sun at 1.356 AU",
+      "type": "milestone"
     },
     {
       "id": "jupiter_approach",
@@ -33,8 +30,7 @@
       "date": "2026-03-16",
       "distance_au": 0.36,
       "description": "Close approach to Jupiter at 0.36 AU",
-      "type": "encounter",
-      "educational_content": "Close approach to Jupiter at 0.36 AU"
+      "type": "encounter"
     }
   ]
 }

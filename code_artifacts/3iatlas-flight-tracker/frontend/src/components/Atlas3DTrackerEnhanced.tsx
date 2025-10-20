@@ -248,17 +248,43 @@ export function Atlas3DTrackerEnhanced({
           <Sun radius={0.15} />
 
           {/* Planets */}
+          {/* Mercury */}
+          {trajectoryData.mercury && trajectoryData.mercury.length > 0 && (
+            <Planet
+              name="Mercury"
+              trajectoryData={trajectoryData.mercury}
+              currentIndex={currentIndex / 4}
+              radius={0.03}
+              color="#8c7853"
+              showOrbit={true}
+            />
+          )}
+
+          {/* Venus */}
+          {trajectoryData.venus && trajectoryData.venus.length > 0 && (
+            <Planet
+              name="Venus"
+              trajectoryData={trajectoryData.venus}
+              currentIndex={currentIndex / 4}
+              radius={0.055}
+              color="#ffc649"
+              showOrbit={true}
+            />
+          )}
+
+          {/* Earth */}
           {trajectoryData.earth.length > 0 && (
             <Planet
               name="Earth"
               trajectoryData={trajectoryData.earth}
-              currentIndex={currentIndex / 4} // Earth updates less frequently
+              currentIndex={currentIndex / 4}
               radius={0.06}
               color="#00aaff"
               showOrbit={true}
             />
           )}
 
+          {/* Mars */}
           {trajectoryData.mars.length > 0 && (
             <Planet
               name="Mars"
@@ -270,6 +296,7 @@ export function Atlas3DTrackerEnhanced({
             />
           )}
 
+          {/* Jupiter */}
           {trajectoryData.jupiter.length > 0 && (
             <Planet
               name="Jupiter"
@@ -277,6 +304,42 @@ export function Atlas3DTrackerEnhanced({
               currentIndex={currentIndex / 8}
               radius={0.4}
               color="#ffbb88"
+              showOrbit={true}
+            />
+          )}
+
+          {/* Saturn */}
+          {trajectoryData.saturn && trajectoryData.saturn.length > 0 && (
+            <Planet
+              name="Saturn"
+              trajectoryData={trajectoryData.saturn}
+              currentIndex={currentIndex / 8}
+              radius={0.35}
+              color="#fad5a5"
+              showOrbit={true}
+            />
+          )}
+
+          {/* Uranus */}
+          {trajectoryData.uranus && trajectoryData.uranus.length > 0 && (
+            <Planet
+              name="Uranus"
+              trajectoryData={trajectoryData.uranus}
+              currentIndex={currentIndex / 16}
+              radius={0.2}
+              color="#4fd0e0"
+              showOrbit={true}
+            />
+          )}
+
+          {/* Neptune */}
+          {trajectoryData.neptune && trajectoryData.neptune.length > 0 && (
+            <Planet
+              name="Neptune"
+              trajectoryData={trajectoryData.neptune}
+              currentIndex={currentIndex / 16}
+              radius={0.19}
+              color="#4166f5"
               showOrbit={true}
             />
           )}
