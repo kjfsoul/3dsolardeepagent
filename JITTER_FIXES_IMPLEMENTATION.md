@@ -41,13 +41,13 @@ const currentTargetRef = useRef(new THREE.Vector3());
 useFrame((_, dt) => {
   // Compute desired target
   desiredTargetRef.current.copy(comet).add(bank);
-  
+
   // Critically-damped approach (no overshoot)
   currentTargetRef.current.lerp(
     desiredTargetRef.current,
     1 - Math.exp(-6 * dt)
   );
-  
+
   controlsRef.current.target.copy(currentTargetRef.current);
   controlsRef.current.update();
 });
@@ -602,4 +602,3 @@ All jitter sources eliminated:
 - 🌌 **Magical**: Interstellar journey brought to life
 
 **Ready to experience the smoothest Ride With ATLAS yet!** 🌠✨
-

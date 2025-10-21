@@ -2,10 +2,11 @@
  * AsteroidBelt Component
  * =============================
  * Fast instanced asteroid belt between Mars and Jupiter
+ * Fixed: Proper setMatrixAt/setColorAt API (no attribute warnings)
  */
 
-import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 interface AsteroidBeltProps {
@@ -25,63 +26,58 @@ export function AsteroidBelt({
 }: AsteroidBeltProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
 
-  const { geom, mat, matrices, colors } = useMemo(() => {
-    const geom = new THREE.IcosahedronGeometry(1, 0);
-    const mat = new THREE.MeshStandardMaterial({
-      color: "#b7b09f",
-      roughness: 0.95,
-      metalness: 0.0,
-      emissive: "#0d0d0d",
-      emissiveIntensity: 0.05,
-      vertexColors: true,
-    });
+  // Reuse one temp object to avoid allocations
+  const tempObj = useMemo(() => new THREE.Object3D(), []);
+  const tempColor = useMemo(() => new THREE.Color(), []);
 
-    const matrices: THREE.Matrix4[] = [];
-    const colors = new Float32Array(count * 3);
+  const geometry = useMemo(() => new THREE.IcosahedronGeometry(1, 0), []);
+  const material = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: "#b7b09f",
+        roughness: 0.95,
+        metalness: 0.0,
+        emissive: "#0d0d0d",
+        emissiveIntensity: 0.05,
+      }),
+    []
+  );
+
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
 
     for (let i = 0; i < count; i++) {
       const r =
         innerRadius + (outerRadius - innerRadius) * Math.sqrt(Math.random());
       const theta = Math.random() * Math.PI * 2;
       const y = (Math.random() - 0.5) * thickness;
+
       const s = scale * (0.4 + Math.pow(Math.random(), 2) * 1.6);
 
-      const pos = new THREE.Vector3(
-        r * Math.cos(theta),
-        y,
-        r * Math.sin(theta)
-      );
-      const rot = new THREE.Euler(
+      tempObj.position.set(r * Math.cos(theta), y, r * Math.sin(theta));
+      tempObj.rotation.set(
         Math.random() * Math.PI,
         Math.random() * Math.PI,
         Math.random() * Math.PI
       );
-      const quat = new THREE.Quaternion().setFromEuler(rot);
-      const sc = new THREE.Vector3(s, s, s);
-      matrices.push(new THREE.Matrix4().compose(pos, quat, sc));
+      tempObj.scale.setScalar(s);
+      tempObj.updateMatrix();
+      mesh.setMatrixAt(i, tempObj.matrix);
 
-      // Per-instance color variation
+      // Per-instance color (supported API)
       const tint = 0.85 + Math.random() * 0.25; // 0.85–1.10
-      colors[i * 3 + 0] = 0.73 * tint;
-      colors[i * 3 + 1] = 0.69 * tint;
-      colors[i * 3 + 2] = 0.63 * tint;
+      tempColor.setRGB(0.73 * tint, 0.69 * tint, 0.63 * tint);
+      mesh.setColorAt(i, tempColor);
     }
-    return { geom, mat, matrices, colors };
-  }, [count, innerRadius, outerRadius, thickness, scale]);
 
-  useEffect(() => {
-    const m = meshRef.current;
-    if (!m) return;
-    for (let i = 0; i < matrices.length; i++) m.setMatrixAt(i, matrices[i]);
-    m.instanceMatrix.needsUpdate = true;
-
-    // Set per-instance colors
-    m.instanceColor = new THREE.InstancedBufferAttribute(colors, 3);
-  }, [matrices, colors]);
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [count, innerRadius, outerRadius, thickness, scale, tempObj, tempColor]);
 
   useFrame((_, dt) => {
     if (meshRef.current) meshRef.current.rotation.y += dt * 0.01;
   });
 
-  return <instancedMesh ref={meshRef} args={[geom, mat, matrices.length]} />;
+  return <instancedMesh ref={meshRef} args={[geometry, material, count]} />;
 }

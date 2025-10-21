@@ -133,7 +133,7 @@ export function SceneContent({
 
     const desiredScale = viewMode === "ride-atlas" ? 0.8 : 0.3;
     let targetScale = desiredScale;
-    
+
     if (desiredScale > boundary) {
       targetScale = boundary;
       scaleStateRef.current.clamped = true;
@@ -156,7 +156,7 @@ export function SceneContent({
       1.2,
       6.0
     );
-    
+
     // Smooth tail length transitions
     tailRef.current = THREE.MathUtils.damp(tailRef.current, tailTarget, 6, 1 / 60);
 
