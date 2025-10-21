@@ -12,20 +12,20 @@
         <h1>3I/ATLAS Debug Console</h1>
         <div id="output"></div>
     </div>
-    
+
     <script>
         const output = document.getElementById('output');
-        
+
         function log(message) {
             output.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
             console.log(message);
         }
-        
+
         log('Starting debug...');
-        
+
         // Test basic JavaScript
         log('JavaScript is working');
-        
+
         // Test fetch
         fetch('/data/trajectory_static.json')
             .then(response => {
@@ -39,7 +39,7 @@
             .catch(error => {
                 log('Fetch error: ' + error.message);
             });
-        
+
         // Test React import
         import('/src/main-test.tsx')
             .then(() => {

@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client'
 
 function TestApp() {
   return (
-    <div style={{ 
-      width: '100vw', 
-      height: '100vh', 
-      backgroundColor: 'black', 
+    <div style={{
+      width: '100vw',
+      height: '100vh',
+      backgroundColor: 'black',
       color: 'white',
       display: 'flex',
       alignItems: 'center',

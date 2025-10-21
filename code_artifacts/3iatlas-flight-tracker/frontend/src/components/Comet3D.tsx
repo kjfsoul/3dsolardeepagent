@@ -28,10 +28,10 @@ export function Comet3D({
   useFrame(() => {
     if (groupRef.current) {
       const velocityVec = new THREE.Vector3(...velocity).normalize();
-
+      
       // Tail points opposite to velocity
       const tailDirection = velocityVec.clone().negate();
-
+      
       // Orient the group
       groupRef.current.lookAt(
         groupRef.current.position.clone().add(tailDirection)
@@ -41,55 +41,38 @@ export function Comet3D({
 
   return (
     <group ref={groupRef} position={position}>
-      {/* Unified Comet Body - Elongated ellipsoid for cohesive look */}
-      <mesh scale={[1, 1, 1.5]}>
-        <sphereGeometry args={[scale * 0.8, 32, 32]} />
+      {/* Single Unified Comet Body - Elongated ellipsoid */}
+      <mesh scale={[1, 1, 2]}>
+        <sphereGeometry args={[scale * 0.6, 32, 32]} />
         <meshStandardMaterial
           color="#00ffaa"
           emissive="#00ff88"
-          emissiveIntensity={1.5}
-          roughness={0.3}
+          emissiveIntensity={1.2}
+          roughness={0.2}
         />
       </mesh>
 
-      {/* Coma - Seamless glow around nucleus */}
-      <mesh scale={[1, 1, 1.5]}>
-        <sphereGeometry args={[scale * 1.4, 32, 32]} />
+      {/* Single Coma - Seamless glow around nucleus */}
+      <mesh scale={[1, 1, 2]}>
+        <sphereGeometry args={[scale * 1.2, 32, 32]} />
         <meshBasicMaterial
           color="#00ff88"
           transparent
-          opacity={0.25}
+          opacity={0.2}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
 
-      {/* Tail - Integrated cone that flows from the body */}
-      <mesh
-        rotation={[Math.PI / 2, 0, 0]}
-        position={[0, -tailLength * 0.3, 0]}
-        scale={[1, 1, 1]}
+      {/* Single Integrated Tail - Flows seamlessly from body */}
+      <mesh 
+        rotation={[Math.PI / 2, 0, 0]} 
+        position={[0, -tailLength * 0.4, 0]}
       >
-        <coneGeometry args={[scale * 0.6, tailLength, 16, 1, true]} />
+        <coneGeometry args={[scale * 0.4, tailLength, 16, 1, true]} />
         <meshBasicMaterial
           color="#00ff66"
           transparent
-          opacity={0.3}
-          side={THREE.DoubleSide}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-
-      {/* Additional tail layers for depth */}
-      <mesh
-        rotation={[Math.PI / 2, 0, 0]}
-        position={[0, -tailLength * 0.2, 0]}
-        scale={[1.2, 1, 1]}
-      >
-        <coneGeometry args={[scale * 0.4, tailLength * 0.8, 16, 1, true]} />
-        <meshBasicMaterial
-          color="#00ff88"
-          transparent
-          opacity={0.15}
+          opacity={0.25}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
         />

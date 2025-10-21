@@ -237,6 +237,31 @@ export function Atlas3DTrackerEnhanced({
     }
   };
 
+  // Camera preset for Ride With ATLAS mode
+  useEffect(() => {
+    if (viewMode === 'ride-atlas' && trajectoryData) {
+      // Set camera to follow comet closely
+      const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'];
+      if (atlasData && atlasData.length > 0) {
+        const currentFrame = atlasData[Math.floor(currentIndex)];
+        if (currentFrame) {
+          const cometPos = new THREE.Vector3(
+            currentFrame.position.x,
+            currentFrame.position.z,
+            -currentFrame.position.y
+          );
+          
+          // Position camera slightly behind and above the comet
+          const cameraOffset = new THREE.Vector3(2, 1, 2);
+          const cameraPosition = cometPos.clone().add(cameraOffset);
+          
+          // This will be handled by OrbitControls target
+          console.log('🎯 Ride With ATLAS: Camera targeting comet at', cometPos);
+        }
+      }
+    }
+  }, [viewMode, currentIndex, trajectoryData]);
+
   // Check if we're near perihelion for glow effect
   const isPerihelion = useMemo(() => {
     if (!currentFrame || !trajectoryData) return false;
@@ -447,8 +472,8 @@ export function Atlas3DTrackerEnhanced({
           <Comet3D
             position={cometPosition}
             velocity={cometVelocity}
-            scale={viewMode === "ride-atlas" ? 0.2 : 0.05}
-            tailLength={viewMode === "ride-atlas" ? 1.5 : 0.8}
+            scale={viewMode === "ride-atlas" ? 0.3 : 0.05}
+            tailLength={viewMode === "ride-atlas" ? 2.0 : 0.8}
           />
 
           {/* Perihelion Glow Effect */}
@@ -477,16 +502,16 @@ export function Atlas3DTrackerEnhanced({
             opacity={0.15}
           />
 
-          {/* Camera Controls - Always Free Cam */}
+          {/* Camera Controls - Always Free Cam with Ride Mode */}
           {!cinematicActive && (
             <OrbitControls
               enableDamping
               dampingFactor={0.05}
               enableZoom={true}
               zoomSpeed={1.2}
-              minDistance={0.5}
-              maxDistance={150}
-              target={cometPositionVec}
+              minDistance={viewMode === 'ride-atlas' ? 0.1 : 0.5}
+              maxDistance={viewMode === 'ride-atlas' ? 5 : 150}
+              target={viewMode === 'ride-atlas' ? cometPositionVec : cometPositionVec}
               mouseButtons={{
                 LEFT: THREE.MOUSE.ROTATE,
                 MIDDLE: THREE.MOUSE.DOLLY,
@@ -528,6 +553,16 @@ export function Atlas3DTrackerEnhanced({
           <div>
             <span className="text-cyan-300">Right Click + Drag:</span> Pan
           </div>
+          {viewMode === 'ride-atlas' && (
+            <div className="mt-2 pt-2 border-t border-cyan-500/30">
+              <div className="text-yellow-400 font-bold">
+                🚀 Ride With ATLAS Mode
+              </div>
+              <div className="text-yellow-300">
+                Camera follows comet closely
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
