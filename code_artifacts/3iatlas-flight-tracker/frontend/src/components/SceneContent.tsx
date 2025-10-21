@@ -51,7 +51,7 @@ export function SceneContent({
   isPerihelion,
   cinematicActive,
   cometPositionVec,
-  rideAlongCamera,
+  rideAlongCamera: _rideAlongCamera,
   focusBody,
   setCinematicActive,
   setCinematicEvent,
@@ -110,92 +110,113 @@ export function SceneContent({
     return [frame.position.x, frame.position.z, -frame.position.y];
   }
 
-  // Calculate comet scale with Sun apparent size clamp
+  // Calculate comet scale with smooth hysteresis
+  const scaleStateRef = useRef({ value: 0.3, clamped: false });
+  const tailRef = useRef(2.0);
+
   const { cometScale, tailLength } = useMemo(() => {
-    const sunRadius = viewMode === "ride-atlas" ? 2.0 * 0.45 : 2.0;
+    const sunBaseRadius = 2.0;
+    const sunRideScale = 0.45;
+    const sunRadius = viewMode === "ride-atlas" ? sunBaseRadius * sunRideScale : sunBaseRadius;
     const cometPos = new THREE.Vector3(...cometPosition);
 
     const camToComet = camera.position.distanceTo(cometPos);
     const camToSun = camera.position.length(); // Sun at [0,0,0]
 
-    // "apparent sizes" ~ radius / distance
+    // Apparent sizes ~ radius / distance
     const sunApparent = sunRadius / Math.max(camToSun, 1e-6);
-    const maxCometApparent = sunApparent * 0.3; // ≤ 30% of Sun on screen
+    const rawBoundary = sunApparent * 0.3 * camToComet; // 30% of Sun
 
-    // Desired ride scale
-    const desiredCometScale = viewMode === "ride-atlas" ? 0.8 : 0.3;
-    // Clamp by apparent size rule
-    const cometScaleClamp = maxCometApparent * camToComet;
-    const finalCometScale = Math.min(desiredCometScale, cometScaleClamp);
+    // Hysteresis: once clamped, keep a 3% buffer to avoid flip-flop
+    let boundary = rawBoundary;
+    if (scaleStateRef.current.clamped) boundary *= 0.97; // small buffer
+
+    const desiredScale = viewMode === "ride-atlas" ? 0.8 : 0.3;
+    let targetScale = desiredScale;
+    
+    if (desiredScale > boundary) {
+      targetScale = boundary;
+      scaleStateRef.current.clamped = true;
+    } else {
+      scaleStateRef.current.clamped = false;
+    }
+
+    // Critically damp the scale
+    scaleStateRef.current.value = THREE.MathUtils.damp(
+      scaleStateRef.current.value,
+      targetScale,
+      8, // stiffness
+      1 / 60 // approx frame time
+    );
 
     // Tail grows as we near perihelion (heliocentric distance)
     const heliocentricR = cometPos.length(); // AU in scene
-    const tailLen = THREE.MathUtils.clamp(
+    const tailTarget = THREE.MathUtils.clamp(
       3.5 / Math.max(heliocentricR, 0.5),
       1.2,
       6.0
     );
+    
+    // Smooth tail length transitions
+    tailRef.current = THREE.MathUtils.damp(tailRef.current, tailTarget, 6, 1 / 60);
 
     return {
-      cometScale: finalCometScale,
-      tailLength: viewMode === "ride-atlas" ? tailLen : 2.0,
+      cometScale: scaleStateRef.current.value,
+      tailLength: viewMode === "ride-atlas" ? tailRef.current : 2.0,
     };
   }, [viewMode, cometPosition, camera.position]);
 
-  // Prepare bodies for screen-space locators (in Ride mode only)
+  // Prepare bodies for screen-space locators (in Ride mode only) - memoized to prevent recreation
   const locatorBodies = useMemo(() => {
     if (viewMode !== "ride-atlas") return [];
 
-    const bodies: { name: string; world: THREE.Vector3; color: string }[] = [];
+    const pick = (arr: VectorData[] | undefined, idxDiv = 4) => {
+      if (!arr || arr.length === 0) return null;
+      const f = arr[Math.floor(currentIndex / idxDiv)];
+      if (!f) return null;
+      return new THREE.Vector3(f.position.x, f.position.z, -f.position.y);
+    };
 
-    if (trajectoryData.earth.length > 0) {
-      const pos = getPlanetPos(trajectoryData.earth, currentIndex / 4);
-      bodies.push({
-        name: "Earth",
-        world: new THREE.Vector3(...pos),
-        color: "#00aaff",
-      });
-    }
-    if (trajectoryData.mars.length > 0) {
-      const pos = getPlanetPos(trajectoryData.mars, currentIndex / 4);
-      bodies.push({
-        name: "Mars",
-        world: new THREE.Vector3(...pos),
-        color: "#ff6666",
-      });
-    }
-    if (trajectoryData.jupiter.length > 0) {
-      const pos = getPlanetPos(trajectoryData.jupiter, currentIndex / 8);
-      bodies.push({
-        name: "Jupiter",
-        world: new THREE.Vector3(...pos),
-        color: "#ffbb88",
-      });
-    }
-
-    return bodies;
+    return [
+      { name: "Earth", color: "#6cf", world: pick(trajectoryData.earth, 4) },
+      { name: "Mars", color: "#faa", world: pick(trajectoryData.mars, 4) },
+      { name: "Jupiter", color: "#fcb", world: pick(trajectoryData.jupiter, 8) },
+    ].filter((b) => b.world) as { name: string; color: string; world: THREE.Vector3 }[];
   }, [viewMode, trajectoryData, currentIndex]);
 
   // Velocity-based camera motion for Ride mode
   const controlsRef = useRef<any>(null);
+  const desiredTargetRef = useRef(new THREE.Vector3());
+  const currentTargetRef = useRef(new THREE.Vector3());
+
   useFrame((_, dt) => {
-    if (viewMode !== "ride-atlas" || !cometVelocity || !controlsRef.current)
-      return;
+    if (!controlsRef.current) return;
 
-    const v = new THREE.Vector3(...cometVelocity).normalize();
-    const comet = new THREE.Vector3(...cometPosition);
+    if (viewMode === "ride-atlas" && cometVelocity && cometPosition) {
+      // Compute desired target with lead + bank
+      const v = new THREE.Vector3(...cometVelocity).normalize();
+      const comet = new THREE.Vector3(...cometPosition);
 
-    const lead = v.clone().multiplyScalar(1.25); // look-ahead
-    const up = new THREE.Vector3(0, 1, 0);
-    const right = new THREE.Vector3().crossVectors(v, up).normalize();
-    const bank = right.multiplyScalar(
-      0.15 * Math.sin(performance.now() * 0.001)
+      const right = new THREE.Vector3()
+        .crossVectors(v, new THREE.Vector3(0, 1, 0))
+        .normalize();
+      const bank = right.multiplyScalar(
+        0.15 * Math.sin(performance.now() * 0.001)
+      );
+
+      desiredTargetRef.current.copy(comet).add(bank); // where we want to look
+    } else {
+      desiredTargetRef.current.set(0, 0, 0);
+    }
+
+    // Critically-damped approach to desired target (no overshoot)
+    currentTargetRef.current.lerp(
+      desiredTargetRef.current,
+      1 - Math.exp(-6 * dt)
     );
 
-    const camTarget = comet.clone().add(lead).add(bank);
-
-    // Smooth camera target interpolation
-    controlsRef.current.target.lerp(camTarget, dt * 2.0);
+    controlsRef.current.target.copy(currentTargetRef.current);
+    controlsRef.current.update();
   });
 
   return (
@@ -438,17 +459,11 @@ export function SceneContent({
       {!cinematicActive && (
         <OrbitControls
           ref={controlsRef}
-          enableDamping
-          dampingFactor={0.03}
+          enableDamping={false}
           enableZoom={true}
           zoomSpeed={1.5}
           minDistance={viewMode === "ride-atlas" ? 0.02 : 0.5}
           maxDistance={focusBody ? 16 : viewMode === "ride-atlas" ? 12 : 50}
-          target={
-            viewMode === "ride-atlas" && rideAlongCamera
-              ? rideAlongCamera.target
-              : cometPositionVec
-          }
           enablePan={true}
           panSpeed={1.0}
           rotateSpeed={1.0}
