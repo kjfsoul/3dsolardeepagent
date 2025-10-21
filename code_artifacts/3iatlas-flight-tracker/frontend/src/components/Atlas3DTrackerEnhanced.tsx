@@ -346,7 +346,11 @@ export function Atlas3DTrackerEnhanced({
         <ambientLight intensity={0.3} />
 
         {/* Camera */}
-        <PerspectiveCamera makeDefault position={[6, 4, 6]} fov={50} />
+        <PerspectiveCamera 
+          makeDefault 
+          position={viewMode === 'true-scale' ? [0, 0, 20] : [6, 4, 6]} 
+          fov={viewMode === 'true-scale' ? 30 : 50} 
+        />
 
         {/* Scene */}
         <Suspense fallback={null}>
@@ -373,7 +377,7 @@ export function Atlas3DTrackerEnhanced({
       <TelemetryHUD currentFrame={currentFrame} />
       <PlaybackRecorder enabled={true} duration={30} />
 
-      {/* Controls Help - Always show since we only have free cam */}
+      {/* Controls Help - Always show since we have full camera controls */}
       <div className="absolute top-20 right-4 bg-black/70 text-white text-xs p-3 rounded border border-cyan-500/30 backdrop-blur-sm">
         <div className="font-bold text-cyan-400 mb-2">
           🎮 Camera Controls
@@ -394,7 +398,17 @@ export function Atlas3DTrackerEnhanced({
                 🚀 Ride With ATLAS Mode
               </div>
               <div className="text-yellow-300">
-                Camera follows comet closely
+                Camera follows comet + full controls
+              </div>
+            </div>
+          )}
+          {viewMode === 'true-scale' && (
+            <div className="mt-2 pt-2 border-t border-cyan-500/30">
+              <div className="text-green-400 font-bold">
+                📏 True Scale Mode
+              </div>
+              <div className="text-green-300">
+                Realistic distances and sizes
               </div>
             </div>
           )}

@@ -473,8 +473,8 @@ export function SceneContent({
         <OrbitControls
           ref={controlsRef}
           enableDamping={false}
-          enablePan={viewMode !== "ride-atlas"}
-          enableRotate={viewMode !== "ride-atlas"}
+          enablePan={true}
+          enableRotate={true}
           enableZoom={true}
           zoomSpeed={1.5}
           minDistance={0.02}
