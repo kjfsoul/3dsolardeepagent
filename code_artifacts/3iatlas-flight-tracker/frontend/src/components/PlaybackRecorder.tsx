@@ -44,26 +44,42 @@ export function PlaybackRecorder({
 
       // Capture canvas as video stream
       const stream = canvas.captureStream(10); // 10 FPS for smooth video
-      
+
+      // Determine supported codec
+      let mimeType = '';
+      if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+        mimeType = 'video/webm;codecs=vp9';
+      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+        mimeType = 'video/webm;codecs=vp8';
+      } else if (MediaRecorder.isTypeSupported('video/webm')) {
+        mimeType = 'video/webm';
+      } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+        mimeType = 'video/mp4';
+      } else {
+        throw new Error('No supported video codec found');
+      }
+
+      console.log(`Using codec: ${mimeType}`);
+
       // Create MediaRecorder for video
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'video/webm;codecs=vp9',
-        videoBitsPerSecond: 2500000 // 2.5 Mbps for good quality
+        mimeType: mimeType,
+        videoBitsPerSecond: 2500000, // 2.5 Mbps for good quality
       });
-      
+
       const chunks: BlobPart[] = [];
-      
+
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.push(event.data);
         }
       };
-      
+
       mediaRecorder.onstop = () => {
-        const videoBlob = new Blob(chunks, { type: 'video/webm' });
+        const videoBlob = new Blob(chunks, { type: mimeType });
         setVideoBlob(videoBlob);
       };
-      
+
       mediaRecorderRef.current = mediaRecorder;
       mediaRecorder.start(1000); // Collect data every second
 
@@ -76,27 +92,40 @@ export function PlaybackRecorder({
     } catch (error) {
       console.error("Error starting video recording:", error);
       setIsRecording(false);
+      
+      // Fallback to frame-only recording
+      console.log("Falling back to frame-only recording...");
+      intervalRef.current = setInterval(() => {
+        const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+        if (canvas) {
+          const frameData = canvas.toDataURL("image/png");
+          setFrames((prev) => [...prev, frameData]);
+        }
+      }, 100);
     }
   };
 
   const stopRecording = () => {
     setIsRecording(false);
-    
+
     // Stop video recording
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state === "recording"
+    ) {
       mediaRecorderRef.current.stop();
     }
-    
+
     // Stop frame capture
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    
+
     // Store the recorded frames
     setRecordedFrames(frames);
     setShowPlayback(true);
-    
+
     if (onComplete) {
       onComplete(frames);
     }
@@ -104,13 +133,22 @@ export function PlaybackRecorder({
 
   const downloadVideo = () => {
     if (!videoBlob) return;
-    
+
     const url = URL.createObjectURL(videoBlob);
     const link = document.createElement("a");
     link.href = url;
+    
+    // Determine file extension based on blob type
+    let extension = 'webm';
+    if (videoBlob.type.includes('mp4')) {
+      extension = 'mp4';
+    } else if (videoBlob.type.includes('webm')) {
+      extension = 'webm';
+    }
+    
     link.download = `atlas-recording-${new Date()
       .toISOString()
-      .slice(0, 19)}.webm`;
+      .slice(0, 19)}.${extension}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -212,7 +250,7 @@ export function PlaybackRecorder({
               </button>
             </div>
             <div className="text-xs text-gray-400 mt-2">
-              Video: {videoBlob ? `${(videoBlob.size / 1024 / 1024).toFixed(1)}MB` : 'Processing...'}
+              Video: {videoBlob ? `${(videoBlob.size / 1024 / 1024).toFixed(1)}MB (${videoBlob.type.split('/')[1]})` : 'Processing...'}
             </div>
           </div>
         )}
