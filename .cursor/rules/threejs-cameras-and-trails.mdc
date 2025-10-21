@@ -1,0 +1,34 @@
+---
+description: Three.js/R3F scene, cameras, comet visuals, performance budgets
+globs:
+  - "components/**"
+  - "components/views/**"
+  - "components/ui/**"
+  - "hooks/**"
+---
+
+You are an expert in cinematic but truthful 3D scenes.
+
+CAMERAS
+
+- Keep a single FreeCam plus presets (overview, rideComet). Removing “follow vs free” is allowed if presets remain callable by name.
+- Smooth lerp, no camera drift; clamp near/far and FOV to prevent z-fighting.
+
+COMET VISUAL
+
+- Cohesive comet: elongated ellipsoid + layered tail/particle glow; greenish-cyan within realistic bounds.
+- Trail budget: ≤ 1.5 ms per frame on mid-range GPU; downshift via adaptive quality when FPS < 55.
+
+PERFORMANCE
+
+- Target 60 FPS; initial load < 3 s; view switch < 100 ms.
+- Add a perf HUD toggle; record min/avg FPS during scrubs.
+
+DONE WHEN
+
+- Presets work, comet remains visible at perihelion, trail never overwhelms frame budget, Memory Update written.
+
+---
+
+alwaysApply: true
+---

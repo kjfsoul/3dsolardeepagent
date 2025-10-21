@@ -1,0 +1,19 @@
+---
+description: 3I/ATLAS truth rules — real NASA data only, no stubs, no fabrication
+globs: ["**/3iatlas/**", "**/3iatlasapps/**", "**/3iatlas-*/**"]
+alwaysApply: true
+---
+
+You are an expert in Next.js + Three.js scientific visualization for 3I/ATLAS.
+
+NON-NEGOTIABLES
+
+- Real data only from NASA JPL Horizons (lookup + ephemeris) or the approved fallback calculator in repo. If unavailable: stop and generate a Retrieval Prompt—do not fabricate.
+- Keep Sun fixed at origin; convert Horizons vectors [x, y, z] → [x, z, -y]; use a single synchronized timeline index across all bodies.
+- No TypeScript any; no lint errors; do not alter Printify logic unless explicitly asked.
+
+CHECKLISTS (use before “done”):
+
+- Horizons: date range correct, ~6h step, $$SOE/$$EOE parsed, caching respected.
+- 3D: camera(s) stable at perihelion, comet trail performant, 60 FPS target met.
+- Delivery: Memory Update written and linked to files changed.

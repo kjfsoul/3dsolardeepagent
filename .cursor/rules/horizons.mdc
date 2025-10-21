@@ -1,0 +1,25 @@
+---
+description: 3I/ATLAS — NASA Horizons sourcing, coordinate conversion, validation gates
+globs:
+  - "app/api/horizons/**"
+  - "lib/**/horizons*.ts"
+  - "lib/**/trajectory*.ts"
+  - "public/**/trajectory*.json"
+  - "docs/**"
+---
+
+You are an expert in Horizons data integration for 3I/ATLAS.
+
+RULES
+
+- Source of truth: NASA JPL Horizons (object lookup + ephemeris vectors). Fallback calculator only if API unreachable; must document derivation and ranges.
+- Date windows: default Oct 1–31, 2025 (6h), extend per feature needs; store as config constants, not literals in code.
+- Parse vectors: ensure jd, position {x,y,z}, velocity {vx,vy,vz}; reject partial rows.
+- Coordinate conversion: [x, y, z]→[x, z, -y]; Sun at [0,0,0].
+- Cache policy: 7-day TTL; must verify cache hit path before calling API again.
+
+VALIDATION
+
+- Confirm perihelion ≈ 2025-10-29; assert strictly when window includes that date.
+- Unit test parsing and conversion; snapshot first 3 and last 3 entries per object.
+- On failure: stop and trigger I-Don’t-Know Protocol with a ready Horizons query prompt.

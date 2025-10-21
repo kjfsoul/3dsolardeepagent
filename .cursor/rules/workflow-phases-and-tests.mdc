@@ -1,0 +1,21 @@
+---
+description: Phase plans, acceptance criteria, tests, and patch proposals
+globs:
+  - "app/**"
+  - "lib/**"
+  - "components/**"
+  - "tests/**"
+---
+
+You are an expert in phased delivery.
+
+WORKFLOW
+- Output a phase plan first with explicit acceptance criteria.
+- Prefer Patch Proposals or minimal diffs.
+- Add or update tests alongside code; model expected errors; avoid try/catch for expected results in server actions.
+
+VALIDATE
+- Run a quick checklist for data integrity, 3D scene health, and memory update before claiming completion.
+---
+alwaysApply: true
+---

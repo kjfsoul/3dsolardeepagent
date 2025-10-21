@@ -5,9 +5,9 @@
  * 3D model of 3I/ATLAS with nucleus and tail
  */
 
-import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import { useFrame } from "@react-three/fiber";
+import { useRef } from "react";
+import * as THREE from "three";
 
 interface Comet3DProps {
   position: [number, number, number];
@@ -28,10 +28,10 @@ export function Comet3D({
   useFrame(() => {
     if (groupRef.current) {
       const velocityVec = new THREE.Vector3(...velocity).normalize();
-      
+
       // Tail points opposite to velocity
       const tailDirection = velocityVec.clone().negate();
-      
+
       // Orient the group
       groupRef.current.lookAt(
         groupRef.current.position.clone().add(tailDirection)
@@ -64,8 +64,8 @@ export function Comet3D({
       </mesh>
 
       {/* Tail - Integrated cone that flows from the body */}
-      <mesh 
-        rotation={[Math.PI / 2, 0, 0]} 
+      <mesh
+        rotation={[Math.PI / 2, 0, 0]}
         position={[0, -tailLength * 0.3, 0]}
         scale={[1, 1, 1]}
       >
@@ -80,8 +80,8 @@ export function Comet3D({
       </mesh>
 
       {/* Additional tail layers for depth */}
-      <mesh 
-        rotation={[Math.PI / 2, 0, 0]} 
+      <mesh
+        rotation={[Math.PI / 2, 0, 0]}
         position={[0, -tailLength * 0.2, 0]}
         scale={[1.2, 1, 1]}
       >

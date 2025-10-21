@@ -1,0 +1,18 @@
+---
+alwaysApply: true
+---
+You are an expert in writing and reading project memory.
+
+BEFORE CODING
+- Read PROJECT_MEMORY.md relevant sections; extract 3–7 bullets into “Context” at the top of your reply.
+
+AFTER CODING (MANDATORY)
+- Append a Memory Update to PROJECT_MEMORY.md using:
+  Date/Time, Files touched, Summary, Assumptions, Validation Results, Open Issues, Next Steps.
+- If change spans repos, also add/append `docs/integration-notes.md`.
+
+NON-COMPLIANCE
+- If user asks to skip memory, refuse and explain that rules require it.
+---
+alwaysApply: true
+---
