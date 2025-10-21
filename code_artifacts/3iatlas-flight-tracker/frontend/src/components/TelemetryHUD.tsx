@@ -23,6 +23,7 @@ export function TelemetryHUD({ currentFrame, className = '' }: TelemetryHUDProps
         distanceAU: 0,
         distanceKm: 0,
         velocityKmS: 0,
+        velocityKmH: 0,
       };
     }
 
@@ -37,14 +38,16 @@ export function TelemetryHUD({ currentFrame, className = '' }: TelemetryHUDProps
       velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z
     );
 
-    // Convert to km/s
+    // Convert to km/s (AU/day -> km/s)
     const velocityKmS = (velocityAUPerDay * AU_TO_KM) / 86400;
+    const velocityKmH = velocityKmS * 3600;
 
     return {
       date: currentFrame.date,
       distanceAU,
       distanceKm: distanceAU * AU_TO_KM,
       velocityKmS,
+      velocityKmH,
     };
   }, [currentFrame]);
 
@@ -91,7 +94,7 @@ export function TelemetryHUD({ currentFrame, className = '' }: TelemetryHUDProps
               {telemetry.velocityKmS.toFixed(2)} km/s
             </div>
             <div className="text-gray-400 text-xs">
-              {(telemetry.velocityKmS * 3600).toFixed(0)} km/h
+              {telemetry.velocityKmH.toFixed(0)} km/h
             </div>
           </div>
         </div>

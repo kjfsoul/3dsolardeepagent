@@ -75,92 +75,109 @@ interface SunProps {
   viewMode?: 'explorer' | 'true-scale' | 'ride-atlas';
 }
 
-export function Sun({ radius = 0.1, viewMode = 'explorer' }: SunProps) {
-  const brightness = viewMode === 'true-scale' ? 0.3 : viewMode === 'ride-atlas' ? 0.12 : 1.0;
-  const glow = viewMode === 'true-scale' ? 0.08 : viewMode === 'ride-atlas' ? 0.02 : 0.25;
-
-  // Optional texture; graceful fallback if not found
-  const [tex, setTex] = useState<THREE.Texture | null>(null);
-  
+export function Sun({ radius = 2.0, viewMode = "explorer" }: SunProps) {
+  // Graceful texture loading (no Suspense, no crash on 404)
+  const [sunTex, setSunTex] = useState<THREE.Texture | null>(null);
   useEffect(() => {
-    const loader = new THREE.TextureLoader();
-    loader.load(
-      '/textures/sun.jpg',
-      (texture) => {
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-        texture.anisotropy = 8;
-        setTex(texture);
+    let mounted = true;
+    new THREE.TextureLoader().load(
+      "/textures/sun_4k.jpg",
+      (tex) => {
+        if (!mounted) return;
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        tex.anisotropy = 8;
+        setSunTex(tex);
       },
       undefined,
       () => {
-        // Gracefully fail - use procedural color instead
-        console.log('Sun texture not found, using procedural material');
+        // optional: console.info("Sun texture not found; using procedural material.");
+        if (mounted) setSunTex(null);
       }
     );
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // Animated UV scroll to fake convection cells
+  // Mode-based brightness
+  const { brightness, coronaOpacity } = useMemo(() => {
+    const b = viewMode === "true-scale" ? 0.25 : viewMode === "ride-atlas" ? 0.15 : 1.0;
+    const c = viewMode === "true-scale" ? 0.08 : viewMode === "ride-atlas" ? 0.04 : 0.2;
+    return { brightness: b, coronaOpacity: c };
+  }, [viewMode]);
+
+  // Animated UV scroll to fake convection
   const surfRef = useRef<THREE.Mesh>(null!);
   useFrame((_, dt) => {
-    if (surfRef.current && tex) {
-      const mat = surfRef.current.material as THREE.MeshStandardMaterial;
-      if (mat.map) {
-        mat.map.offset.x = (mat.map.offset.x + dt * 0.01) % 1;
-        mat.map.offset.y = (mat.map.offset.y + dt * 0.006) % 1;
-      }
+    const mat = surfRef.current?.material as THREE.MeshStandardMaterial | undefined;
+    if (mat?.map) {
+      mat.map.offset.x = (mat.map.offset.x + dt * 0.01) % 1;
+      mat.map.offset.y = (mat.map.offset.y + dt * 0.006) % 1;
     }
   });
 
-  // Corona sprite
-  const corona = useMemo(() => {
-    const size = radius * 4.0;
-    const c = new THREE.SpriteMaterial({
-      color: new THREE.Color(0xffaa00),
-      blending: THREE.AdditiveBlending,
-      transparent: true,
-      opacity: glow * 0.9,
-      depthWrite: false,
-    });
-    const s = new THREE.Sprite(c);
-    s.scale.set(size, size, 1);
-    return s;
-  }, [radius, glow]);
-
   return (
     <group>
-      {/* photosphere */}
+      {/* Light source */}
+      <pointLight color="#fff5cc" intensity={25} distance={0} decay={2} />
+
+      {/* Photosphere */}
       <mesh ref={surfRef}>
-        <sphereGeometry args={[radius, 64, 64]} />
-        <meshStandardMaterial
-          map={tex ?? undefined}
-          color={tex ? undefined : '#ff7a18'}
-          emissive={'#ff6a00'}
-          emissiveIntensity={brightness * 0.75}
-          metalness={0}
-          roughness={1}
-        />
+        <sphereGeometry args={[radius * 0.95, 64, 64]} />
+        {sunTex ? (
+          <meshStandardMaterial
+            map={sunTex}
+            emissive="#ff9900"
+            emissiveIntensity={brightness * 1.2}
+            roughness={0.5}
+          />
+        ) : (
+          <meshStandardMaterial
+            color="#ff7a18"
+            emissive="#ff6a00"
+            emissiveIntensity={brightness * 0.9}
+            roughness={0.8}
+          />
+        )}
       </mesh>
 
-      {/* hot core bloom */}
+      {/* Core bloom */}
       <mesh>
         <sphereGeometry args={[radius * 0.65, 32, 32]} />
         <meshBasicMaterial color="#ffffff" opacity={brightness * 0.35} transparent />
       </mesh>
 
-      {/* corona sprite */}
-      <primitive object={corona} />
+      {/* Soft corona shells (cheap + reliable) */}
+      <mesh>
+        <sphereGeometry args={[radius * 1.25, 64, 64]} />
+        <meshBasicMaterial
+          color="#ffcc66"
+          transparent
+          opacity={coronaOpacity}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[radius * 1.6, 64, 64]} />
+        <meshBasicMaterial
+          color="#ffd27a"
+          transparent
+          opacity={coronaOpacity * 0.6}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
 
-      {/* light */}
-      <pointLight color="#fff7e6" intensity={24} distance={0} decay={2} />
-
+      {/* Label */}
       <Text
-        position={[0, radius * 2.5, 0]}
-        fontSize={0.2}
-        color="#ffaa00"
+        position={[0, radius * 2.1, 0]}
+        fontSize={radius * 0.18}
+        color="#ffcc66"
         anchorX="center"
         anchorY="middle"
         outlineWidth={0.02}
-        outlineColor="#000000"
+        outlineColor="#000"
       >
         Sun
       </Text>

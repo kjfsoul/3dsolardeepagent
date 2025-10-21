@@ -69,12 +69,12 @@ export function Atlas3DTrackerEnhanced({
   const lastTimeRef = useRef<number>(Date.now());
 
   // Helper function to get body position at index
-  const bodyPositionAt = (trajectory: any[], idx: number): THREE.Vector3 | null => {
+  function bodyPositionAt(trajectory: any[] | undefined, idx: number) {
     if (!trajectory || trajectory.length === 0) return null;
     const f = trajectory[Math.floor(idx)];
     if (!f) return null;
     return new THREE.Vector3(f.position.x, f.position.z, -f.position.y);
-  };
+  }
 
   // Scale calculation helper
   const getScaledRadius = (name: string, baseRadius: number): number => {
@@ -206,33 +206,34 @@ export function Atlas3DTrackerEnhanced({
       -currentFrame.position.y
     );
 
-    const candidates: { name: string; pos: THREE.Vector3 | null; r: number }[] = [
-      { name: 'Mars', pos: bodyPositionAt(trajectoryData.mars, currentIndex / 4), r: 0.2 },
-      { name: 'Earth', pos: bodyPositionAt(trajectoryData.earth, currentIndex / 4), r: 0.15 },
-      { name: 'Jupiter', pos: bodyPositionAt(trajectoryData.jupiter, currentIndex / 8), r: 0.4 },
+    const cands = [
+      { name: "Mars", pos: bodyPositionAt(trajectoryData.mars, currentIndex / 4), r: 0.2 },
+      { name: "Earth", pos: bodyPositionAt(trajectoryData.earth, currentIndex / 4), r: 0.15 },
+      { name: "Jupiter", pos: bodyPositionAt(trajectoryData.jupiter, currentIndex / 8), r: 0.4 },
     ];
 
-    let winner: string | null = null;
-    let minD = Infinity;
-
-    for (const c of candidates) {
+    let near: { name: string; d: number } | null = null;
+    for (const c of cands) {
       if (!c.pos) continue;
       const d = atlasPos.distanceTo(c.pos);
-      if (d < c.r && d < minD) {
-        minD = d;
-        winner = c.name;
-      }
+      if (d < c.r && (!near || d < near.d)) near = { name: c.name, d };
     }
 
     const now = performance.now();
-    if (winner && (!focusBody || (winner !== focusBody && now > focusUntil))) {
-      setFocusBody(winner);
+    if (near && (!focusBody || (near.name !== focusBody && now > focusUntil))) {
+      setFocusBody(near.name);
       setFocusUntil(now + 3500);
-      setCinematicEvent(`${winner.toLowerCase()}_flyby` as any);
-    } else if (now > focusUntil) {
+      setCinematicEvent({
+        id: `focus-${near.name}-${now}`,
+        name: `Fly-by: ${near.name}`,
+        date: currentFrame.date,
+        description: `Close approach to ${near.name}`,
+        type: "encounter",
+      } as any);
+    } else if (!near && now > focusUntil) {
       setFocusBody(null);
     }
-  }, [trajectoryData, currentIndex, currentFrame, focusBody, focusUntil]);
+  }, [trajectoryData, currentFrame, currentIndex, focusBody, focusUntil, setCinematicEvent]);
 
   // Calculate comet position and velocity for 3D scene
   const cometPosition = useMemo((): [number, number, number] => {
