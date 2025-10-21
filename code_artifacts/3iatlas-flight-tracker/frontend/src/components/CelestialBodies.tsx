@@ -156,6 +156,7 @@ export function Sun({ radius = 2.0, viewMode = "explorer" }: SunProps) {
           opacity={coronaOpacity}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
+          depthTest={false}
         />
       </mesh>
       <mesh>
@@ -166,6 +167,7 @@ export function Sun({ radius = 2.0, viewMode = "explorer" }: SunProps) {
           opacity={coronaOpacity * 0.6}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
+          depthTest={false}
         />
       </mesh>
 
