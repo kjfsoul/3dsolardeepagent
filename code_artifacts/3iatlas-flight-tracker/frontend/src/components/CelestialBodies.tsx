@@ -42,8 +42,8 @@ export function CelestialBody({
 
       {showLabel && (
         <Text
-          position={[0, radius * 2, 0]}
-          fontSize={0.2}
+          position={[0, radius * 1.5, 0]}
+          fontSize={0.15}
           color={color}
           anchorX="center"
           anchorY="middle"
@@ -116,8 +116,8 @@ export function Sun({ radius = 0.1, viewMode = 'explorer' }: SunProps) {
 
       {/* Label */}
       <Text
-        position={[0, radius * 3, 0]}
-        fontSize={0.25}
+        position={[0, radius * 2.5, 0]}
+        fontSize={0.2}
         color="#ffaa00"
         anchorX="center"
         anchorY="middle"

@@ -106,8 +106,8 @@ export function Comet3D({
 
       {/* Comet Label */}
       <Text
-        position={[0, scale * 4, 0]}
-        fontSize={scale * 2.5}
+        position={[0, scale * 2, 0]}
+        fontSize={scale * 1.5}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"

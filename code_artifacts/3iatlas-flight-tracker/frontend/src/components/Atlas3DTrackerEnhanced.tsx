@@ -22,6 +22,7 @@ import { Planet, Sun } from './CelestialBodies';
 import { Comet3D, HighlightGlow } from './Comet3D';
 import { CinematicCamera } from './FollowCamera';
 import { PlaybackControls } from './PlaybackControls';
+import { PlaybackRecorder } from './PlaybackRecorder';
 import { Starfield } from './Starfield';
 import { TelemetryHUD } from './TelemetryHUD';
 import { TimelinePanel } from './TimelinePanel';
@@ -336,7 +337,7 @@ export function Atlas3DTrackerEnhanced({
         <ambientLight intensity={0.3} />
 
         {/* Camera */}
-        <PerspectiveCamera makeDefault position={[10, 8, 10]} fov={60} />
+        <PerspectiveCamera makeDefault position={[6, 4, 6]} fov={50} />
 
         {/* Scene */}
         <Suspense fallback={null}>
@@ -564,6 +565,7 @@ export function Atlas3DTrackerEnhanced({
 
       {/* UI Overlays */}
       <TelemetryHUD currentFrame={currentFrame} />
+      <PlaybackRecorder enabled={true} duration={30} />
 
       {/* Controls Help - Always show since we only have free cam */}
       <div className="absolute top-20 right-4 bg-black/70 text-white text-xs p-3 rounded border border-cyan-500/30 backdrop-blur-sm">
