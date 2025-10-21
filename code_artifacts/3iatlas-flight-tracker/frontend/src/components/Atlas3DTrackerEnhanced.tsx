@@ -346,10 +346,10 @@ export function Atlas3DTrackerEnhanced({
         <ambientLight intensity={0.3} />
 
         {/* Camera */}
-        <PerspectiveCamera 
-          makeDefault 
-          position={viewMode === 'true-scale' ? [0, 0, 20] : [6, 4, 6]} 
-          fov={viewMode === 'true-scale' ? 30 : 50} 
+        <PerspectiveCamera
+          makeDefault
+          position={viewMode === "true-scale" ? [0, 0, 20] : [6, 4, 6]}
+          fov={viewMode === "true-scale" ? 30 : 50}
         />
 
         {/* Scene */}
@@ -379,9 +379,7 @@ export function Atlas3DTrackerEnhanced({
 
       {/* Controls Help - Always show since we have full camera controls */}
       <div className="absolute top-20 right-4 bg-black/70 text-white text-xs p-3 rounded border border-cyan-500/30 backdrop-blur-sm">
-        <div className="font-bold text-cyan-400 mb-2">
-          🎮 Camera Controls
-        </div>
+        <div className="font-bold text-cyan-400 mb-2">🎮 Camera Controls</div>
         <div className="space-y-1">
           <div>
             <span className="text-cyan-300">Left Click + Drag:</span> Rotate
@@ -392,7 +390,7 @@ export function Atlas3DTrackerEnhanced({
           <div>
             <span className="text-cyan-300">Right Click + Drag:</span> Pan
           </div>
-          {viewMode === 'ride-atlas' && (
+          {viewMode === "ride-atlas" && (
             <div className="mt-2 pt-2 border-t border-cyan-500/30">
               <div className="text-yellow-400 font-bold">
                 🚀 Ride With ATLAS Mode
@@ -402,11 +400,9 @@ export function Atlas3DTrackerEnhanced({
               </div>
             </div>
           )}
-          {viewMode === 'true-scale' && (
+          {viewMode === "true-scale" && (
             <div className="mt-2 pt-2 border-t border-cyan-500/30">
-              <div className="text-green-400 font-bold">
-                📏 True Scale Mode
-              </div>
+              <div className="text-green-400 font-bold">📏 True Scale Mode</div>
               <div className="text-green-300">
                 Realistic distances and sizes
               </div>
