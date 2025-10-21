@@ -64,8 +64,8 @@ interface SunProps {
 
 export function Sun({ radius = 0.1, viewMode = 'explorer' }: SunProps) {
   // Adjust brightness for different view modes to prevent overwhelming
-  const brightness = viewMode === 'true-scale' ? 0.3 : viewMode === 'ride-atlas' ? 0.2 : 1.0;
-  const glowOpacity = viewMode === 'true-scale' ? 0.1 : viewMode === 'ride-atlas' ? 0.05 : 0.3;
+  const brightness = viewMode === 'true-scale' ? 0.3 : viewMode === 'ride-atlas' ? 0.1 : 1.0;
+  const glowOpacity = viewMode === 'true-scale' ? 0.1 : viewMode === 'ride-atlas' ? 0.02 : 0.3;
 
   return (
     <group position={[0, 0, 0]}>

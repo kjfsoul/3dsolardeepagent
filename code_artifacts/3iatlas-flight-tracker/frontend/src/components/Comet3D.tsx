@@ -43,8 +43,8 @@ export function Comet3D({
   return (
     <group ref={groupRef} position={position}>
       {/* Primary Comet Head - Enhanced cone base */}
-      <mesh 
-        rotation={[Math.PI / 2, 0, 0]} 
+      <mesh
+        rotation={[Math.PI / 2, 0, 0]}
         position={[0, 0, 0]}
         scale={[1, 1, 1]}
       >
@@ -58,8 +58,8 @@ export function Comet3D({
       </mesh>
 
       {/* Comet Head Glow - Subtle white glow */}
-      <mesh 
-        rotation={[Math.PI / 2, 0, 0]} 
+      <mesh
+        rotation={[Math.PI / 2, 0, 0]}
         position={[0, 0, 0]}
         scale={[1.2, 1, 1]}
       >
@@ -73,8 +73,8 @@ export function Comet3D({
       </mesh>
 
       {/* Main Tail - Flows from head */}
-      <mesh 
-        rotation={[Math.PI / 2, 0, 0]} 
+      <mesh
+        rotation={[Math.PI / 2, 0, 0]}
         position={[0, -tailLength * 0.15, 0]}
         scale={[1, 1, 1]}
       >
@@ -89,8 +89,8 @@ export function Comet3D({
       </mesh>
 
       {/* Secondary Tail Layer - For depth */}
-      <mesh 
-        rotation={[Math.PI / 2, 0, 0]} 
+      <mesh
+        rotation={[Math.PI / 2, 0, 0]}
         position={[0, -tailLength * 0.1, 0]}
         scale={[1.3, 1, 1]}
       >

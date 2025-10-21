@@ -275,8 +275,8 @@ export function Atlas3DTrackerEnhanced({
       -currentFrame.position.y
     );
 
-    // Camera positioned behind and slightly above the comet
-    const cameraOffset = new THREE.Vector3(1.5, 0.8, 1.5);
+    // Camera positioned closer behind and above the comet for better focus
+    const cameraOffset = new THREE.Vector3(1.0, 0.5, 1.0);
     const cameraPosition = cometPos.clone().add(cameraOffset);
 
     return {
@@ -496,8 +496,8 @@ export function Atlas3DTrackerEnhanced({
           <Comet3D
             position={cometPosition}
             velocity={cometVelocity}
-            scale={viewMode === "ride-atlas" ? 0.3 : 0.05}
-            tailLength={viewMode === "ride-atlas" ? 2.0 : 0.8}
+            scale={viewMode === "ride-atlas" ? 0.8 : 0.05}
+            tailLength={viewMode === "ride-atlas" ? 4.0 : 0.8}
           />
 
           {/* Perihelion Glow Effect */}
@@ -533,8 +533,8 @@ export function Atlas3DTrackerEnhanced({
               dampingFactor={0.03}
               enableZoom={true}
               zoomSpeed={1.5}
-              minDistance={viewMode === 'ride-atlas' ? 0.05 : 0.5}
-              maxDistance={viewMode === 'ride-atlas' ? 5 : 150}
+              minDistance={viewMode === 'ride-atlas' ? 0.02 : 0.5}
+              maxDistance={viewMode === 'ride-atlas' ? 10 : 150}
               target={viewMode === 'ride-atlas' && rideAlongCamera ? rideAlongCamera.target : cometPositionVec}
               enablePan={true}
               panSpeed={1.0}
