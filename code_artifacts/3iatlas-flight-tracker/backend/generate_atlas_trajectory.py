@@ -338,7 +338,7 @@ class OrbitalMechanicsCalculator:
         return {
             'date': dt.strftime('%Y-%m-%d %H:%M:%S'),
             'position': {'x': x, 'y': y, 'z': z},
-            'velocity': {'vx': vx, 'vy': vy, 'vz': vz},
+            'velocity': {'x': vx, 'y': vy, 'z': vz},  # Match API format
             'calculated': True,
             'distance_au': abs(r)
         }
@@ -412,7 +412,7 @@ class OrbitalMechanicsCalculator:
             trajectory.append({
                 'date': current.strftime('%Y-%m-%d %H:%M:%S'),
                 'position': {'x': x, 'y': y, 'z': z},
-                'velocity': {'vx': vx, 'vy': vy, 'vz': vz},
+                'velocity': {'x': vx, 'y': vy, 'z': vz},  # Match API format
                 'calculated': True
             })
 
@@ -445,11 +445,11 @@ class TrajectoryDataGenerator:
             try:
                 with open(STATIC_FILE, 'r') as f:
                     cached_data = json.load(f)
-                
+
                 # Check if cache is within 7-day TTL
                 generated_time = datetime.fromisoformat(cached_data['metadata']['generated'])
                 cache_age = datetime.now() - generated_time
-                
+
                 if cache_age.days < 7:
                     cache_valid = True
                     print(f"✅ Cache valid (age: {cache_age.days} days < 7-day TTL)")
