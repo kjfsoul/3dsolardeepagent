@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3I/ATLAS Debug</title>
+    <style>
+        body { background: black; color: white; font-family: monospace; }
+        #debug { padding: 20px; }
+    </style>
+</head>
+<body>
+    <div id="debug">
+        <h1>3I/ATLAS Debug Console</h1>
+        <div id="output"></div>
+    </div>
+    
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            output.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            console.log(message);
+        }
+        
+        log('Starting debug...');
+        
+        // Test basic JavaScript
+        log('JavaScript is working');
+        
+        // Test fetch
+        fetch('/data/trajectory_static.json')
+            .then(response => {
+                log('Fetch response: ' + response.status);
+                return response.json();
+            })
+            .then(data => {
+                log('Data loaded: ' + Object.keys(data).join(', '));
+                log('Atlas points: ' + (data.atlas ? data.atlas.length : 'none'));
+            })
+            .catch(error => {
+                log('Fetch error: ' + error.message);
+            });
+        
+        // Test React import
+        import('/src/main-test.tsx')
+            .then(() => {
+                log('React module loaded successfully');
+            })
+            .catch(error => {
+                log('React module error: ' + error.message);
+            });
+    </script>
+</body>
+</html>

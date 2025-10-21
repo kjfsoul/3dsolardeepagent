@@ -99,25 +99,31 @@ export function Atlas3DTrackerEnhanced({
   useEffect(() => {
     async function loadData() {
       try {
+        console.log('🚀 Starting data load...');
         // Load trajectory data
         const trajectoryResponse = await fetch('/data/trajectory_static.json');
+        console.log('📡 Trajectory response:', trajectoryResponse.status);
         if (!trajectoryResponse.ok) {
           throw new Error('Failed to load trajectory data');
         }
         const trajectoryJson = await trajectoryResponse.json();
+        console.log('✅ Trajectory data loaded:', Object.keys(trajectoryJson));
         setTrajectoryData(trajectoryJson);
 
         // Load events
         const eventsResponse = await fetch('/data/timeline_events.json');
+        console.log('📡 Events response:', eventsResponse.status);
         if (!eventsResponse.ok) {
           throw new Error('Failed to load events data');
         }
         const eventsJson = await eventsResponse.json();
+        console.log('✅ Events data loaded:', eventsJson.events?.length || 0);
         setEvents(eventsJson.events);
 
+        console.log('🎉 All data loaded successfully!');
         setLoading(false);
       } catch (err) {
-        console.error('Error loading data:', err);
+        console.error('❌ Error loading data:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
         setLoading(false);
       }
