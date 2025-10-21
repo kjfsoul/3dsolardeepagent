@@ -30,16 +30,20 @@ import { FullTrajectoryLine, TrajectoryTrail } from './TrajectoryTrail';
 // Type imports
 import { TimelineEvent, TrajectoryData } from '@/types/trajectory';
 
+type ViewMode = 'explorer' | 'true-scale' | 'ride-atlas';
+
 interface Atlas3DTrackerEnhancedProps {
   autoPlay?: boolean;
   initialSpeed?: number;
   initialFollowMode?: boolean;
+  initialViewMode?: ViewMode;
 }
 
 export function Atlas3DTrackerEnhanced({
   autoPlay = true,
   initialSpeed = 2,
   initialFollowMode = true,
+  initialViewMode = 'explorer',
 }: Atlas3DTrackerEnhancedProps) {
   // State management
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryData | null>(null);
@@ -48,6 +52,7 @@ export function Atlas3DTrackerEnhanced({
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [speed, setSpeed] = useState(initialSpeed);
   const [followMode, setFollowMode] = useState(initialFollowMode);
+  const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,6 +63,39 @@ export function Atlas3DTrackerEnhanced({
   // Animation ref
   const animationFrameRef = useRef<number>();
   const lastTimeRef = useRef<number>(Date.now());
+
+  // Scale calculation helper
+  const getScaledRadius = (name: string, baseRadius: number): number => {
+    switch (viewMode) {
+      case 'true-scale':
+        // True scale ratios (Sun = 10x Jupiter, Jupiter = base)
+        const trueScaleRatios: Record<string, number> = {
+          'Sun': 10.0,      // ~10x Jupiter diameter
+          'Mercury': 0.03,  // ~0.38x Earth
+          'Venus': 0.09,    // ~0.95x Earth  
+          'Earth': 0.09,    // Reference
+          'Mars': 0.05,     // ~0.53x Earth
+          'Jupiter': 1.0,   // Base scale
+          'Saturn': 0.84,   // ~0.84x Jupiter
+          'Uranus': 0.36,   // ~0.36x Jupiter
+          'Neptune': 0.35,  // ~0.35x Jupiter
+          'Pluto': 0.02,    // ~0.18x Earth
+          'Ceres': 0.03,    // ~0.27x Earth
+          'Vesta': 0.015,   // ~0.15x Earth
+          'Pallas': 0.015,  // ~0.15x Earth
+        };
+        return (trueScaleRatios[name] || baseRadius) * 0.1; // Scale down for visibility
+        
+      case 'ride-atlas':
+        // Keep planets at explorer scale, but smaller overall
+        return baseRadius * 0.5;
+        
+      case 'explorer':
+      default:
+        // Current compressed scale
+        return baseRadius;
+    }
+  };
 
   // Load trajectory data
   useEffect(() => {
@@ -253,7 +291,7 @@ export function Atlas3DTrackerEnhanced({
           <Starfield count={3000} radius={80} depth={40} />
 
           {/* Sun - Compressed scale: ~5x Jupiter for visibility */}
-          <Sun radius={2.0} />
+          <Sun radius={getScaledRadius('Sun', 2.0)} viewMode={viewMode} />
 
           {/* Planets */}
           {/* Planets - Compressed scale relative to Jupiter=0.4 */}
@@ -263,7 +301,7 @@ export function Atlas3DTrackerEnhanced({
               name="Mercury"
               trajectoryData={trajectoryData.mercury}
               currentIndex={currentIndex / 4}
-              radius={0.012}
+              radius={getScaledRadius('Mercury', 0.012)}
               color="#8c7853"
               showOrbit={true}
             />
@@ -275,7 +313,7 @@ export function Atlas3DTrackerEnhanced({
               name="Venus"
               trajectoryData={trajectoryData.venus}
               currentIndex={currentIndex / 4}
-              radius={0.034}
+              radius={getScaledRadius('Venus', 0.034)}
               color="#ffc649"
               showOrbit={true}
             />
@@ -287,7 +325,7 @@ export function Atlas3DTrackerEnhanced({
               name="Earth"
               trajectoryData={trajectoryData.earth}
               currentIndex={currentIndex / 4}
-              radius={0.036}
+              radius={getScaledRadius('Earth', 0.036)}
               color="#00aaff"
               showOrbit={true}
             />
@@ -299,7 +337,7 @@ export function Atlas3DTrackerEnhanced({
               name="Ceres"
               trajectoryData={trajectoryData.ceres}
               currentIndex={currentIndex / 8}
-              radius={0.01}
+              radius={getScaledRadius('Ceres', 0.01)}
               color="#a89f91"
               showOrbit={true}
             />
@@ -311,7 +349,7 @@ export function Atlas3DTrackerEnhanced({
               name="Vesta"
               trajectoryData={trajectoryData.vesta}
               currentIndex={currentIndex / 8}
-              radius={0.006}
+              radius={getScaledRadius('Vesta', 0.006)}
               color="#b5a88f"
               showOrbit={true}
             />
@@ -323,7 +361,7 @@ export function Atlas3DTrackerEnhanced({
               name="Pallas"
               trajectoryData={trajectoryData.pallas}
               currentIndex={currentIndex / 8}
-              radius={0.006}
+              radius={getScaledRadius('Pallas', 0.006)}
               color="#9d9589"
               showOrbit={true}
             />
@@ -335,7 +373,7 @@ export function Atlas3DTrackerEnhanced({
               name="Mars"
               trajectoryData={trajectoryData.mars}
               currentIndex={currentIndex / 4}
-              radius={0.019}
+              radius={getScaledRadius('Mars', 0.019)}
               color="#ff6666"
               showOrbit={true}
             />
@@ -347,7 +385,7 @@ export function Atlas3DTrackerEnhanced({
               name="Jupiter"
               trajectoryData={trajectoryData.jupiter}
               currentIndex={currentIndex / 8}
-              radius={0.4}
+              radius={getScaledRadius('Jupiter', 0.4)}
               color="#ffbb88"
               showOrbit={true}
             />
@@ -359,7 +397,7 @@ export function Atlas3DTrackerEnhanced({
               name="Saturn"
               trajectoryData={trajectoryData.saturn}
               currentIndex={currentIndex / 8}
-              radius={0.34}
+              radius={getScaledRadius('Saturn', 0.34)}
               color="#fad5a5"
               showOrbit={true}
             />
@@ -371,7 +409,7 @@ export function Atlas3DTrackerEnhanced({
               name="Uranus"
               trajectoryData={trajectoryData.uranus}
               currentIndex={currentIndex / 16}
-              radius={0.14}
+              radius={getScaledRadius('Uranus', 0.14)}
               color="#4fd0e0"
               showOrbit={true}
             />
@@ -383,7 +421,7 @@ export function Atlas3DTrackerEnhanced({
               name="Neptune"
               trajectoryData={trajectoryData.neptune}
               currentIndex={currentIndex / 16}
-              radius={0.14}
+              radius={getScaledRadius('Neptune', 0.14)}
               color="#4166f5"
               showOrbit={true}
             />
@@ -395,7 +433,7 @@ export function Atlas3DTrackerEnhanced({
               name="Pluto"
               trajectoryData={trajectoryData.pluto}
               currentIndex={currentIndex / 16}
-              radius={0.007}
+              radius={getScaledRadius('Pluto', 0.007)}
               color="#b8a793"
               showOrbit={true}
             />
@@ -405,8 +443,8 @@ export function Atlas3DTrackerEnhanced({
           <Comet3D
             position={cometPosition}
             velocity={cometVelocity}
-            scale={0.05}
-            tailLength={0.8}
+            scale={viewMode === 'ride-atlas' ? 0.2 : 0.05}
+            tailLength={viewMode === 'ride-atlas' ? 1.5 : 0.8}
           />
 
           {/* Perihelion Glow Effect */}
@@ -454,7 +492,10 @@ export function Atlas3DTrackerEnhanced({
             <FollowCamera
               target={cometPositionVec}
               enabled={true}
-              offset={new THREE.Vector3(5, 3, 5)}
+              offset={viewMode === 'ride-atlas' 
+                ? new THREE.Vector3(8, 5, 8) 
+                : new THREE.Vector3(5, 3, 5)
+              }
               smoothness={0.05}
             />
           )}
@@ -497,11 +538,13 @@ export function Atlas3DTrackerEnhanced({
         currentIndex={currentIndex}
         maxIndex={(trajectoryData.atlas || trajectoryData['3iatlas'] || []).length - 1}
         followMode={followMode}
+        viewMode={viewMode}
         onPlayPause={() => setIsPlaying(!isPlaying)}
         onReset={() => setCurrentIndex(0)}
         onSpeedChange={setSpeed}
         onSeek={setCurrentIndex}
         onFollowModeToggle={() => setFollowMode(!followMode)}
+        onViewModeChange={setViewMode}
       />
     </div>
   );

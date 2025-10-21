@@ -59,15 +59,24 @@ export function CelestialBody({
 
 interface SunProps {
   radius?: number;
+  viewMode?: 'explorer' | 'true-scale' | 'ride-atlas';
 }
 
-export function Sun({ radius = 0.1 }: SunProps) {
+export function Sun({ radius = 0.1, viewMode = 'explorer' }: SunProps) {
+  // Adjust brightness for true-scale mode to prevent overwhelming
+  const brightness = viewMode === 'true-scale' ? 0.3 : 1.0;
+  const glowOpacity = viewMode === 'true-scale' ? 0.1 : 0.3;
+  
   return (
     <group position={[0, 0, 0]}>
       {/* Sun sphere */}
       <mesh>
         <sphereGeometry args={[radius, 32, 32]} />
-        <meshBasicMaterial color="#ffff00" />
+        <meshBasicMaterial 
+          color="#ffff00" 
+          opacity={brightness}
+          transparent={brightness < 1.0}
+        />
       </mesh>
 
       {/* Sun glow */}
@@ -76,7 +85,7 @@ export function Sun({ radius = 0.1 }: SunProps) {
         <meshBasicMaterial
           color="#ffff00"
           transparent
-          opacity={0.3}
+          opacity={glowOpacity}
           blending={THREE.AdditiveBlending}
         />
       </mesh>

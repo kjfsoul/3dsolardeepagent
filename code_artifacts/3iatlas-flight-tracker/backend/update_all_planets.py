@@ -39,7 +39,7 @@ CONFIG = {
     "objects": {
         # === Interstellar Visitor ===
         "1004083": {"name": "3I/ATLAS", "step": "6h", "color": "#00ffff"},
-        
+
         # === Planets ===
         "199": {"name": "Mercury", "step": "1d", "color": "#8c7853"},
         "299": {"name": "Venus", "step": "1d", "color": "#ffc649"},
@@ -50,12 +50,12 @@ CONFIG = {
         "799": {"name": "Uranus", "step": "4d", "color": "#4fd0e0"},
         "899": {"name": "Neptune", "step": "4d", "color": "#4166f5"},
         "999": {"name": "Pluto", "step": "4d", "color": "#b8a793"},
-        
+
         # === Major Asteroids (dwarf planets & largest asteroids) ===
         "Ceres": {"name": "Ceres", "step": "2d", "color": "#a89f91"},
         "20000004": {"name": "Vesta", "step": "2d", "color": "#b5a88f"},
         "20000002": {"name": "Pallas", "step": "2d", "color": "#9d9589"},
-        
+
         # === Famous Comets ===
         # Uncomment these to add (may be far from Sun during this period):
         # "20002688": {"name": "Halley", "step": "4d", "color": "#88ccff"},

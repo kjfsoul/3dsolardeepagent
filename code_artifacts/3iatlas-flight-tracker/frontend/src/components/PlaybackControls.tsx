@@ -13,11 +13,13 @@ interface PlaybackControlsProps {
   currentIndex: number;
   maxIndex: number;
   followMode: boolean;
+  viewMode: 'explorer' | 'true-scale' | 'ride-atlas';
   onPlayPause: () => void;
   onReset: () => void;
   onSpeedChange: (speed: number) => void;
   onSeek: (index: number) => void;
   onFollowModeToggle: () => void;
+  onViewModeChange: (mode: 'explorer' | 'true-scale' | 'ride-atlas') => void;
 }
 
 export function PlaybackControls({
@@ -26,15 +28,23 @@ export function PlaybackControls({
   currentIndex,
   maxIndex,
   followMode,
+  viewMode,
   onPlayPause,
   onReset,
   onSpeedChange,
   onSeek,
   onFollowModeToggle,
+  onViewModeChange,
 }: PlaybackControlsProps) {
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [showViewMenu, setShowViewMenu] = useState(false);
 
   const speedOptions = [0.5, 1, 2, 5, 10, 25];
+  const viewModeLabels = {
+    'explorer': 'Explorer',
+    'true-scale': 'True Scale', 
+    'ride-atlas': 'Ride With ATLAS'
+  };
 
   return (
     <div
@@ -108,6 +118,36 @@ export function PlaybackControls({
                   }`}
                 >
                   {s}x
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* View Mode Toggle */}
+        <div className="relative">
+          <button
+            onClick={() => setShowViewMenu(!showViewMenu)}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+            title="Change view scale"
+          >
+            View: {viewModeLabels[viewMode]}
+          </button>
+
+          {showViewMenu && (
+            <div className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+              {Object.entries(viewModeLabels).map(([mode, label]) => (
+                <button
+                  key={mode}
+                  onClick={() => {
+                    onViewModeChange(mode as 'explorer' | 'true-scale' | 'ride-atlas');
+                    setShowViewMenu(false);
+                  }}
+                  className={`block w-full px-4 py-2 text-left hover:bg-gray-700 transition-colors ${
+                    viewMode === mode ? 'bg-green-600' : ''
+                  }`}
+                >
+                  {label}
                 </button>
               ))}
             </div>
