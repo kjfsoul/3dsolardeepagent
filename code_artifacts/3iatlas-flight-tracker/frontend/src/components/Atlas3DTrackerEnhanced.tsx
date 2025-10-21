@@ -256,11 +256,35 @@ export function Atlas3DTrackerEnhanced({
           const cameraPosition = cometPos.clone().add(cameraOffset);
           
           // This will be handled by OrbitControls target
-          console.log('🎯 Ride With ATLAS: Camera targeting comet at', cometPos);
+          console.log(
+            "🎯 Ride With ATLAS: Camera targeting comet at",
+            cometPos
+          );
         }
       }
     }
   }, [viewMode, currentIndex, trajectoryData]);
+
+  // True ride-along camera for Ride With ATLAS mode
+  const rideAlongCamera = useMemo(() => {
+    if (viewMode !== 'ride-atlas' || !currentFrame) return null;
+    
+    const cometPos = new THREE.Vector3(
+      currentFrame.position.x,
+      currentFrame.position.z,
+      -currentFrame.position.y
+    );
+    
+    // Camera positioned behind and slightly above the comet
+    const cameraOffset = new THREE.Vector3(1.5, 0.8, 1.5);
+    const cameraPosition = cometPos.clone().add(cameraOffset);
+    
+    return {
+      position: cameraPosition,
+      target: cometPos,
+      distance: cameraOffset.length()
+    };
+  }, [viewMode, currentFrame]);
 
   // Check if we're near perihelion for glow effect
   const isPerihelion = useMemo(() => {
@@ -502,7 +526,7 @@ export function Atlas3DTrackerEnhanced({
             opacity={0.15}
           />
 
-          {/* Camera Controls - Always Free Cam with Ride Mode */}
+          {/* Camera Controls - Dynamic based on view mode */}
           {!cinematicActive && (
             <OrbitControls
               enableDamping
@@ -510,8 +534,8 @@ export function Atlas3DTrackerEnhanced({
               enableZoom={true}
               zoomSpeed={1.2}
               minDistance={viewMode === 'ride-atlas' ? 0.1 : 0.5}
-              maxDistance={viewMode === 'ride-atlas' ? 5 : 150}
-              target={viewMode === 'ride-atlas' ? cometPositionVec : cometPositionVec}
+              maxDistance={viewMode === 'ride-atlas' ? 3 : 150}
+              target={viewMode === 'ride-atlas' && rideAlongCamera ? rideAlongCamera.target : cometPositionVec}
               mouseButtons={{
                 LEFT: THREE.MOUSE.ROTATE,
                 MIDDLE: THREE.MOUSE.DOLLY,

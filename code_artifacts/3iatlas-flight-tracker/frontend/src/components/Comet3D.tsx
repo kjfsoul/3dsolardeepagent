@@ -7,6 +7,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
+import { Text } from "@react-three/drei";
 import * as THREE from "three";
 
 interface Comet3DProps {
@@ -28,10 +29,10 @@ export function Comet3D({
   useFrame(() => {
     if (groupRef.current) {
       const velocityVec = new THREE.Vector3(...velocity).normalize();
-      
+
       // Tail points opposite to velocity
       const tailDirection = velocityVec.clone().negate();
-      
+
       // Orient the group
       groupRef.current.lookAt(
         groupRef.current.position.clone().add(tailDirection)
@@ -64,10 +65,7 @@ export function Comet3D({
       </mesh>
 
       {/* Single Integrated Tail - Flows seamlessly from body */}
-      <mesh 
-        rotation={[Math.PI / 2, 0, 0]} 
-        position={[0, -tailLength * 0.4, 0]}
-      >
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -tailLength * 0.4, 0]}>
         <coneGeometry args={[scale * 0.4, tailLength, 16, 1, true]} />
         <meshBasicMaterial
           color="#00ff66"
@@ -77,6 +75,19 @@ export function Comet3D({
           blending={THREE.AdditiveBlending}
         />
       </mesh>
+
+      {/* Comet Label */}
+      <Text
+        position={[0, scale * 3, 0]}
+        fontSize={scale * 2}
+        color="#00ff88"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.02}
+        outlineColor="#000000"
+      >
+        3I/ATLAS
+      </Text>
     </group>
   );
 }
