@@ -430,7 +430,7 @@ class TrajectoryDataGenerator:
         self.fallback = OrbitalMechanicsCalculator()
 
     def generate_static_data(self, force_api: bool = False) -> Dict:
-        """Generate pre-computed static trajectory data"""
+        """Generate pre-computed static trajectory data with proper caching"""
 
         print("\n" + "="*70)
         print("3I/ATLAS TRAJECTORY DATA GENERATION")
@@ -439,11 +439,28 @@ class TrajectoryDataGenerator:
         print(f"Current Date: {CURRENT_DATE}")
         print("="*70 + "\n")
 
-        # Check if we should use cached data
+        # Check cache validity per horizons.mdc rules (7-day TTL)
+        cache_valid = False
         if not force_api and os.path.exists(STATIC_FILE):
-            print("ℹ Static data file exists. Use --force to regenerate.\n")
-            with open(STATIC_FILE, 'r') as f:
-                return json.load(f)
+            try:
+                with open(STATIC_FILE, 'r') as f:
+                    cached_data = json.load(f)
+                
+                # Check if cache is within 7-day TTL
+                generated_time = datetime.fromisoformat(cached_data['metadata']['generated'])
+                cache_age = datetime.now() - generated_time
+                
+                if cache_age.days < 7:
+                    cache_valid = True
+                    print(f"✅ Cache valid (age: {cache_age.days} days < 7-day TTL)")
+                    print("ℹ Using cached data. Use --force to regenerate.\n")
+                    return cached_data
+                else:
+                    print(f"⚠️ Cache expired (age: {cache_age.days} days >= 7-day TTL)")
+                    print("🔄 Regenerating data...\n")
+            except Exception as e:
+                print(f"⚠️ Cache validation failed: {e}")
+                print("🔄 Regenerating data...\n")
 
         # Fetch data for all objects
         data = {

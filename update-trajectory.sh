@@ -23,8 +23,8 @@ echo "   Objects: 3I/ATLAS, Earth, Mars, Jupiter, Mercury, Venus, Saturn, Uranus
 echo "   Date range: July 1, 2025 → March 31, 2026"
 echo ""
 
-# Run the trajectory update
-python3 generate_atlas_trajectory.py --force
+# Run the trajectory update (respects 7-day cache TTL)
+python3 generate_atlas_trajectory.py
 
 echo ""
 echo "✅ Trajectory data updated successfully!"
@@ -37,21 +37,21 @@ else
     echo "📊 New trajectory data detected"
     echo ""
     echo "🔄 Committing changes..."
-    
+
     # Add the updated data files
     git add ../frontend/public/data/
-    
+
     # Commit with timestamp
     git commit -m "🤖 Auto-update trajectory data from NASA Horizons
 
 - Updated 3I/ATLAS ephemeris data
-- Refreshed planetary positions  
+- Refreshed planetary positions
 - Generated on: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
 - Source: NASA JPL Horizons System"
-    
+
     echo "🚀 Pushing to repository..."
     git push
-    
+
     echo ""
     echo "✅ Changes committed and pushed successfully!"
 fi

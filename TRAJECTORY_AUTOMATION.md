@@ -10,7 +10,7 @@ This repository includes automated workflows to keep 3I/ATLAS trajectory data cu
 - **Action:** Updates trajectory data and commits changes
 - **Manual trigger:** Available in GitHub Actions tab
 
-### 2. Daily Scheduled Update  
+### 2. Daily Scheduled Update
 **File:** `.github/workflows/daily-trajectory-update.yml`
 - **Triggers:** Daily at 6:00 AM UTC
 - **Action:** Fetches latest NASA data and commits if changes exist
