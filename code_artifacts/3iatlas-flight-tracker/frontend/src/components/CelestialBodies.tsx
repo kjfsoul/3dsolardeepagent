@@ -66,14 +66,14 @@ export function Sun({ radius = 0.1, viewMode = 'explorer' }: SunProps) {
   // Adjust brightness for true-scale mode to prevent overwhelming
   const brightness = viewMode === 'true-scale' ? 0.3 : 1.0;
   const glowOpacity = viewMode === 'true-scale' ? 0.1 : 0.3;
-  
+
   return (
     <group position={[0, 0, 0]}>
       {/* Sun sphere */}
       <mesh>
         <sphereGeometry args={[radius, 32, 32]} />
-        <meshBasicMaterial 
-          color="#ffff00" 
+        <meshBasicMaterial
+          color="#ffff00"
           opacity={brightness}
           transparent={brightness < 1.0}
         />

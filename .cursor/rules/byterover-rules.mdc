@@ -1,8 +1,7 @@
 ---
 description: ByteRover MCP Custom Instructions
-alwaysApply: true
+alwaysApply: false
 ---
-
 [byterover-mcp]
 
 You are given two tools from Byterover MCP server, including

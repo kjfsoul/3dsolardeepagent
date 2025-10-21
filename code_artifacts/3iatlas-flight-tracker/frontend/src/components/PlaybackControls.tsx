@@ -12,13 +12,11 @@ interface PlaybackControlsProps {
   speed: number;
   currentIndex: number;
   maxIndex: number;
-  followMode: boolean;
   viewMode: 'explorer' | 'true-scale' | 'ride-atlas';
   onPlayPause: () => void;
   onReset: () => void;
   onSpeedChange: (speed: number) => void;
   onSeek: (index: number) => void;
-  onFollowModeToggle: () => void;
   onViewModeChange: (mode: 'explorer' | 'true-scale' | 'ride-atlas') => void;
 }
 
@@ -27,13 +25,11 @@ export function PlaybackControls({
   speed,
   currentIndex,
   maxIndex,
-  followMode,
   viewMode,
   onPlayPause,
   onReset,
   onSpeedChange,
   onSeek,
-  onFollowModeToggle,
   onViewModeChange,
 }: PlaybackControlsProps) {
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
@@ -41,9 +37,9 @@ export function PlaybackControls({
 
   const speedOptions = [0.5, 1, 2, 5, 10, 25];
   const viewModeLabels = {
-    'explorer': 'Explorer',
-    'true-scale': 'True Scale', 
-    'ride-atlas': 'Ride With ATLAS'
+    explorer: "Explorer",
+    "true-scale": "True Scale",
+    "ride-atlas": "Ride With ATLAS",
   };
 
   return (
@@ -153,19 +149,6 @@ export function PlaybackControls({
             </div>
           )}
         </div>
-
-        {/* Follow Mode Toggle */}
-        <button
-          onClick={onFollowModeToggle}
-          className={`px-4 py-2 rounded-lg transition-colors ${
-            followMode
-              ? 'bg-green-600 hover:bg-green-500'
-              : 'bg-gray-700 hover:bg-gray-600'
-          }`}
-          title="Toggle 'Riding with ATLAS' camera"
-        >
-          {followMode ? '🎥 Following' : '🎥 Free Cam'}
-        </button>
       </div>
     </div>
   );
