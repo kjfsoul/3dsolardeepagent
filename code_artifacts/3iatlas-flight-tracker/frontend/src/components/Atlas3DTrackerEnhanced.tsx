@@ -239,9 +239,9 @@ export function Atlas3DTrackerEnhanced({
 
   // Camera preset for Ride With ATLAS mode
   useEffect(() => {
-    if (viewMode === 'ride-atlas' && trajectoryData) {
+    if (viewMode === "ride-atlas" && trajectoryData) {
       // Set camera to follow comet closely
-      const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'];
+      const atlasData = trajectoryData.atlas || trajectoryData["3iatlas"];
       if (atlasData && atlasData.length > 0) {
         const currentFrame = atlasData[Math.floor(currentIndex)];
         if (currentFrame) {
@@ -250,11 +250,11 @@ export function Atlas3DTrackerEnhanced({
             currentFrame.position.z,
             -currentFrame.position.y
           );
-          
+
           // Position camera slightly behind and above the comet
           const cameraOffset = new THREE.Vector3(2, 1, 2);
           const cameraPosition = cometPos.clone().add(cameraOffset);
-          
+
           // This will be handled by OrbitControls target
           console.log(
             "🎯 Ride With ATLAS: Camera targeting comet at",
@@ -267,22 +267,22 @@ export function Atlas3DTrackerEnhanced({
 
   // True ride-along camera for Ride With ATLAS mode
   const rideAlongCamera = useMemo(() => {
-    if (viewMode !== 'ride-atlas' || !currentFrame) return null;
-    
+    if (viewMode !== "ride-atlas" || !currentFrame) return null;
+
     const cometPos = new THREE.Vector3(
       currentFrame.position.x,
       currentFrame.position.z,
       -currentFrame.position.y
     );
-    
+
     // Camera positioned behind and slightly above the comet
     const cameraOffset = new THREE.Vector3(1.5, 0.8, 1.5);
     const cameraPosition = cometPos.clone().add(cameraOffset);
-    
+
     return {
       position: cameraPosition,
       target: cometPos,
-      distance: cameraOffset.length()
+      distance: cameraOffset.length(),
     };
   }, [viewMode, currentFrame]);
 
@@ -526,16 +526,19 @@ export function Atlas3DTrackerEnhanced({
             opacity={0.15}
           />
 
-          {/* Camera Controls - Dynamic based on view mode */}
+          {/* Camera Controls - Enhanced for better exploration */}
           {!cinematicActive && (
             <OrbitControls
               enableDamping
-              dampingFactor={0.05}
+              dampingFactor={0.03}
               enableZoom={true}
-              zoomSpeed={1.2}
-              minDistance={viewMode === 'ride-atlas' ? 0.1 : 0.5}
-              maxDistance={viewMode === 'ride-atlas' ? 3 : 150}
+              zoomSpeed={1.5}
+              minDistance={viewMode === 'ride-atlas' ? 0.05 : 0.5}
+              maxDistance={viewMode === 'ride-atlas' ? 5 : 150}
               target={viewMode === 'ride-atlas' && rideAlongCamera ? rideAlongCamera.target : cometPositionVec}
+              enablePan={true}
+              panSpeed={1.0}
+              rotateSpeed={1.0}
               mouseButtons={{
                 LEFT: THREE.MOUSE.ROTATE,
                 MIDDLE: THREE.MOUSE.DOLLY,

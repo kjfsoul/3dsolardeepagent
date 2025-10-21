@@ -69,23 +69,44 @@ export function Sun({ radius = 0.1, viewMode = 'explorer' }: SunProps) {
 
   return (
     <group position={[0, 0, 0]}>
-      {/* Sun sphere */}
+      {/* Sun core - Hot white center */}
+      <mesh>
+        <sphereGeometry args={[radius * 0.7, 32, 32]} />
+        <meshBasicMaterial
+          color="#ffffff"
+          opacity={brightness * 0.8}
+          transparent={brightness < 1.0}
+        />
+      </mesh>
+
+      {/* Sun surface - Orange-yellow with texture */}
       <mesh>
         <sphereGeometry args={[radius, 32, 32]} />
         <meshBasicMaterial
-          color="#ffff00"
+          color="#ff6600"
           opacity={brightness}
           transparent={brightness < 1.0}
         />
       </mesh>
 
-      {/* Sun glow */}
+      {/* Solar corona - Outer atmosphere */}
+      <mesh>
+        <sphereGeometry args={[radius * 1.3, 32, 32]} />
+        <meshBasicMaterial
+          color="#ffaa00"
+          transparent
+          opacity={glowOpacity * 0.5}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+
+      {/* Solar flares - Dynamic outer glow */}
       <mesh>
         <sphereGeometry args={[radius * 2, 32, 32]} />
         <meshBasicMaterial
-          color="#ffff00"
+          color="#ffdd00"
           transparent
-          opacity={glowOpacity}
+          opacity={glowOpacity * 0.3}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
@@ -97,7 +118,7 @@ export function Sun({ radius = 0.1, viewMode = 'explorer' }: SunProps) {
       <Text
         position={[0, radius * 3, 0]}
         fontSize={0.25}
-        color="#ffff00"
+        color="#ffaa00"
         anchorX="center"
         anchorY="middle"
         outlineWidth={0.02}
