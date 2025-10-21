@@ -44,10 +44,11 @@ export function PlaybackControls({
 
   return (
     <div
-      className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-md text-white p-4 rounded-lg z-10 shadow-2xl"
+      className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-md text-white p-4 rounded-lg shadow-2xl"
       style={{
         minWidth: '600px',
         border: '1px solid rgba(0, 255, 136, 0.3)',
+        zIndex: 1000, // High z-index to ensure controls are above Canvas
       }}
     >
       {/* Timeline Slider */}
@@ -101,7 +102,10 @@ export function PlaybackControls({
           </button>
 
           {showSpeedMenu && (
-            <div className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div 
+              className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+              style={{ zIndex: 1001, pointerEvents: 'auto' }}
+            >
               {speedOptions.map((s) => (
                 <button
                   key={s}
@@ -131,7 +135,10 @@ export function PlaybackControls({
           </button>
 
           {showViewMenu && (
-            <div className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div 
+              className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+              style={{ zIndex: 1001, pointerEvents: 'auto' }}
+            >
               {Object.entries(viewModeLabels).map(([mode, label]) => (
                 <button
                   key={mode}
