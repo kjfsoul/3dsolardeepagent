@@ -46,17 +46,17 @@ export function PlaybackRecorder({
       const stream = canvas.captureStream(10); // 10 FPS for smooth video
 
       // Determine supported codec
-      let mimeType = '';
-      if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
-        mimeType = 'video/webm;codecs=vp9';
-      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
-        mimeType = 'video/webm;codecs=vp8';
-      } else if (MediaRecorder.isTypeSupported('video/webm')) {
-        mimeType = 'video/webm';
-      } else if (MediaRecorder.isTypeSupported('video/mp4')) {
-        mimeType = 'video/mp4';
+      let mimeType = "";
+      if (MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) {
+        mimeType = "video/webm;codecs=vp9";
+      } else if (MediaRecorder.isTypeSupported("video/webm;codecs=vp8")) {
+        mimeType = "video/webm;codecs=vp8";
+      } else if (MediaRecorder.isTypeSupported("video/webm")) {
+        mimeType = "video/webm";
+      } else if (MediaRecorder.isTypeSupported("video/mp4")) {
+        mimeType = "video/mp4";
       } else {
-        throw new Error('No supported video codec found');
+        throw new Error("No supported video codec found");
       }
 
       console.log(`Using codec: ${mimeType}`);
@@ -88,11 +88,10 @@ export function PlaybackRecorder({
         const frameData = canvas.toDataURL("image/png");
         setFrames((prev) => [...prev, frameData]);
       }, 100);
-
     } catch (error) {
       console.error("Error starting video recording:", error);
       setIsRecording(false);
-      
+
       // Fallback to frame-only recording
       console.log("Falling back to frame-only recording...");
       intervalRef.current = setInterval(() => {
@@ -137,15 +136,15 @@ export function PlaybackRecorder({
     const url = URL.createObjectURL(videoBlob);
     const link = document.createElement("a");
     link.href = url;
-    
+
     // Determine file extension based on blob type
-    let extension = 'webm';
-    if (videoBlob.type.includes('mp4')) {
-      extension = 'mp4';
-    } else if (videoBlob.type.includes('webm')) {
-      extension = 'webm';
+    let extension = "webm";
+    if (videoBlob.type.includes("mp4")) {
+      extension = "mp4";
+    } else if (videoBlob.type.includes("webm")) {
+      extension = "webm";
     }
-    
+
     link.download = `atlas-recording-${new Date()
       .toISOString()
       .slice(0, 19)}.${extension}`;
