@@ -3,80 +3,103 @@
  * Comet3D Component
  * =============================
  * 3D model of 3I/ATLAS with nucleus and tail
+ * Tail points away from the Sun (solar wind), not opposite velocity
  */
 
 import { Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { mergeBufferGeometries } from "three-stdlib";
 
 interface Comet3DProps {
   position: [number, number, number];
-  velocity: [number, number, number];
+  velocity: [number, number, number]; // kept for telemetry (not used for tail)
   scale?: number;
   tailLength?: number;
+  sunPosition?: [number, number, number]; // NEW: world pos of Sun (0,0,0 in your scene)
 }
 
 export function Comet3D({
   position,
-  velocity,
-  scale = 0.05,
-  tailLength = 0.5,
+  velocity: _velocity, // kept for telemetry (not used for tail)
+  scale = 0.3,
+  tailLength = 2.0,
+  sunPosition = [0, 0, 0],
 }: Comet3DProps) {
-  const groupRef = useRef<THREE.Group>(null);
+  const groupRef = useRef<THREE.Group>(null!);
 
-  // Orient comet tail opposite to velocity direction
-  useFrame(() => {
-    if (groupRef.current) {
-      const velocityVec = new THREE.Vector3(...velocity).normalize();
+  // Build a single geometry: elongated ellipsoid + open cone
+  const mergedGeo = useMemo(() => {
+    const head = new THREE.SphereGeometry(scale * 0.8, 24, 24);
+    // make it slightly ellipsoidal
+    head.scale(1.0, 1.2, 1.0);
 
-      // Tail points opposite to velocity
-      const tailDirection = velocityVec.clone().negate();
+    const tail = new THREE.ConeGeometry(scale * 0.42, tailLength * 0.9, 24, 1, true);
+    // shift tail so it attaches behind the head
+    tail.translate(0, -tailLength * 0.45, 0);
+    // rotate to align with +Y forward (we'll orient group later)
+    tail.rotateX(Math.PI / 2);
 
-      // Orient the group
-      groupRef.current.lookAt(
-        groupRef.current.position.clone().add(tailDirection)
-      );
+    const g = mergeBufferGeometries([head, tail], true)!;
+    return g;
+  }, [scale, tailLength]);
+
+  const mat = useMemo(() => {
+    const m = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#e6f1ff'),
+      emissive: new THREE.Color('#bcdcff'),
+      emissiveIntensity: 0.35,
+      roughness: 0.4,
+      transmission: 0.0,
+      transparent: true,
+      opacity: 0.95,
+    });
+    return m;
+  }, []);
+
+  // tiny particle glow for tail (cheap)
+  const tailGlow = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    const N = 180;
+    const positions = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      const t = Math.random();
+      const r = (1 - t) * scale * 0.6;
+      const ang = Math.random() * Math.PI * 2;
+      positions[i * 3 + 0] = r * Math.cos(ang);
+      positions[i * 3 + 1] = -t * tailLength; // stretch back
+      positions[i * 3 + 2] = r * Math.sin(ang);
     }
+    g.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const m = new THREE.PointsMaterial({
+      size: scale * 0.1,
+      color: '#d6ecff',
+      transparent: true,
+      opacity: 0.65,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    return new THREE.Points(g, m);
+  }, [scale, tailLength]);
+
+  // orient by vector from Sun → comet (tail points away from Sun)
+  useFrame(() => {
+    if (!groupRef.current) return;
+    const comet = new THREE.Vector3(...position);
+    const sun = new THREE.Vector3(...sunPosition);
+    const awayFromSun = comet.clone().sub(sun).normalize();
+    // lookAt along the tail direction (back of the comet)
+    groupRef.current.lookAt(comet.clone().add(awayFromSun));
   });
 
   return (
     <group ref={groupRef} position={position}>
-      {/* Unified Comet Head - Single ellipsoid shape */}
-      <mesh
-        rotation={[Math.PI / 2, 0, 0]}
-        position={[0, 0, 0]}
-        scale={[1, 1, 1]}
-      >
-        <sphereGeometry args={[scale * 0.8, 16, 16]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          emissive="#e0f0ff"
-          emissiveIntensity={0.4}
-          roughness={0.3}
-        />
-      </mesh>
-
-      {/* Comet Tail - Single elongated cone */}
-      <mesh
-        rotation={[Math.PI / 2, 0, 0]}
-        position={[0, -tailLength * 0.3, 0]}
-        scale={[1, 1, 1]}
-      >
-        <coneGeometry args={[scale * 0.4, tailLength * 0.8, 16, 1, true]} />
-        <meshBasicMaterial
-          color="#c0e0ff"
-          transparent
-          opacity={0.8}
-          side={THREE.DoubleSide}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-
-      {/* Comet Label */}
+      <mesh geometry={mergedGeo} material={mat} />
+      <primitive object={tailGlow} />
       <Text
-        position={[0, scale * 2, 0]}
-        fontSize={scale * 1.5}
+        position={[0, scale * 1.8, 0]}
+        fontSize={Math.max(0.12, scale * 0.5)}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"

@@ -44,7 +44,7 @@ export function PlaybackControls({
 
   return (
     <div
-      className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-md text-white p-4 rounded-lg z-10"
+      className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-md text-white p-4 rounded-lg z-10 shadow-2xl"
       style={{
         minWidth: '600px',
         border: '1px solid rgba(0, 255, 136, 0.3)',

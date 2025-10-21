@@ -18,6 +18,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 // Component imports
+import { AsteroidBelt } from './AsteroidBelt';
 import { Planet, Sun } from './CelestialBodies';
 import { Comet3D, HighlightGlow } from './Comet3D';
 import { CinematicCamera } from './FollowCamera';
@@ -59,9 +60,21 @@ export function Atlas3DTrackerEnhanced({
   const [cinematicActive, setCinematicActive] = useState(false);
   const [cinematicEvent, setCinematicEvent] = useState<'mars_flyby' | 'perihelion' | 'jupiter_approach' | null>(null);
 
+  // Auto fly-by zoom states
+  const [focusBody, setFocusBody] = useState<string | null>(null);
+  const [focusUntil, setFocusUntil] = useState<number>(0);
+
   // Animation ref
   const animationFrameRef = useRef<number>();
   const lastTimeRef = useRef<number>(Date.now());
+
+  // Helper function to get body position at index
+  const bodyPositionAt = (trajectory: any[], idx: number): THREE.Vector3 | null => {
+    if (!trajectory || trajectory.length === 0) return null;
+    const f = trajectory[Math.floor(idx)];
+    if (!f) return null;
+    return new THREE.Vector3(f.position.x, f.position.z, -f.position.y);
+  };
 
   // Scale calculation helper
   const getScaledRadius = (name: string, baseRadius: number): number => {
@@ -183,6 +196,44 @@ export function Atlas3DTrackerEnhanced({
     return atlasData[index] || null;
   }, [trajectoryData, currentIndex]);
 
+  // Auto fly-by zoom: proximity detection
+  useEffect(() => {
+    if (!trajectoryData || !currentFrame) return;
+
+    const atlasPos = new THREE.Vector3(
+      currentFrame.position.x,
+      currentFrame.position.z,
+      -currentFrame.position.y
+    );
+
+    const candidates: { name: string; pos: THREE.Vector3 | null; r: number }[] = [
+      { name: 'Mars', pos: bodyPositionAt(trajectoryData.mars, currentIndex / 4), r: 0.2 },
+      { name: 'Earth', pos: bodyPositionAt(trajectoryData.earth, currentIndex / 4), r: 0.15 },
+      { name: 'Jupiter', pos: bodyPositionAt(trajectoryData.jupiter, currentIndex / 8), r: 0.4 },
+    ];
+
+    let winner: string | null = null;
+    let minD = Infinity;
+
+    for (const c of candidates) {
+      if (!c.pos) continue;
+      const d = atlasPos.distanceTo(c.pos);
+      if (d < c.r && d < minD) {
+        minD = d;
+        winner = c.name;
+      }
+    }
+
+    const now = performance.now();
+    if (winner && (!focusBody || (winner !== focusBody && now > focusUntil))) {
+      setFocusBody(winner);
+      setFocusUntil(now + 3500);
+      setCinematicEvent(`${winner.toLowerCase()}_flyby` as any);
+    } else if (now > focusUntil) {
+      setFocusBody(null);
+    }
+  }, [trajectoryData, currentIndex, currentFrame, focusBody, focusUntil]);
+
   // Calculate comet position and velocity for 3D scene
   const cometPosition = useMemo((): [number, number, number] => {
     if (!currentFrame) return [0, 0, 0];
@@ -251,10 +302,6 @@ export function Atlas3DTrackerEnhanced({
             currentFrame.position.z,
             -currentFrame.position.y
           );
-
-          // Position camera slightly behind and above the comet
-          const cameraOffset = new THREE.Vector3(2, 1, 2);
-          const cameraPosition = cometPos.clone().add(cameraOffset);
 
           // This will be handled by OrbitControls target
           console.log(
@@ -346,6 +393,9 @@ export function Atlas3DTrackerEnhanced({
 
           {/* Sun - Compressed scale: ~5x Jupiter for visibility */}
           <Sun radius={getScaledRadius("Sun", 2.0)} viewMode={viewMode} />
+
+          {/* Asteroid Belt */}
+          <AsteroidBelt count={1600} innerRadius={2.2} outerRadius={3.2} thickness={0.3} scale={0.015} />
 
           {/* Planets */}
           {/* Planets - Compressed scale relative to Jupiter=0.4 */}
@@ -497,8 +547,9 @@ export function Atlas3DTrackerEnhanced({
           <Comet3D
             position={cometPosition}
             velocity={cometVelocity}
-            scale={viewMode === "ride-atlas" ? 0.8 : 0.05}
-            tailLength={viewMode === "ride-atlas" ? 4.0 : 0.8}
+            scale={viewMode === "ride-atlas" ? 0.8 : 0.3}
+            tailLength={viewMode === "ride-atlas" ? 4.0 : 2.0}
+            sunPosition={[0, 0, 0]}
           />
 
           {/* Perihelion Glow Effect */}
@@ -535,7 +586,7 @@ export function Atlas3DTrackerEnhanced({
               enableZoom={true}
               zoomSpeed={1.5}
               minDistance={viewMode === 'ride-atlas' ? 0.02 : 0.5}
-              maxDistance={viewMode === 'ride-atlas' ? 10 : 150}
+              maxDistance={focusBody ? 12 : (viewMode === 'ride-atlas' ? 10 : 150)}
               target={viewMode === 'ride-atlas' && rideAlongCamera ? rideAlongCamera.target : cometPositionVec}
               enablePan={true}
               panSpeed={1.0}

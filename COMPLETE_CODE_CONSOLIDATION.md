@@ -1,9 +1,11 @@
 # 3I/ATLAS Flight Tracker - Complete Code Consolidation
 
 ## Overview
+
 This document contains the complete source code for the 3I/ATLAS Flight Tracker, a real-time 3D visualization system for tracking the interstellar comet 3I/ATLAS (C/2025 N1) as it passes through our solar system.
 
 **Technology Stack:**
+
 - **Frontend**: React 18 + TypeScript + Three.js (@react-three/fiber, @react-three/drei)
 - **Backend**: Python 3 + requests library for NASA JPL Horizons API
 - **Build Tool**: Vite
@@ -16,6 +18,7 @@ This document contains the complete source code for the 3I/ATLAS Flight Tracker,
 ## 1. Main Application Entry Point
 
 ### `src/App.tsx`
+
 ```typescript
 import { Atlas3DTrackerEnhanced } from './components/Atlas3DTrackerEnhanced';
 
@@ -35,6 +38,7 @@ export default App;
 ## 2. TypeScript Type Definitions
 
 ### `src/types/trajectory.ts`
+
 ```typescript
 export interface Vector3D {
   x: number;
@@ -101,6 +105,7 @@ export interface TimelineEvent {
 ## 3. Core Three.js/R3F Components
 
 ### `src/components/Atlas3DTrackerEnhanced.tsx` - Main Scene Orchestrator
+
 ```typescript
 /**
  * Atlas3DTrackerEnhanced Component
@@ -546,6 +551,7 @@ export function Atlas3DTrackerEnhanced({
 ## 4. Celestial Body Components
 
 ### `src/components/CelestialBodies.tsx` - Sun and Planet Components
+
 ```typescript
 /**
  * CelestialBodies Component
@@ -694,6 +700,7 @@ export function Sun({ radius = 0.1, viewMode = 'explorer' }: SunProps) {
 ## 5. Comet Component
 
 ### `src/components/Comet3D.tsx` - 3I/ATLAS Comet Rendering
+
 ```typescript
 /**
  * Comet3D Component
@@ -840,6 +847,7 @@ export function HighlightGlow({
 ## 6. Trajectory Components
 
 ### `src/components/TrajectoryTrail.tsx` - Active Trail Rendering
+
 ```typescript
 /**
  * TrajectoryTrail Component
@@ -975,6 +983,7 @@ export function FullTrajectoryLine({
 ## 7. Background and Environment
 
 ### `src/components/Starfield.tsx` - Background Starfield
+
 ```typescript
 /**
  * Starfield Component
@@ -1036,6 +1045,7 @@ export function Starfield({ count = 3000, radius = 80, depth = 40 }: StarfieldPr
 ## 8. UI Components
 
 ### `src/components/PlaybackControls.tsx` - UI Controls
+
 ```typescript
 /**
  * PlaybackControls Component
@@ -1159,6 +1169,7 @@ export function PlaybackControls({
 ```
 
 ### `src/components/TelemetryHUD.tsx` - Data Display
+
 ```typescript
 /**
  * TelemetryHUD Component
@@ -1220,6 +1231,7 @@ export function TelemetryHUD({ currentFrame }: TelemetryHUDProps) {
 ```
 
 ### `src/components/PlaybackRecorder.tsx` - Advanced Video Recording System
+
 ```typescript
 /**
  * PlaybackRecorder Component
@@ -1522,6 +1534,7 @@ export function analyzeFrames(frames: string[]): FrameAnalysis[] {
 ## 9. Supporting Components
 
 ### `src/components/TimelinePanel.tsx` - Event Timeline
+
 ```typescript
 /**
  * TimelinePanel Component
@@ -1558,6 +1571,7 @@ export function TimelinePanel({ events, currentDate, onEventClick }: TimelinePan
 ```
 
 ### `src/components/FollowCamera.tsx` - Camera Component
+
 ```typescript
 /**
  * FollowCamera Component
@@ -1604,6 +1618,7 @@ export function FollowCamera({ target, duration = 3.0, onComplete }: FollowCamer
 ## 10. Backend Data Generation
 
 ### `backend/generate_atlas_trajectory.py` - NASA Horizons API Integration
+
 ```python
 #!/usr/bin/env python3
 """
@@ -2367,6 +2382,7 @@ if __name__ == "__main__":
 ## 11. Configuration Files
 
 ### `package.json`
+
 ```json
 {
   "name": "3iatlas-flight-tracker",
@@ -2399,6 +2415,7 @@ if __name__ == "__main__":
 ```
 
 ### `vite.config.ts`
+
 ```typescript
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -2413,6 +2430,7 @@ export default defineConfig({
 ```
 
 ### `tsconfig.json`
+
 ```json
 {
   "compilerOptions": {
@@ -2453,7 +2471,7 @@ This complete code consolidation provides:
 
 3. **Fixed Color Issues**: Comet now has blue tint (`#c0e0ff`) to distinguish from green trajectory lines (`#00ff88`).
 
-4. **Advanced Video Recording**: 
+4. **Advanced Video Recording**:
    - **Multi-codec Support**: VP9 → VP8 → WebM → MP4 fallback chain
    - **Browser Compatibility**: Works across Chrome, Firefox, Safari, Edge
    - **Multiple Download Options**: Video files (WebM/MP4), PNG frames, JSON data
@@ -2464,7 +2482,7 @@ This complete code consolidation provides:
 
 6. **Technical Architecture**: Clear separation between R3F components (3D rendering), React components (UI), and Python backend (data generation).
 
-7. **Codec Compatibility**: 
+7. **Codec Compatibility**:
    - **VP9**: Best quality (Chrome, Firefox, Edge)
    - **VP8**: Good quality (older browsers, Safari)
    - **WebM**: Basic quality (universal fallback)

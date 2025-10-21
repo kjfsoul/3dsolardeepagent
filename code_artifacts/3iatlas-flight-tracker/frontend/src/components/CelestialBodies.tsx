@@ -6,7 +6,9 @@
  */
 
 import { VectorData } from '@/types/trajectory';
-import { Text } from '@react-three/drei';
+import { Text, useTexture } from '@react-three/drei';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 interface CelestialBodyProps {
@@ -28,6 +30,16 @@ export function CelestialBody({
   emissiveIntensity = 0,
   showLabel = true,
 }: CelestialBodyProps) {
+  const { camera } = useThree();
+  
+  // Fade labels with distance to camera to reduce clutter
+  const labelOpacity = useMemo(() => {
+    const camPos = camera.position;
+    const d = camPos.distanceTo(new THREE.Vector3(...position));
+    // fade from 1 at close to 0.15 at far
+    return THREE.MathUtils.clamp(2.5 / d, 0.15, 1.0);
+  }, [camera.position, position]);
+
   return (
     <group position={position}>
       <mesh>
@@ -49,6 +61,7 @@ export function CelestialBody({
           anchorY="middle"
           outlineWidth={0.02}
           outlineColor="#000000"
+          fillOpacity={labelOpacity}
         >
           {name}
         </Text>
@@ -63,58 +76,75 @@ interface SunProps {
 }
 
 export function Sun({ radius = 0.1, viewMode = 'explorer' }: SunProps) {
-  // Adjust brightness for different view modes to prevent overwhelming
-  const brightness = viewMode === 'true-scale' ? 0.3 : viewMode === 'ride-atlas' ? 0.1 : 1.0;
-  const glowOpacity = viewMode === 'true-scale' ? 0.1 : viewMode === 'ride-atlas' ? 0.02 : 0.3;
+  const brightness = viewMode === 'true-scale' ? 0.3 : viewMode === 'ride-atlas' ? 0.12 : 1.0;
+  const glow = viewMode === 'true-scale' ? 0.08 : viewMode === 'ride-atlas' ? 0.02 : 0.25;
+
+  // Optional texture; if not found, material still looks good.
+  const tex = useTexture(
+    { color: '/textures/sun.jpg' },
+    (t) => {
+      if (t && typeof t === 'object' && 'color' in t) {
+        const colorTex = t.color as THREE.Texture;
+        colorTex.wrapS = colorTex.wrapT = THREE.RepeatWrapping;
+        colorTex.anisotropy = 8;
+      }
+    }
+  ).color as THREE.Texture | undefined;
+
+  // Animated UV scroll to fake convection cells
+  const surfRef = useRef<THREE.Mesh>(null!);
+  useFrame((_, dt) => {
+    if (surfRef.current && tex) {
+      const mat = surfRef.current.material as THREE.MeshStandardMaterial;
+      if (mat.map) {
+        mat.map.offset.x = (mat.map.offset.x + dt * 0.01) % 1;
+        mat.map.offset.y = (mat.map.offset.y + dt * 0.006) % 1;
+      }
+    }
+  });
+
+  // Corona sprite
+  const corona = useMemo(() => {
+    const size = radius * 4.0;
+    const c = new THREE.SpriteMaterial({
+      color: new THREE.Color(0xffaa00),
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      opacity: glow * 0.9,
+      depthWrite: false,
+    });
+    const s = new THREE.Sprite(c);
+    s.scale.set(size, size, 1);
+    return s;
+  }, [radius, glow]);
 
   return (
-    <group position={[0, 0, 0]}>
-      {/* Sun core - Hot white center */}
-      <mesh>
-        <sphereGeometry args={[radius * 0.7, 32, 32]} />
-        <meshBasicMaterial
-          color="#ffffff"
-          opacity={brightness * 0.8}
-          transparent={brightness < 1.0}
+    <group>
+      {/* photosphere */}
+      <mesh ref={surfRef}>
+        <sphereGeometry args={[radius, 64, 64]} />
+        <meshStandardMaterial
+          map={tex ?? undefined}
+          color={tex ? undefined : '#ff7a18'}
+          emissive={'#ff6a00'}
+          emissiveIntensity={brightness * 0.75}
+          metalness={0}
+          roughness={1}
         />
       </mesh>
 
-      {/* Sun surface - Orange-yellow with texture */}
+      {/* hot core bloom */}
       <mesh>
-        <sphereGeometry args={[radius, 32, 32]} />
-        <meshBasicMaterial
-          color="#ff6600"
-          opacity={brightness}
-          transparent={brightness < 1.0}
-        />
+        <sphereGeometry args={[radius * 0.65, 32, 32]} />
+        <meshBasicMaterial color="#ffffff" opacity={brightness * 0.35} transparent />
       </mesh>
 
-      {/* Solar corona - Outer atmosphere */}
-      <mesh>
-        <sphereGeometry args={[radius * 1.3, 32, 32]} />
-        <meshBasicMaterial
-          color="#ffaa00"
-          transparent
-          opacity={glowOpacity * 0.5}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
+      {/* corona sprite */}
+      <primitive object={corona} />
 
-      {/* Solar flares - Dynamic outer glow */}
-      <mesh>
-        <sphereGeometry args={[radius * 2, 32, 32]} />
-        <meshBasicMaterial
-          color="#ffdd00"
-          transparent
-          opacity={glowOpacity * 0.3}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
+      {/* light */}
+      <pointLight color="#fff7e6" intensity={24} distance={0} decay={2} />
 
-      {/* Sun light */}
-      <pointLight color="#ffffff" intensity={25} distance={0} decay={2} />
-
-      {/* Label */}
       <Text
         position={[0, radius * 2.5, 0]}
         fontSize={0.2}
