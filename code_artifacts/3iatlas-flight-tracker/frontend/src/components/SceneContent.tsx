@@ -184,39 +184,52 @@ export function SceneContent({
     ].filter((b) => b.world) as { name: string; color: string; world: THREE.Vector3 }[];
   }, [viewMode, trajectoryData, currentIndex]);
 
-  // Velocity-based camera motion for Ride mode
+  // Stable chase camera for Ride mode (no sway)
   const controlsRef = useRef<any>(null);
-  const desiredTargetRef = useRef(new THREE.Vector3());
-  const currentTargetRef = useRef(new THREE.Vector3());
+  const targetRef = useRef(new THREE.Vector3());
+  const camPosRef = useRef(new THREE.Vector3(6, 4, 6)); // initial position
 
-  useFrame((_, dt) => {
+  useFrame((state, dt) => {
     if (!controlsRef.current) return;
 
     if (viewMode === "ride-atlas" && cometVelocity && cometPosition) {
-      // Compute desired target with lead + bank
-      const v = new THREE.Vector3(...cometVelocity).normalize();
+      // Comet world position & forward (from velocity)
       const comet = new THREE.Vector3(...cometPosition);
+      const fwd = new THREE.Vector3(...cometVelocity).normalize();
 
-      const right = new THREE.Vector3()
-        .crossVectors(v, new THREE.Vector3(0, 1, 0))
-        .normalize();
-      const bank = right.multiplyScalar(
-        0.15 * Math.sin(performance.now() * 0.001)
-      );
+      // Build a stable local frame around comet (right, up)
+      const worldUp = new THREE.Vector3(0, 1, 0);
+      let right = new THREE.Vector3().crossVectors(fwd, worldUp);
+      if (right.lengthSq() < 1e-6) right = new THREE.Vector3(1, 0, 0);
+      right.normalize();
+      const up = new THREE.Vector3().crossVectors(right, fwd).normalize();
 
-      desiredTargetRef.current.copy(comet).add(bank); // where we want to look
+      // Comfortable chase offset (AU-ish scene units)
+      const back = 2.2; // behind comet along -fwd
+      const height = 0.9; // above
+      const lateral = 0.0; // left/right
+
+      const desiredPos = comet
+        .clone()
+        .add(fwd.clone().multiplyScalar(-back))
+        .add(up.clone().multiplyScalar(height))
+        .add(right.clone().multiplyScalar(lateral));
+
+      // Critically-damped smoothing for position + target
+      const k = 6; // responsiveness
+      camPosRef.current.lerp(desiredPos, 1 - Math.exp(-k * dt));
+      targetRef.current.lerp(comet, 1 - Math.exp(-k * dt));
+
+      // Apply
+      state.camera.position.copy(camPosRef.current);
+      controlsRef.current.target.copy(targetRef.current);
+      controlsRef.current.update();
     } else {
-      desiredTargetRef.current.set(0, 0, 0);
+      // Non-ride mode: reset target to origin
+      targetRef.current.lerp(new THREE.Vector3(0, 0, 0), 1 - Math.exp(-6 * dt));
+      controlsRef.current.target.copy(targetRef.current);
+      controlsRef.current.update();
     }
-
-    // Critically-damped approach to desired target (no overshoot)
-    currentTargetRef.current.lerp(
-      desiredTargetRef.current,
-      1 - Math.exp(-6 * dt)
-    );
-
-    controlsRef.current.target.copy(currentTargetRef.current);
-    controlsRef.current.update();
   });
 
   return (
@@ -460,11 +473,12 @@ export function SceneContent({
         <OrbitControls
           ref={controlsRef}
           enableDamping={false}
+          enablePan={viewMode !== "ride-atlas"}
+          enableRotate={viewMode !== "ride-atlas"}
           enableZoom={true}
           zoomSpeed={1.5}
-          minDistance={viewMode === "ride-atlas" ? 0.02 : 0.5}
+          minDistance={0.02}
           maxDistance={focusBody ? 16 : viewMode === "ride-atlas" ? 12 : 50}
-          enablePan={true}
           panSpeed={1.0}
           rotateSpeed={1.0}
           mouseButtons={{

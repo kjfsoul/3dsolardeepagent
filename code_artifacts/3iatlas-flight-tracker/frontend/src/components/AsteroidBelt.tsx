@@ -5,8 +5,8 @@
  * Fixed: Proper setMatrixAt/setColorAt API (no attribute warnings)
  */
 
-import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 interface AsteroidBeltProps {
@@ -30,7 +30,12 @@ export function AsteroidBelt({
   const tempObj = useMemo(() => new THREE.Object3D(), []);
   const tempColor = useMemo(() => new THREE.Color(), []);
 
-  const geometry = useMemo(() => new THREE.IcosahedronGeometry(1, 0), []);
+  const geometry = useMemo(() => {
+    const g = new THREE.IcosahedronGeometry(1, 0);
+    g.computeVertexNormals();
+    return g;
+  }, []);
+
   const material = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
@@ -39,6 +44,7 @@ export function AsteroidBelt({
         metalness: 0.0,
         emissive: "#0d0d0d",
         emissiveIntensity: 0.05,
+        vertexColors: true, // required for per-instance color
       }),
     []
   );
