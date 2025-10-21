@@ -21,7 +21,7 @@
 
 ### **1. Comet Apparent Size Clamp** ✅
 
-**Problem:** Comet could visually dwarf the Sun when camera got close  
+**Problem:** Comet could visually dwarf the Sun when camera got close
 **Solution:** Clamp comet by Sun's apparent screen size
 
 ```typescript
@@ -43,7 +43,7 @@ const finalCometScale = Math.min(desiredCometScale, cometScaleClamp);
 
 ### **2. Enhanced Planet Visibility** ✅
 
-**Problem:** Planets became invisible specks in Ride mode  
+**Problem:** Planets became invisible specks in Ride mode
 **Solution:** Improved scaling + higher distance floor
 
 ```typescript
@@ -73,7 +73,7 @@ const targetFrac = 0.06; // 33% higher floor
 
 ### **3. Billboard Labels** ✅
 
-**Problem:** Labels flipped and mirrored when orbiting  
+**Problem:** Labels flipped and mirrored when orbiting
 **Solution:** Wrapped all labels in `<Billboard>` component
 
 ```tsx
@@ -102,7 +102,7 @@ const targetFrac = 0.06; // 33% higher floor
 
 ### **4. Planet Locators (Screen-Space)** ✅
 
-**Problem:** Users lost track of where planets were in Ride mode  
+**Problem:** Users lost track of where planets were in Ride mode
 **Solution:** Screen-space indicators for key bodies
 
 ```typescript
@@ -132,13 +132,13 @@ const project = (v: THREE.Vector3) => {
 
 ### **5. Velocity-Based Camera Motion** ✅
 
-**Problem:** Camera felt static, "glued to comet"  
+**Problem:** Camera felt static, "glued to comet"
 **Solution:** Lead + banking based on velocity vector
 
 ```typescript
 useFrame((_, dt) => {
   if (viewMode !== 'ride-atlas') return;
-  
+
   const v = new THREE.Vector3(...cometVelocity).normalize();
   const comet = new THREE.Vector3(...cometPosition);
 
@@ -168,14 +168,14 @@ useFrame((_, dt) => {
 
 ### **6. Perihelion Tail Scaling** ✅
 
-**Problem:** Tail length was static regardless of solar distance  
+**Problem:** Tail length was static regardless of solar distance
 **Solution:** Dynamic scaling based on heliocentric distance
 
 ```typescript
 const heliocentricR = cometPos.length(); // AU from Sun
 const tailLen = THREE.MathUtils.clamp(
-  3.5 / Math.max(heliocentricR, 0.5), 
-  1.2, 
+  3.5 / Math.max(heliocentricR, 0.5),
+  1.2,
   6.0
 );
 ```
@@ -248,19 +248,19 @@ const tailLen = THREE.MathUtils.clamp(
 ## 🔬 Scientific Accuracy
 
 ### Solar Physics
-✅ **Sun dominance**: Largest object in system  
-✅ **Apparent size**: Correct visual hierarchy  
+✅ **Sun dominance**: Largest object in system
+✅ **Apparent size**: Correct visual hierarchy
 ✅ **Corona depth**: depthTest={false} prevents artifacts
 
 ### Comet Physics
-✅ **Tail direction**: Points away from Sun (solar wind)  
-✅ **Tail length**: Varies with heliocentric distance  
-✅ **Perihelion**: Longest tail at closest approach (6.0 AU)  
+✅ **Tail direction**: Points away from Sun (solar wind)
+✅ **Tail length**: Varies with heliocentric distance
+✅ **Perihelion**: Longest tail at closest approach (6.0 AU)
 ✅ **Aphelion**: Shortest tail when far (1.2 AU)
 
 ### Orbital Mechanics
-✅ **Planet positions**: NASA Horizons data preserved  
-✅ **Relative motion**: Velocity vector for camera lead  
+✅ **Planet positions**: NASA Horizons data preserved
+✅ **Relative motion**: Velocity vector for camera lead
 ✅ **Screen projection**: Accurate frustum calculations
 
 ---
@@ -516,10 +516,10 @@ Perihelion (1.356 AU): ~2.6 AU tail ✅
 
 ### User Satisfaction Goals
 
-**Immersion**: ⭐⭐⭐⭐⭐ (was ⭐⭐)  
-**Readability**: ⭐⭐⭐⭐⭐ (was ⭐⭐)  
-**Context**: ⭐⭐⭐⭐⭐ (was ⭐)  
-**Accuracy**: ⭐⭐⭐⭐⭐ (was ⭐⭐⭐)  
+**Immersion**: ⭐⭐⭐⭐⭐ (was ⭐⭐)
+**Readability**: ⭐⭐⭐⭐⭐ (was ⭐⭐)
+**Context**: ⭐⭐⭐⭐⭐ (was ⭐)
+**Accuracy**: ⭐⭐⭐⭐⭐ (was ⭐⭐⭐)
 **Cinematic Feel**: ⭐⭐⭐⭐⭐ (was ⭐)
 
 ---
@@ -554,7 +554,6 @@ Perihelion (1.356 AU): ~2.6 AU tail ✅
 5. `PlanetLocators.tsx` - NEW: Screen-space indicators
 6. `Atlas3DTrackerEnhanced.tsx` - Updated OrbitControls maxDistance
 
-**Total**: 5 modified, 1 created  
-**Lines changed**: ~280 lines  
+**Total**: 5 modified, 1 created
+**Lines changed**: ~280 lines
 **Impact**: Transformative
-

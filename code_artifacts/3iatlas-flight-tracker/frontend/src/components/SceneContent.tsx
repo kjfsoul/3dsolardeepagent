@@ -16,10 +16,10 @@ import { CinematicCamera } from './FollowCamera';
 import { Starfield } from './Starfield';
 import { FullTrajectoryLine, TrajectoryTrail } from './TrajectoryTrail';
 
-import { PlanetLocators } from './PlanetLocators';
-import { TrajectoryData, VectorData } from '@/types/trajectory';
+import { TrajectoryData, VectorData } from "@/types/trajectory";
+import { PlanetLocators } from "./PlanetLocators";
 
-type ViewMode = 'explorer' | 'true-scale' | 'ride-atlas';
+type ViewMode = "explorer" | "true-scale" | "ride-atlas";
 
 interface SceneContentProps {
   trajectoryData: TrajectoryData;
@@ -31,7 +31,10 @@ interface SceneContentProps {
   isPerihelion: boolean;
   cinematicActive: boolean;
   cometPositionVec: THREE.Vector3;
-  rideAlongCamera: { position: [number, number, number]; target: [number, number, number] } | null;
+  rideAlongCamera: {
+    position: [number, number, number];
+    target: [number, number, number];
+  } | null;
   focusBody: string | null;
   setCinematicActive?: (active: boolean) => void;
   setCinematicEvent?: (event: any) => void;
@@ -57,15 +60,19 @@ export function SceneContent({
   const { camera } = useThree();
 
   // Distance-aware sizing helper
-  function sizeForView(body: string, base: number, pos: [number, number, number]) {
+  function sizeForView(
+    body: string,
+    base: number,
+    pos: [number, number, number]
+  ) {
     // Start with mode logic
     let r = base;
     switch (viewMode) {
-      case 'true-scale':
+      case "true-scale":
         r = base * 0.1;
         break;
-      case 'ride-atlas':
-        r = body === 'Sun' ? base * 0.45 : base * 0.40; // was 0.3 - make planets more visible
+      case "ride-atlas":
+        r = body === "Sun" ? base * 0.45 : base * 0.4; // was 0.3 - make planets more visible
         break;
       default:
         r = base;
@@ -77,8 +84,11 @@ export function SceneContent({
 
     // Tunables: a gentle floor that varies per mode
     const targetFrac =
-      viewMode === 'ride-atlas' ? 0.06 : // was 0.045 - make planets readable
-      viewMode === 'true-scale' ? 0.025 : 0.0;
+      viewMode === "ride-atlas"
+        ? 0.06 // was 0.045 - make planets readable
+        : viewMode === "true-scale"
+        ? 0.025
+        : 0.0;
 
     if (targetFrac > 0) {
       const floor = d * targetFrac;
@@ -86,12 +96,15 @@ export function SceneContent({
     }
 
     // Keep things from going hilariously huge near camera
-    const clampMax = viewMode === 'ride-atlas' ? base * 1.1 : base * 3.0;
+    const clampMax = viewMode === "ride-atlas" ? base * 1.1 : base * 3.0;
     return Math.min(r, clampMax);
   }
 
   // Helper to get planet position
-  function getPlanetPos(trajectory: VectorData[], idx: number): [number, number, number] {
+  function getPlanetPos(
+    trajectory: VectorData[],
+    idx: number
+  ): [number, number, number] {
     const frame = trajectory[Math.floor(idx)];
     if (!frame) return [0, 0, 0];
     return [frame.position.x, frame.position.z, -frame.position.y];
@@ -99,66 +112,85 @@ export function SceneContent({
 
   // Calculate comet scale with Sun apparent size clamp
   const { cometScale, tailLength } = useMemo(() => {
-    const sunRadius = viewMode === 'ride-atlas' ? 2.0 * 0.45 : 2.0;
+    const sunRadius = viewMode === "ride-atlas" ? 2.0 * 0.45 : 2.0;
     const cometPos = new THREE.Vector3(...cometPosition);
-    
+
     const camToComet = camera.position.distanceTo(cometPos);
     const camToSun = camera.position.length(); // Sun at [0,0,0]
 
     // "apparent sizes" ~ radius / distance
     const sunApparent = sunRadius / Math.max(camToSun, 1e-6);
-    const maxCometApparent = sunApparent * 0.30; // ≤ 30% of Sun on screen
+    const maxCometApparent = sunApparent * 0.3; // ≤ 30% of Sun on screen
 
     // Desired ride scale
-    const desiredCometScale = viewMode === 'ride-atlas' ? 0.8 : 0.3;
+    const desiredCometScale = viewMode === "ride-atlas" ? 0.8 : 0.3;
     // Clamp by apparent size rule
     const cometScaleClamp = maxCometApparent * camToComet;
     const finalCometScale = Math.min(desiredCometScale, cometScaleClamp);
 
     // Tail grows as we near perihelion (heliocentric distance)
     const heliocentricR = cometPos.length(); // AU in scene
-    const tailLen = THREE.MathUtils.clamp(3.5 / Math.max(heliocentricR, 0.5), 1.2, 6.0);
+    const tailLen = THREE.MathUtils.clamp(
+      3.5 / Math.max(heliocentricR, 0.5),
+      1.2,
+      6.0
+    );
 
-    return { 
-      cometScale: finalCometScale, 
-      tailLength: viewMode === 'ride-atlas' ? tailLen : 2.0 
+    return {
+      cometScale: finalCometScale,
+      tailLength: viewMode === "ride-atlas" ? tailLen : 2.0,
     };
   }, [viewMode, cometPosition, camera.position]);
 
   // Prepare bodies for screen-space locators (in Ride mode only)
   const locatorBodies = useMemo(() => {
-    if (viewMode !== 'ride-atlas') return [];
-    
+    if (viewMode !== "ride-atlas") return [];
+
     const bodies: { name: string; world: THREE.Vector3; color: string }[] = [];
-    
+
     if (trajectoryData.earth.length > 0) {
       const pos = getPlanetPos(trajectoryData.earth, currentIndex / 4);
-      bodies.push({ name: 'Earth', world: new THREE.Vector3(...pos), color: '#00aaff' });
+      bodies.push({
+        name: "Earth",
+        world: new THREE.Vector3(...pos),
+        color: "#00aaff",
+      });
     }
     if (trajectoryData.mars.length > 0) {
       const pos = getPlanetPos(trajectoryData.mars, currentIndex / 4);
-      bodies.push({ name: 'Mars', world: new THREE.Vector3(...pos), color: '#ff6666' });
+      bodies.push({
+        name: "Mars",
+        world: new THREE.Vector3(...pos),
+        color: "#ff6666",
+      });
     }
     if (trajectoryData.jupiter.length > 0) {
       const pos = getPlanetPos(trajectoryData.jupiter, currentIndex / 8);
-      bodies.push({ name: 'Jupiter', world: new THREE.Vector3(...pos), color: '#ffbb88' });
+      bodies.push({
+        name: "Jupiter",
+        world: new THREE.Vector3(...pos),
+        color: "#ffbb88",
+      });
     }
-    
+
     return bodies;
   }, [viewMode, trajectoryData, currentIndex]);
 
   // Velocity-based camera motion for Ride mode
   const controlsRef = useRef<any>(null);
   useFrame((_, dt) => {
-    if (viewMode !== 'ride-atlas' || !cometVelocity || !controlsRef.current) return;
-    
+    if (viewMode !== "ride-atlas" || !cometVelocity || !controlsRef.current)
+      return;
+
     const v = new THREE.Vector3(...cometVelocity).normalize();
     const comet = new THREE.Vector3(...cometPosition);
 
     const lead = v.clone().multiplyScalar(1.25); // look-ahead
     const up = new THREE.Vector3(0, 1, 0);
     const right = new THREE.Vector3().crossVectors(v, up).normalize();
-    const bank = right.multiplyScalar(0.15 * Math.sin(performance.now() * 0.001));
+    const bank = right.multiplyScalar(
+      0.15 * Math.sin(performance.now() * 0.001)
+    );
 
     const camTarget = comet.clone().add(lead).add(bank);
 
@@ -172,12 +204,12 @@ export function SceneContent({
       <Starfield count={3000} radius={80} depth={40} />
 
       {/* Planet Locators (screen-space) */}
-      {viewMode === 'ride-atlas' && locatorBodies.length > 0 && (
+      {viewMode === "ride-atlas" && locatorBodies.length > 0 && (
         <PlanetLocators bodies={locatorBodies} />
       )}
 
       {/* Sun */}
-      <Sun radius={sizeForView('Sun', 2.0, [0, 0, 0])} viewMode={viewMode} />
+      <Sun radius={sizeForView("Sun", 2.0, [0, 0, 0])} viewMode={viewMode} />
 
       {/* Asteroid Belt */}
       <group renderOrder={-1}>
@@ -196,7 +228,11 @@ export function SceneContent({
           name="Mercury"
           trajectoryData={trajectoryData.mercury}
           currentIndex={currentIndex / 4}
-          radius={sizeForView('Mercury', 0.012, getPlanetPos(trajectoryData.mercury, currentIndex / 4))}
+          radius={sizeForView(
+            "Mercury",
+            0.012,
+            getPlanetPos(trajectoryData.mercury, currentIndex / 4)
+          )}
           color="#8c7853"
           showOrbit={true}
         />
@@ -207,7 +243,11 @@ export function SceneContent({
           name="Venus"
           trajectoryData={trajectoryData.venus}
           currentIndex={currentIndex / 4}
-          radius={sizeForView('Venus', 0.034, getPlanetPos(trajectoryData.venus, currentIndex / 4))}
+          radius={sizeForView(
+            "Venus",
+            0.034,
+            getPlanetPos(trajectoryData.venus, currentIndex / 4)
+          )}
           color="#ffc649"
           showOrbit={true}
         />
@@ -218,7 +258,11 @@ export function SceneContent({
           name="Earth"
           trajectoryData={trajectoryData.earth}
           currentIndex={currentIndex / 4}
-          radius={sizeForView('Earth', 0.036, getPlanetPos(trajectoryData.earth, currentIndex / 4))}
+          radius={sizeForView(
+            "Earth",
+            0.036,
+            getPlanetPos(trajectoryData.earth, currentIndex / 4)
+          )}
           color="#00aaff"
           showOrbit={true}
         />
@@ -229,7 +273,11 @@ export function SceneContent({
           name="Ceres"
           trajectoryData={trajectoryData.ceres}
           currentIndex={currentIndex / 8}
-          radius={sizeForView('Ceres', 0.01, getPlanetPos(trajectoryData.ceres, currentIndex / 8))}
+          radius={sizeForView(
+            "Ceres",
+            0.01,
+            getPlanetPos(trajectoryData.ceres, currentIndex / 8)
+          )}
           color="#a89f91"
           showOrbit={true}
         />
@@ -240,7 +288,11 @@ export function SceneContent({
           name="Vesta"
           trajectoryData={trajectoryData.vesta}
           currentIndex={currentIndex / 8}
-          radius={sizeForView('Vesta', 0.006, getPlanetPos(trajectoryData.vesta, currentIndex / 8))}
+          radius={sizeForView(
+            "Vesta",
+            0.006,
+            getPlanetPos(trajectoryData.vesta, currentIndex / 8)
+          )}
           color="#b5a88f"
           showOrbit={true}
         />
@@ -251,7 +303,11 @@ export function SceneContent({
           name="Pallas"
           trajectoryData={trajectoryData.pallas}
           currentIndex={currentIndex / 8}
-          radius={sizeForView('Pallas', 0.006, getPlanetPos(trajectoryData.pallas, currentIndex / 8))}
+          radius={sizeForView(
+            "Pallas",
+            0.006,
+            getPlanetPos(trajectoryData.pallas, currentIndex / 8)
+          )}
           color="#9d9589"
           showOrbit={true}
         />
@@ -262,7 +318,11 @@ export function SceneContent({
           name="Mars"
           trajectoryData={trajectoryData.mars}
           currentIndex={currentIndex / 4}
-          radius={sizeForView('Mars', 0.019, getPlanetPos(trajectoryData.mars, currentIndex / 4))}
+          radius={sizeForView(
+            "Mars",
+            0.019,
+            getPlanetPos(trajectoryData.mars, currentIndex / 4)
+          )}
           color="#ff6666"
           showOrbit={true}
         />
@@ -273,7 +333,11 @@ export function SceneContent({
           name="Jupiter"
           trajectoryData={trajectoryData.jupiter}
           currentIndex={currentIndex / 8}
-          radius={sizeForView('Jupiter', 0.4, getPlanetPos(trajectoryData.jupiter, currentIndex / 8))}
+          radius={sizeForView(
+            "Jupiter",
+            0.4,
+            getPlanetPos(trajectoryData.jupiter, currentIndex / 8)
+          )}
           color="#ffbb88"
           showOrbit={true}
         />
@@ -284,7 +348,11 @@ export function SceneContent({
           name="Saturn"
           trajectoryData={trajectoryData.saturn}
           currentIndex={currentIndex / 8}
-          radius={sizeForView('Saturn', 0.34, getPlanetPos(trajectoryData.saturn, currentIndex / 8))}
+          radius={sizeForView(
+            "Saturn",
+            0.34,
+            getPlanetPos(trajectoryData.saturn, currentIndex / 8)
+          )}
           color="#fad5a5"
           showOrbit={true}
         />
@@ -295,7 +363,11 @@ export function SceneContent({
           name="Uranus"
           trajectoryData={trajectoryData.uranus}
           currentIndex={currentIndex / 16}
-          radius={sizeForView('Uranus', 0.14, getPlanetPos(trajectoryData.uranus, currentIndex / 16))}
+          radius={sizeForView(
+            "Uranus",
+            0.14,
+            getPlanetPos(trajectoryData.uranus, currentIndex / 16)
+          )}
           color="#4fd0e0"
           showOrbit={true}
         />
@@ -306,7 +378,11 @@ export function SceneContent({
           name="Neptune"
           trajectoryData={trajectoryData.neptune}
           currentIndex={currentIndex / 16}
-          radius={sizeForView('Neptune', 0.14, getPlanetPos(trajectoryData.neptune, currentIndex / 16))}
+          radius={sizeForView(
+            "Neptune",
+            0.14,
+            getPlanetPos(trajectoryData.neptune, currentIndex / 16)
+          )}
           color="#4166f5"
           showOrbit={true}
         />
@@ -317,7 +393,11 @@ export function SceneContent({
           name="Pluto"
           trajectoryData={trajectoryData.pluto}
           currentIndex={currentIndex / 16}
-          radius={sizeForView('Pluto', 0.007, getPlanetPos(trajectoryData.pluto, currentIndex / 16))}
+          radius={sizeForView(
+            "Pluto",
+            0.007,
+            getPlanetPos(trajectoryData.pluto, currentIndex / 16)
+          )}
           color="#b8a793"
           showOrbit={true}
         />
@@ -362,9 +442,13 @@ export function SceneContent({
           dampingFactor={0.03}
           enableZoom={true}
           zoomSpeed={1.5}
-          minDistance={viewMode === 'ride-atlas' ? 0.02 : 0.5}
-          maxDistance={focusBody ? 16 : (viewMode === 'ride-atlas' ? 12 : 50)}
-          target={viewMode === 'ride-atlas' && rideAlongCamera ? rideAlongCamera.target : cometPositionVec}
+          minDistance={viewMode === "ride-atlas" ? 0.02 : 0.5}
+          maxDistance={focusBody ? 16 : viewMode === "ride-atlas" ? 12 : 50}
+          target={
+            viewMode === "ride-atlas" && rideAlongCamera
+              ? rideAlongCamera.target
+              : cometPositionVec
+          }
           enablePan={true}
           panSpeed={1.0}
           rotateSpeed={1.0}
