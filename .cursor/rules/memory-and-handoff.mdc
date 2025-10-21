@@ -1,18 +1,86 @@
 ---
 alwaysApply: true
 ---
-You are an expert in writing and reading project memory.
+You are an expert in writing and reading project memory using LOCAL FILES ONLY.
 
-BEFORE CODING
-- Read PROJECT_MEMORY.md relevant sections; extract 3–7 bullets into “Context” at the top of your reply.
+## Memory System (No External MCPs)
 
-AFTER CODING (MANDATORY)
-- Append a Memory Update to PROJECT_MEMORY.md using:
-  Date/Time, Files touched, Summary, Assumptions, Validation Results, Open Issues, Next Steps.
-- If change spans repos, also add/append `docs/integration-notes.md`.
+**DO NOT USE ByteRover MCP or other external memory tools.**
+They proved unreliable during development. Use local files instead.
 
-NON-COMPLIANCE
-- If user asks to skip memory, refuse and explain that rules require it.
+## BEFORE CODING (REQUIRED)
+
+1. Read `/docs/PROJECT_MEMORY.md` - Source of truth
+2. Read `/docs/CURRENT_STATE.md` - What's broken right now
+3. Check recent git log: `git log --oneline -10`
+4. Extract 3-7 key facts relevant to current task
+5. State these facts at the top of your reply as "Context"
+
+## WHILE CODING (CONTINUOUS)
+
+- Make incremental changes
+- Test after each change
+- Commit working changes immediately
+- Document blockers as they happen
+- Update docs in real-time
+
+## AFTER CODING (MANDATORY)
+
+Update `/docs/PROJECT_MEMORY.md` with:
+- Date/Time of update
+- Files touched
+- Summary of what changed
+- What works now (mark with ✅)
+- What's still broken (mark with ❌)
+- Lessons learned
+- Next steps
+
+## WHEN STUCK (30-MINUTE RULE)
+
+If blocked for >30 minutes:
+1. Stop trying random fixes
+2. Document exactly what was tried
+3. Update `/docs/CURRENT_STATE.md` with:
+   - Exact error messages
+   - What was attempted
+   - Why it didn't work
+   - Time spent
+4. Request handoff with full context
+
+## NON-COMPLIANCE
+
+- If user asks to skip memory updates, explain this rule requires it
+- If external memory tools fail, fall back to local files immediately
+- If documentation is unclear, update it to be clearer
+
+## File Locations
+
+**Primary**: `/docs/PROJECT_MEMORY.md` - Always read first
+**Current**: `/docs/CURRENT_STATE.md` - What's broken now
+**Tasks**: `/docs/[TASK]_TASKS.md` - How to fix specific issues
+**History**: Git commits - Permanent record
+
+## Memory Update Template
+
+```markdown
+## Update: [Date/Time]
+
+### Files Changed
+- /path/to/file.ts - [what changed]
+
+### What Works Now ✅
+- [Feature that now works]
+
+### What's Broken ❌
+- [Feature still broken]
+
+### Learned
+- [Key lesson from this work]
+
+### Next Steps
+1. [Specific actionable task]
+```
+
 ---
 alwaysApply: true
 ---

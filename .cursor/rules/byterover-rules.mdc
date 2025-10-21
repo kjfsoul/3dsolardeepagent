@@ -1,22 +1,55 @@
 ---
-description: ByteRover MCP Custom Instructions
+description: ByteRover MCP Status - DO NOT USE for 3I/ATLAS project
 alwaysApply: false
 ---
-[byterover-mcp]
 
-You are given two tools from Byterover MCP server, including
-## 1. `byterover-store-knowledge`
-You `MUST` always use this tool when:
+# ByteRover MCP - NOT USED
 
-+ Learning new patterns, APIs, or architectural decisions from the codebase
-+ Encountering error solutions or debugging techniques
-+ Finding reusable code patterns or utility functions
-+ Completing any significant task or plan implementation
+**STATUS: DISABLED for 3I/ATLAS project**
 
-## 2. `byterover-retrieve-knowledge`
-You `MUST` always use this tool when:
+## Why Disabled
 
-+ Starting any new task or implementation to gather relevant context
-+ Before making architectural decisions to understand existing patterns
-+ When debugging issues to check for previous solutions
-+ Working with unfamiliar parts of the codebase
+During intensive development on the 3I/ATLAS project (Jan 2025), ByteRover MCP tools failed:
+- `byterover-store-knowledge` calls appeared to succeed but data not retrievable
+- `byterover-retrieve-knowledge` failed to return stored context
+- Required re-explaining same concepts across multiple sessions
+- Added overhead without demonstrated benefit
+- No evidence of persistent knowledge accumulation
+
+## Time Lost
+
+~2 hours spent calling ByteRover tools with no benefit.
+Context had to be re-explained manually each session anyway.
+
+## What Works Instead
+
+**Use local markdown files:**
+- `/docs/PROJECT_MEMORY.md` - Always available, always accurate
+- `/docs/CURRENT_STATE.md` - Real-time status
+- `/docs/[TASK]_TASKS.md` - Step-by-step fixes
+- Git commit history - Permanent record
+- Inline code comments - Context where needed
+
+## For Other Projects
+
+ByteRover MCP may work fine on other projects.
+This specific project had issues with it.
+
+**Before using on a new project:**
+1. Test storage/retrieval on simple task
+2. Verify knowledge actually persists
+3. Verify knowledge can be retrieved
+4. Compare to local file approach
+5. Use what works better
+
+## Conclusion
+
+**For 3I/ATLAS: Use local files, not ByteRover MCP.**
+
+See `/Users/kfitz/3iatlas/.cursor/rules/00-project-core.mdc` for the working memory system.
+
+---
+
+**Last Updated**: January 22, 2025
+**Decision**: Disabled for this project
+**Alternative**: Local markdown documentation
