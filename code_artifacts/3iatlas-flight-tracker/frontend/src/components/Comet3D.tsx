@@ -42,63 +42,32 @@ export function Comet3D({
 
   return (
     <group ref={groupRef} position={position}>
-      {/* Primary Comet Head - Enhanced cone base */}
+      {/* Unified Comet Head - Single ellipsoid shape */}
       <mesh
         rotation={[Math.PI / 2, 0, 0]}
         position={[0, 0, 0]}
         scale={[1, 1, 1]}
       >
-        <coneGeometry args={[scale * 0.8, tailLength * 0.3, 16, 1, true]} />
+        <sphereGeometry args={[scale * 0.8, 16, 16]} />
         <meshStandardMaterial
           color="#ffffff"
-          emissive="#f0f0f0"
-          emissiveIntensity={0.3}
-          roughness={0.4}
+          emissive="#e0f0ff"
+          emissiveIntensity={0.4}
+          roughness={0.3}
         />
       </mesh>
 
-      {/* Comet Head Glow - Subtle white glow */}
+      {/* Comet Tail - Single elongated cone */}
       <mesh
         rotation={[Math.PI / 2, 0, 0]}
-        position={[0, 0, 0]}
-        scale={[1.2, 1, 1]}
-      >
-        <coneGeometry args={[scale * 0.6, tailLength * 0.25, 16, 1, true]} />
-        <meshBasicMaterial
-          color="#ffffff"
-          transparent
-          opacity={0.2}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-
-      {/* Main Tail - Flows from head */}
-      <mesh
-        rotation={[Math.PI / 2, 0, 0]}
-        position={[0, -tailLength * 0.15, 0]}
+        position={[0, -tailLength * 0.3, 0]}
         scale={[1, 1, 1]}
       >
-        <coneGeometry args={[scale * 0.6, tailLength * 0.85, 16, 1, true]} />
+        <coneGeometry args={[scale * 0.4, tailLength * 0.8, 16, 1, true]} />
         <meshBasicMaterial
-          color="#e0e0e0"
+          color="#c0e0ff"
           transparent
-          opacity={0.6}
-          side={THREE.DoubleSide}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-
-      {/* Secondary Tail Layer - For depth */}
-      <mesh
-        rotation={[Math.PI / 2, 0, 0]}
-        position={[0, -tailLength * 0.1, 0]}
-        scale={[1.3, 1, 1]}
-      >
-        <coneGeometry args={[scale * 0.4, tailLength * 0.7, 16, 1, true]} />
-        <meshBasicMaterial
-          color="#c0c0c0"
-          transparent
-          opacity={0.3}
+          opacity={0.8}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
         />

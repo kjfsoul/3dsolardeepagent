@@ -27,7 +27,7 @@ export function PlaybackRecorder({
     setIsRecording(true);
     setFrames([]);
     startTimeRef.current = Date.now();
-    
+
     // Capture frames every 100ms
     intervalRef.current = setInterval(() => {
       const canvas = document.querySelector('canvas');
