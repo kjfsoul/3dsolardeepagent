@@ -47,7 +47,7 @@ export function PlanetLocators({ bodies }: { bodies: Body[] }) {
           return (
             <div key={b.name} style={style}>
               {s.inView ? (
-                <></>  {/* Don't show locator when planet is in view - let the 3D label handle it */}
+                null // Don't show locator when planet is in view - let the 3D label handle it
               ) : (
                 <>➜ {b.name}</>
               )}
