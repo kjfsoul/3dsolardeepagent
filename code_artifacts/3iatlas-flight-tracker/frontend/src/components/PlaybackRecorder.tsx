@@ -1,7 +1,7 @@
 /**
  * PlaybackRecorder Component
  * =============================
- * Simple recording component for capturing screenshots
+ * Records the 3D scene as video (MP4/WebM) and frame data
  */
 
 import { useRef, useState } from "react";
@@ -21,28 +21,73 @@ export function PlaybackRecorder({
   const [frames, setFrames] = useState<string[]>([]);
   const [recordedFrames, setRecordedFrames] = useState<string[]>([]);
   const [showPlayback, setShowPlayback] = useState(false);
+  const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const startTimeRef = useRef<number>(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const startRecording = () => {
+  const startRecording = async () => {
     setIsRecording(true);
     setFrames([]);
     setShowPlayback(false);
+    setVideoBlob(null);
     startTimeRef.current = Date.now();
-    
-    // Capture frames every 100ms
-    intervalRef.current = setInterval(() => {
-      const canvas = document.querySelector('canvas');
-      if (canvas) {
+
+    try {
+      // Get the canvas element
+      const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+      if (!canvas) {
+        console.error("Canvas not found");
+        return;
+      }
+
+      // Capture canvas as video stream
+      const stream = canvas.captureStream(10); // 10 FPS for smooth video
+      
+      // Create MediaRecorder for video
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm;codecs=vp9',
+        videoBitsPerSecond: 2500000 // 2.5 Mbps for good quality
+      });
+      
+      const chunks: BlobPart[] = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = () => {
+        const videoBlob = new Blob(chunks, { type: 'video/webm' });
+        setVideoBlob(videoBlob);
+      };
+      
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start(1000); // Collect data every second
+
+      // Also capture individual frames for analysis
+      intervalRef.current = setInterval(() => {
         const frameData = canvas.toDataURL("image/png");
         setFrames((prev) => [...prev, frameData]);
-      }
-    }, 100);
+      }, 100);
+
+    } catch (error) {
+      console.error("Error starting video recording:", error);
+      setIsRecording(false);
+    }
   };
 
   const stopRecording = () => {
     setIsRecording(false);
+    
+    // Stop video recording
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+    
+    // Stop frame capture
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -57,14 +102,31 @@ export function PlaybackRecorder({
     }
   };
 
+  const downloadVideo = () => {
+    if (!videoBlob) return;
+    
+    const url = URL.createObjectURL(videoBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `atlas-recording-${new Date()
+      .toISOString()
+      .slice(0, 19)}.webm`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const downloadFrames = () => {
     if (recordedFrames.length === 0) return;
-    
+
     // Create a zip-like structure (simplified - just download first frame as example)
     const firstFrame = recordedFrames[0];
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = firstFrame;
-    link.download = `atlas-recording-${new Date().toISOString().slice(0, 19)}.png`;
+    link.download = `atlas-recording-${new Date()
+      .toISOString()
+      .slice(0, 19)}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -72,20 +134,24 @@ export function PlaybackRecorder({
 
   const downloadAllFrames = () => {
     if (recordedFrames.length === 0) return;
-    
+
     // Create a JSON file with all frame data
     const frameData = {
       timestamp: new Date().toISOString(),
       duration: duration,
       frameCount: recordedFrames.length,
-      frames: recordedFrames
+      frames: recordedFrames,
     };
-    
-    const blob = new Blob([JSON.stringify(frameData, null, 2)], { type: 'application/json' });
+
+    const blob = new Blob([JSON.stringify(frameData, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `atlas-recording-${new Date().toISOString().slice(0, 19)}.json`;
+    link.download = `atlas-recording-${new Date()
+      .toISOString()
+      .slice(0, 19)}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -99,42 +165,54 @@ export function PlaybackRecorder({
 
   return (
     <div className="absolute top-4 left-4 z-20">
-      <div className="bg-black/70 backdrop-blur-sm text-white p-3 rounded-lg border border-cyan-500/30">
-        <div className="font-bold text-cyan-400 mb-2">🎥 Recording</div>
-        
+      <div className="bg-black/70 backdrop-blur-sm text-white p-3 rounded-lg border border-cyan-500/30 max-w-xs">
+        <div className="font-bold text-cyan-400 mb-2">🎥 Video Recording</div>
+
         <button
           onClick={isRecording ? stopRecording : startRecording}
-          className={`px-4 py-2 rounded mb-2 ${
+          className={`px-4 py-2 rounded mb-2 w-full ${
             isRecording ? "bg-red-500 text-white" : "bg-blue-500 text-white"
           }`}
         >
-          {isRecording ? "Stop Recording" : "Record Playback"}
+          {isRecording ? "Stop Recording" : "Record Video"}
         </button>
-        
+
         {isRecording && (
           <div className="text-white text-sm mb-2">
-            Recording... {Math.floor((Date.now() - startTimeRef.current) / 1000)}s
+            Recording...{" "}
+            {Math.floor((Date.now() - startTimeRef.current) / 1000)}s
           </div>
         )}
-        
-        {showPlayback && recordedFrames.length > 0 && (
+
+        {showPlayback && (
           <div className="mt-2 pt-2 border-t border-gray-600">
             <div className="text-green-400 text-sm mb-2">
-              ✅ Recorded {recordedFrames.length} frames
+              ✅ Recording Complete
             </div>
             <div className="space-y-1">
+              {videoBlob && (
+                <button
+                  onClick={downloadVideo}
+                  className="w-full px-2 py-1 bg-red-600 hover:bg-red-500 rounded text-xs"
+                >
+                  📹 Download Video (WebM)
+                </button>
+              )}
               <button
                 onClick={downloadFrames}
                 className="w-full px-2 py-1 bg-green-600 hover:bg-green-500 rounded text-xs"
               >
-                Download Sample Frame
+                🖼️ Sample Frame (PNG)
               </button>
               <button
                 onClick={downloadAllFrames}
                 className="w-full px-2 py-1 bg-purple-600 hover:bg-purple-500 rounded text-xs"
               >
-                Download All Data (JSON)
+                📊 All Data (JSON)
               </button>
+            </div>
+            <div className="text-xs text-gray-400 mt-2">
+              Video: {videoBlob ? `${(videoBlob.size / 1024 / 1024).toFixed(1)}MB` : 'Processing...'}
             </div>
           </div>
         )}
