@@ -69,7 +69,7 @@ export function SceneContent({
     let r = base;
     switch (viewMode) {
       case "true-scale":
-        r = base * 0.1;
+        r = base * 0.001; // Much smaller for true scale
         break;
       case "ride-atlas":
         r = body === "Sun" ? base * 0.45 : base * 0.4; // was 0.3 - make planets more visible
@@ -131,7 +131,7 @@ export function SceneContent({
     let boundary = rawBoundary;
     if (scaleStateRef.current.clamped) boundary *= 0.97; // small buffer
 
-    const desiredScale = viewMode === "ride-atlas" ? 0.8 : 0.3;
+    const desiredScale = viewMode === "ride-atlas" ? 0.8 : 0.6; // Make comet more visible in explorer
     let targetScale = desiredScale;
 
     if (desiredScale > boundary) {

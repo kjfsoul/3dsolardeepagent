@@ -37,31 +37,33 @@ export function TimelinePanel({
     <>
       {/* Timeline Buttons */}
       <div
-        className={`fixed left-4 top-1/2 transform -translate-y-1/2 space-y-3 z-10 ${className}`}
+        className={`fixed left-4 top-20 space-y-2 z-10 ${className}`}
       >
         {events.map((event) => (
           <button
             key={event.id}
             onClick={() => handleEventClick(event)}
-            className={`block w-full px-4 py-3 rounded-lg transition-all ${
+            className={`block w-full px-3 py-2 rounded-lg transition-all ${
               event.type === 'milestone'
                 ? 'bg-green-600/80 hover:bg-green-500'
                 : 'bg-blue-600/80 hover:bg-blue-500'
             } text-white text-left backdrop-blur-md`}
             style={{
-              minWidth: '180px',
+              minWidth: '200px',
               border: `2px solid ${
                 event.type === 'milestone' ? '#00ff88' : '#00aaff'
               }`,
             }}
             title={event.description}
           >
-            <div className="font-bold text-sm">{event.name}</div>
-            <div className="text-xs opacity-80 mt-1">
-              {new Date(event.date).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-              })}
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-xs">{event.name}</span>
+              <span className="text-xs opacity-80">
+                {new Date(event.date).toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </span>
             </div>
           </button>
         ))}

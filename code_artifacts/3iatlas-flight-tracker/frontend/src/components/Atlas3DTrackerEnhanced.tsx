@@ -38,7 +38,7 @@ interface Atlas3DTrackerEnhancedProps {
 export function Atlas3DTrackerEnhanced({
   autoPlay = true,
   initialSpeed = 2,
-  initialViewMode = 'explorer',
+  initialViewMode = 'ride-atlas',
 }: Atlas3DTrackerEnhancedProps) {
   // State management
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryData | null>(null);
@@ -348,8 +348,8 @@ export function Atlas3DTrackerEnhanced({
         {/* Camera */}
         <PerspectiveCamera
           makeDefault
-          position={viewMode === "true-scale" ? [0, 0, 20] : [6, 4, 6]}
-          fov={viewMode === "true-scale" ? 30 : 50}
+          position={viewMode === "true-scale" ? [0, 0, 5] : [6, 4, 6]}
+          fov={viewMode === "true-scale" ? 45 : 50}
         />
 
         {/* Scene */}
