@@ -147,7 +147,7 @@ export function Atlas3DTrackerEnhanced({
   // Data loading
   useEffect(() => {
     console.log('🚀 Starting data load...');
-    
+
     // Load trajectory data
     fetch('/data/trajectory_static.json')
       .then(response => {
@@ -182,10 +182,10 @@ export function Atlas3DTrackerEnhanced({
   // Get current frame data
   const currentFrame = useMemo(() => {
     if (!trajectoryData) return null;
-    
+
     const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'];
     if (!atlasData || atlasData.length === 0) return null;
-    
+
     const frame = atlasData[Math.floor(currentIndex)];
     if (!frame) return null;
 
@@ -215,16 +215,16 @@ export function Atlas3DTrackerEnhanced({
   // Ride-along camera for "ride-atlas" mode
   const rideAlongCamera = useMemo(() => {
     if (!currentFrame || viewMode !== 'ride-atlas') return null;
-    
+
     const cometPos = new THREE.Vector3(
       currentFrame.position.x,
       currentFrame.position.z,
       -currentFrame.position.y
     );
-    
+
     const cameraOffset = new THREE.Vector3(1.0, 0.5, 1.0);
     const cameraPos = cometPos.clone().add(cameraOffset);
-    
+
     return {
       position: [cameraPos.x, cameraPos.y, cameraPos.z] as [number, number, number],
       target: [cometPos.x, cometPos.y, cometPos.z] as [number, number, number],
@@ -994,18 +994,18 @@ interface StarfieldProps {
 export function Starfield({ count = 3000, radius = 80, depth = 40 }: StarfieldProps) {
   const points = useMemo(() => {
     const positions = new Float32Array(count * 3);
-    
+
     for (let i = 0; i < count; i++) {
       // Generate random positions in a sphere
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       const r = radius + Math.random() * depth;
-      
+
       positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
       positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = r * Math.cos(phi);
     }
-    
+
     return positions;
   }, [count, radius, depth]);
 
@@ -1105,14 +1105,14 @@ export function PlaybackControls({
         >
           Reset
         </button>
-        
+
         <button
           onClick={() => onPlayPause(!isPlaying)}
           className="px-4 py-1 bg-blue-600 hover:bg-blue-500 rounded text-sm"
         >
           {isPlaying ? 'Pause' : 'Play'}
         </button>
-        
+
         <select
           value={playbackSpeed}
           onChange={(e) => onSpeedChange(Number(e.target.value))}
@@ -1132,7 +1132,7 @@ export function PlaybackControls({
           >
             View: {viewModeLabels[viewMode as keyof typeof viewModeLabels]}
           </button>
-          
+
           {showViewMenu && (
             <div className="absolute bottom-full mb-2 left-0 bg-black/90 border border-cyan-500/30 rounded p-2 min-w-max">
               {Object.entries(viewModeLabels).map(([key, label]) => (
@@ -1175,21 +1175,21 @@ export function TelemetryHUD({ currentFrame }: TelemetryHUDProps) {
 
   const distanceKm = currentFrame.distance_au * 149597870.7;
   const velocityKmh = Math.sqrt(
-    currentFrame.velocity.x ** 2 + 
-    currentFrame.velocity.y ** 2 + 
+    currentFrame.velocity.x ** 2 +
+    currentFrame.velocity.y ** 2 +
     currentFrame.velocity.z ** 2
   ) * 149597870.7 * 24;
 
   return (
     <div className="absolute top-4 right-4 bg-black/70 text-white p-4 rounded-lg border border-cyan-500/30 backdrop-blur-sm">
       <h3 className="text-lg font-bold text-cyan-400 mb-3">3I/ATLAS</h3>
-      
+
       <div className="space-y-2 text-sm">
         <div>
           <span className="text-gray-400">Date:</span>
           <span className="ml-2">{currentFrame.date}</span>
         </div>
-        
+
         <div>
           <span className="text-gray-400">Distance from Sun:</span>
           <div className="ml-2">
@@ -1199,7 +1199,7 @@ export function TelemetryHUD({ currentFrame }: TelemetryHUDProps) {
             </div>
           </div>
         </div>
-        
+
         <div>
           <span className="text-gray-400">Velocity:</span>
           <div className="ml-2">
@@ -1210,7 +1210,7 @@ export function TelemetryHUD({ currentFrame }: TelemetryHUDProps) {
           </div>
         </div>
       </div>
-      
+
       <button className="mt-3 w-full px-3 py-1 bg-cyan-600 hover:bg-cyan-500 rounded text-sm">
         Real-time trajectory data
       </button>
@@ -1250,7 +1250,7 @@ export function PlaybackRecorder({
     setIsRecording(true);
     setFrames([]);
     startTimeRef.current = Date.now();
-    
+
     // Capture frames every 100ms
     intervalRef.current = setInterval(() => {
       const canvas = document.querySelector('canvas');
@@ -1353,7 +1353,7 @@ export function TimelinePanel({ events, currentDate, onEventClick }: TimelinePan
   return (
     <div className="absolute left-4 top-4 bg-black/70 text-white p-4 rounded-lg border border-cyan-500/30 backdrop-blur-sm max-w-xs">
       <h3 className="text-lg font-bold text-cyan-400 mb-3">Key Events</h3>
-      
+
       <div className="space-y-2 text-sm">
         {events.map((event) => (
           <button
@@ -1866,11 +1866,11 @@ class TrajectoryDataGenerator:
             try:
                 with open(STATIC_FILE, 'r') as f:
                     cached_data = json.load(f)
-                
+
                 # Check if cache is within 7-day TTL
                 generated_time = datetime.fromisoformat(cached_data['metadata']['generated'])
                 cache_age = datetime.now() - generated_time
-                
+
                 if cache_age.days < 7:
                     cache_valid = True
                     print(f"✅ Cache valid (age: {cache_age.days} days < 7-day TTL)")

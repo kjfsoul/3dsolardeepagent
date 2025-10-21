@@ -55,7 +55,7 @@ export function PlaybackRecorder({
   }
 
   return (
-    <div className="absolute top-4 right-4 z-20">
+    <div className="absolute top-4 left-4 z-20">
       <button
         onClick={isRecording ? stopRecording : startRecording}
         className={`px-4 py-2 rounded ${
