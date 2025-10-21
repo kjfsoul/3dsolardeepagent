@@ -42,55 +42,63 @@ export function Comet3D({
 
   return (
     <group ref={groupRef} position={position}>
-      {/* Unified Comet Body - Single elongated ellipsoid for seamless look */}
-      <mesh scale={[1, 1, 3]}>
-        <sphereGeometry args={[scale * 0.8, 32, 32]} />
+      {/* Primary Comet Head - Enhanced cone base */}
+      <mesh 
+        rotation={[Math.PI / 2, 0, 0]} 
+        position={[0, 0, 0]}
+        scale={[1, 1, 1]}
+      >
+        <coneGeometry args={[scale * 0.8, tailLength * 0.3, 16, 1, true]} />
         <meshStandardMaterial
-          color="#00ffaa"
-          emissive="#00ff88"
-          emissiveIntensity={1.5}
-          roughness={0.3}
+          color="#ffffff"
+          emissive="#f0f0f0"
+          emissiveIntensity={0.3}
+          roughness={0.4}
         />
       </mesh>
 
-      {/* Seamless Coma - Flows from nucleus */}
-      <mesh scale={[1, 1, 3]}>
-        <sphereGeometry args={[scale * 1.5, 32, 32]} />
+      {/* Comet Head Glow - Subtle white glow */}
+      <mesh 
+        rotation={[Math.PI / 2, 0, 0]} 
+        position={[0, 0, 0]}
+        scale={[1.2, 1, 1]}
+      >
+        <coneGeometry args={[scale * 0.6, tailLength * 0.25, 16, 1, true]} />
         <meshBasicMaterial
-          color="#00ff88"
+          color="#ffffff"
           transparent
-          opacity={0.3}
+          opacity={0.2}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
 
-      {/* Integrated Tail - Seamlessly connected to body */}
+      {/* Main Tail - Flows from head */}
       <mesh 
         rotation={[Math.PI / 2, 0, 0]} 
-        position={[0, -tailLength * 0.2, 0]}
+        position={[0, -tailLength * 0.15, 0]}
         scale={[1, 1, 1]}
       >
-        <coneGeometry args={[scale * 0.6, tailLength, 16, 1, true]} />
+        <coneGeometry args={[scale * 0.6, tailLength * 0.85, 16, 1, true]} />
         <meshBasicMaterial
-          color="#00ff66"
+          color="#e0e0e0"
           transparent
-          opacity={0.4}
+          opacity={0.6}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
 
-      {/* Additional tail layers for depth and realism */}
+      {/* Secondary Tail Layer - For depth */}
       <mesh 
         rotation={[Math.PI / 2, 0, 0]} 
         position={[0, -tailLength * 0.1, 0]}
         scale={[1.3, 1, 1]}
       >
-        <coneGeometry args={[scale * 0.4, tailLength * 0.8, 16, 1, true]} />
+        <coneGeometry args={[scale * 0.4, tailLength * 0.7, 16, 1, true]} />
         <meshBasicMaterial
-          color="#00ff88"
+          color="#c0c0c0"
           transparent
-          opacity={0.2}
+          opacity={0.3}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
         />
@@ -98,9 +106,9 @@ export function Comet3D({
 
       {/* Comet Label */}
       <Text
-        position={[0, scale * 3, 0]}
-        fontSize={scale * 2}
-        color="#00ff88"
+        position={[0, scale * 4, 0]}
+        fontSize={scale * 2.5}
+        color="#ffffff"
         anchorX="center"
         anchorY="middle"
         outlineWidth={0.02}
