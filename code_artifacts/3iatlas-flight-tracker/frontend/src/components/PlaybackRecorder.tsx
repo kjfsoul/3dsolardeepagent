@@ -1,12 +1,10 @@
 /**
  * PlaybackRecorder Component
  * =============================
- * Records the 3D scene for AI analysis and review
+ * Simple recording component for capturing screenshots
  */
 
-import { useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import { useRef, useState } from "react";
 
 interface PlaybackRecorderProps {
   enabled?: boolean;
@@ -14,57 +12,57 @@ interface PlaybackRecorderProps {
   onComplete?: (frames: string[]) => void;
 }
 
-export function PlaybackRecorder({ 
-  enabled = false, 
-  duration = 10, 
-  onComplete 
+export function PlaybackRecorder({
+  enabled = false,
+  duration = 10,
+  onComplete,
 }: PlaybackRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [frames, setFrames] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const startTimeRef = useRef<number>(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const startRecording = () => {
     setIsRecording(true);
     setFrames([]);
     startTimeRef.current = Date.now();
+    
+    // Capture frames every 100ms
+    intervalRef.current = setInterval(() => {
+      const canvas = document.querySelector('canvas');
+      if (canvas) {
+        const frameData = canvas.toDataURL("image/png");
+        setFrames((prev) => [...prev, frameData]);
+      }
+    }, 100);
   };
 
   const stopRecording = () => {
     setIsRecording(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
     if (onComplete) {
       onComplete(frames);
     }
   };
 
-  useFrame((state) => {
-    if (!isRecording || !enabled) return;
-
-    const elapsed = (Date.now() - startTimeRef.current) / 1000;
-    if (elapsed >= duration) {
-      stopRecording();
-      return;
-    }
-
-    // Capture frame every 100ms
-    if (Math.floor(elapsed * 10) % 1 === 0) {
-      const canvas = state.gl.domElement;
-      const frameData = canvas.toDataURL('image/png');
-      setFrames(prev => [...prev, frameData]);
-    }
-  });
+  // Auto-stop after duration
+  if (isRecording && Date.now() - startTimeRef.current >= duration * 1000) {
+    stopRecording();
+  }
 
   return (
     <div className="absolute top-4 right-4 z-20">
       <button
         onClick={isRecording ? stopRecording : startRecording}
         className={`px-4 py-2 rounded ${
-          isRecording 
-            ? 'bg-red-500 text-white' 
-            : 'bg-blue-500 text-white'
+          isRecording ? "bg-red-500 text-white" : "bg-blue-500 text-white"
         }`}
       >
-        {isRecording ? 'Stop Recording' : 'Record Playback'}
+        {isRecording ? "Stop Recording" : "Record Playback"}
       </button>
       {isRecording && (
         <div className="text-white text-sm mt-2">
@@ -89,18 +87,18 @@ interface FrameAnalysis {
 
 export function analyzeFrames(frames: string[]): FrameAnalysis[] {
   const analyses: FrameAnalysis[] = [];
-  
+
   frames.forEach((frame, index) => {
     const analysis: FrameAnalysis = {
       timestamp: index * 0.1, // 100ms intervals
       issues: [],
-      suggestions: []
+      suggestions: [],
     };
 
     // Basic analysis - can be enhanced with computer vision
-    if (frame.includes('data:image/png')) {
+    if (frame.includes("data:image/png")) {
       // Frame captured successfully
-      analysis.issues.push('Frame captured');
+      analysis.issues.push("Frame captured");
     }
 
     analyses.push(analysis);

@@ -4,7 +4,7 @@ SYSTEM ENFORCEMENT — READ BEFORE WORK:
 2) Present a Phase Plan with acceptance criteria.
 3) Implement minimally and verifiably.
 4) Validate results against the rules’ checklists.
-5) Write a Memory Update block ready to paste into PROJECT_MEMORY.md.
+5) Write and paste a Memory Update block ready to paste into PROJECT_MEMORY.md.
 
 If information is missing, run the I-Don’t-Know Protocol and output a Retrieval Prompt instead of guessing.
 
