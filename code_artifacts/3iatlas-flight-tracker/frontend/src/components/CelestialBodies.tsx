@@ -31,7 +31,7 @@ export function CelestialBody({
   showLabel = true,
 }: CelestialBodyProps) {
   const { camera } = useThree();
-  
+
   // Fade labels with distance to camera to reduce clutter
   const labelOpacity = useMemo(() => {
     const camPos = camera.position;

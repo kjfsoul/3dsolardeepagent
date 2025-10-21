@@ -4,9 +4,9 @@
  * Fast instanced asteroid belt between Mars and Jupiter
  */
 
+import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from 'react';
-import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
+import * as THREE from "three";
 
 interface AsteroidBeltProps {
   count?: number;
@@ -37,14 +37,15 @@ export function AsteroidBelt({
 
     const mats: THREE.Matrix4[] = [];
     const dummy = new THREE.Object3D();
-    
+
     for (let i = 0; i < count; i++) {
-      const r = innerRadius + (outerRadius - innerRadius) * Math.sqrt(Math.random());
+      const r =
+        innerRadius + (outerRadius - innerRadius) * Math.sqrt(Math.random());
       const theta = Math.random() * Math.PI * 2;
       const y = (Math.random() - 0.5) * thickness;
 
       const s = scale * (0.4 + Math.pow(Math.random(), 2) * 1.6);
-      
+
       dummy.position.set(r * Math.cos(theta), y, r * Math.sin(theta));
       dummy.rotation.set(
         Math.random() * Math.PI,
@@ -53,7 +54,7 @@ export function AsteroidBelt({
       );
       dummy.scale.set(s, s, s);
       dummy.updateMatrix();
-      
+
       mats.push(dummy.matrix.clone());
     }
     return { geom: g, mat: m, matrices: mats };
@@ -79,4 +80,3 @@ export function AsteroidBelt({
     <instancedMesh ref={meshRef} args={[geom, mat, matrices.length]} />
   );
 }
-
