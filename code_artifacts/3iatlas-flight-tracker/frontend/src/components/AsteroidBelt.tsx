@@ -4,8 +4,8 @@
  * Fast instanced asteroid belt between Mars and Jupiter
  */
 
-import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 interface AsteroidBeltProps {
@@ -38,14 +38,19 @@ export function AsteroidBelt({
 
     const matrices: THREE.Matrix4[] = [];
     const colors = new Float32Array(count * 3);
-    
+
     for (let i = 0; i < count; i++) {
-      const r = innerRadius + (outerRadius - innerRadius) * Math.sqrt(Math.random());
+      const r =
+        innerRadius + (outerRadius - innerRadius) * Math.sqrt(Math.random());
       const theta = Math.random() * Math.PI * 2;
       const y = (Math.random() - 0.5) * thickness;
       const s = scale * (0.4 + Math.pow(Math.random(), 2) * 1.6);
 
-      const pos = new THREE.Vector3(r * Math.cos(theta), y, r * Math.sin(theta));
+      const pos = new THREE.Vector3(
+        r * Math.cos(theta),
+        y,
+        r * Math.sin(theta)
+      );
       const rot = new THREE.Euler(
         Math.random() * Math.PI,
         Math.random() * Math.PI,
@@ -69,7 +74,7 @@ export function AsteroidBelt({
     if (!m) return;
     for (let i = 0; i < matrices.length; i++) m.setMatrixAt(i, matrices[i]);
     m.instanceMatrix.needsUpdate = true;
-    
+
     // Set per-instance colors
     m.instanceColor = new THREE.InstancedBufferAttribute(colors, 3);
   }, [matrices, colors]);

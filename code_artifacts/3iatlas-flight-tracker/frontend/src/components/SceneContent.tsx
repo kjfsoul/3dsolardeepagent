@@ -5,9 +5,9 @@
  */
 
 import { OrbitControls } from '@react-three/drei';
-import { useThree } from '@react-three/fiber';
-import * as THREE from 'three';
-import { useMemo } from 'react';
+import { useFrame, useThree } from "@react-three/fiber";
+import { useMemo, useRef } from 'react';
+import * as THREE from "three";
 
 import { AsteroidBelt } from './AsteroidBelt';
 import { Planet, Sun } from './CelestialBodies';
@@ -16,6 +16,7 @@ import { CinematicCamera } from './FollowCamera';
 import { Starfield } from './Starfield';
 import { FullTrajectoryLine, TrajectoryTrail } from './TrajectoryTrail';
 
+import { PlanetLocators } from './PlanetLocators';
 import { TrajectoryData, VectorData } from '@/types/trajectory';
 
 type ViewMode = 'explorer' | 'true-scale' | 'ride-atlas';
@@ -64,7 +65,7 @@ export function SceneContent({
         r = base * 0.1;
         break;
       case 'ride-atlas':
-        r = body === 'Sun' ? base * 0.5 : base * 0.3;
+        r = body === 'Sun' ? base * 0.45 : base * 0.40; // was 0.3 - make planets more visible
         break;
       default:
         r = base;
@@ -76,17 +77,17 @@ export function SceneContent({
 
     // Tunables: a gentle floor that varies per mode
     const targetFrac =
-      viewMode === 'ride-atlas' ? 0.045 : viewMode === 'true-scale' ? 0.025 : 0.0;
+      viewMode === 'ride-atlas' ? 0.06 : // was 0.045 - make planets readable
+      viewMode === 'true-scale' ? 0.025 : 0.0;
 
     if (targetFrac > 0) {
-      const floor = d * targetFrac; // "visible enough" size
-      r = THREE.MathUtils.lerp(r, Math.max(r, floor), 0.8);
+      const floor = d * targetFrac;
+      r = Math.max(r, floor); // Direct max, no lerp for clearer sizing
     }
 
-    // Clamp absurdly large sizes when very close (prevents "planet fills screen" shots)
-    const clampMax = viewMode === 'ride-atlas' ? base * 1.2 : base * 3.0;
-    r = Math.min(r, clampMax);
-    return r;
+    // Keep things from going hilariously huge near camera
+    const clampMax = viewMode === 'ride-atlas' ? base * 1.1 : base * 3.0;
+    return Math.min(r, clampMax);
   }
 
   // Helper to get planet position
@@ -96,18 +97,84 @@ export function SceneContent({
     return [frame.position.x, frame.position.z, -frame.position.y];
   }
 
-  // Calculate comet scale with distance awareness
-  const cometScale = useMemo(() => {
-    const baseScale = viewMode === 'ride-atlas' ? 0.8 : 0.3;
-    const d = camera.position.distanceTo(new THREE.Vector3(...cometPosition)) + 1e-6;
-    const floor = viewMode === 'ride-atlas' ? d * 0.035 : d * 0.02;
-    return Math.min(Math.max(baseScale, floor), 1.2);
+  // Calculate comet scale with Sun apparent size clamp
+  const { cometScale, tailLength } = useMemo(() => {
+    const sunRadius = viewMode === 'ride-atlas' ? 2.0 * 0.45 : 2.0;
+    const cometPos = new THREE.Vector3(...cometPosition);
+    
+    const camToComet = camera.position.distanceTo(cometPos);
+    const camToSun = camera.position.length(); // Sun at [0,0,0]
+
+    // "apparent sizes" ~ radius / distance
+    const sunApparent = sunRadius / Math.max(camToSun, 1e-6);
+    const maxCometApparent = sunApparent * 0.30; // ≤ 30% of Sun on screen
+
+    // Desired ride scale
+    const desiredCometScale = viewMode === 'ride-atlas' ? 0.8 : 0.3;
+    // Clamp by apparent size rule
+    const cometScaleClamp = maxCometApparent * camToComet;
+    const finalCometScale = Math.min(desiredCometScale, cometScaleClamp);
+
+    // Tail grows as we near perihelion (heliocentric distance)
+    const heliocentricR = cometPos.length(); // AU in scene
+    const tailLen = THREE.MathUtils.clamp(3.5 / Math.max(heliocentricR, 0.5), 1.2, 6.0);
+
+    return { 
+      cometScale: finalCometScale, 
+      tailLength: viewMode === 'ride-atlas' ? tailLen : 2.0 
+    };
   }, [viewMode, cometPosition, camera.position]);
+
+  // Prepare bodies for screen-space locators (in Ride mode only)
+  const locatorBodies = useMemo(() => {
+    if (viewMode !== 'ride-atlas') return [];
+    
+    const bodies: { name: string; world: THREE.Vector3; color: string }[] = [];
+    
+    if (trajectoryData.earth.length > 0) {
+      const pos = getPlanetPos(trajectoryData.earth, currentIndex / 4);
+      bodies.push({ name: 'Earth', world: new THREE.Vector3(...pos), color: '#00aaff' });
+    }
+    if (trajectoryData.mars.length > 0) {
+      const pos = getPlanetPos(trajectoryData.mars, currentIndex / 4);
+      bodies.push({ name: 'Mars', world: new THREE.Vector3(...pos), color: '#ff6666' });
+    }
+    if (trajectoryData.jupiter.length > 0) {
+      const pos = getPlanetPos(trajectoryData.jupiter, currentIndex / 8);
+      bodies.push({ name: 'Jupiter', world: new THREE.Vector3(...pos), color: '#ffbb88' });
+    }
+    
+    return bodies;
+  }, [viewMode, trajectoryData, currentIndex]);
+
+  // Velocity-based camera motion for Ride mode
+  const controlsRef = useRef<any>(null);
+  useFrame((_, dt) => {
+    if (viewMode !== 'ride-atlas' || !cometVelocity || !controlsRef.current) return;
+    
+    const v = new THREE.Vector3(...cometVelocity).normalize();
+    const comet = new THREE.Vector3(...cometPosition);
+
+    const lead = v.clone().multiplyScalar(1.25); // look-ahead
+    const up = new THREE.Vector3(0, 1, 0);
+    const right = new THREE.Vector3().crossVectors(v, up).normalize();
+    const bank = right.multiplyScalar(0.15 * Math.sin(performance.now() * 0.001));
+
+    const camTarget = comet.clone().add(lead).add(bank);
+
+    // Smooth camera target interpolation
+    controlsRef.current.target.lerp(camTarget, dt * 2.0);
+  });
 
   return (
     <>
       {/* Starfield Background */}
       <Starfield count={3000} radius={80} depth={40} />
+
+      {/* Planet Locators (screen-space) */}
+      {viewMode === 'ride-atlas' && locatorBodies.length > 0 && (
+        <PlanetLocators bodies={locatorBodies} />
+      )}
 
       {/* Sun */}
       <Sun radius={sizeForView('Sun', 2.0, [0, 0, 0])} viewMode={viewMode} />
@@ -261,7 +328,7 @@ export function SceneContent({
         position={cometPosition}
         velocity={cometVelocity}
         scale={cometScale}
-        tailLength={viewMode === "ride-atlas" ? 4.0 : 2.0}
+        tailLength={tailLength}
         sunPosition={[0, 0, 0]}
       />
 
@@ -290,6 +357,7 @@ export function SceneContent({
       {/* Camera Controls - Enhanced for better exploration */}
       {!cinematicActive && (
         <OrbitControls
+          ref={controlsRef}
           enableDamping
           dampingFactor={0.03}
           enableZoom={true}
@@ -323,4 +391,3 @@ export function SceneContent({
     </>
   );
 }
-

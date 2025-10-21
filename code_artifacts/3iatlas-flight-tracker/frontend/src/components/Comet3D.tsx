@@ -5,7 +5,7 @@
  * Tail points away from the Sun (solar wind), not opposite velocity
  */
 
-import { Text } from "@react-three/drei";
+import { Billboard, Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
@@ -93,17 +93,18 @@ export function Comet3D({
     <group ref={groupRef} position={position}>
       <mesh geometry={geom} material={mat} />
       <primitive object={dust} />
-      <Text
-        position={[0, scale * 2.0, 0]}
-        fontSize={Math.max(0.12, scale * 0.5)}
-        color="#ffffff"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.02}
-        outlineColor="#000"
-      >
-        3I/ATLAS
-      </Text>
+      <Billboard follow lockX={false} lockY={false} lockZ={false} position={[0, scale * 2.0, 0]}>
+        <Text
+          fontSize={Math.max(0.12, scale * 0.5)}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.02}
+          outlineColor="#000"
+        >
+          3I/ATLAS
+        </Text>
+      </Billboard>
     </group>
   );
 }

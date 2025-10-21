@@ -6,7 +6,7 @@
  */
 
 import { VectorData } from '@/types/trajectory';
-import { Text } from '@react-three/drei';
+import { Billboard, Text } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -53,18 +53,19 @@ export function CelestialBody({
       </mesh>
 
       {showLabel && (
-        <Text
-          position={[0, radius * 1.5, 0]}
-          fontSize={0.15}
-          color={color}
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.02}
-          outlineColor="#000000"
-          fillOpacity={labelOpacity}
-        >
-          {name}
-        </Text>
+        <Billboard follow lockX={false} lockY={false} lockZ={false} position={[0, radius * 1.5, 0]}>
+          <Text
+            fontSize={0.15}
+            color={color}
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.02}
+            outlineColor="#000000"
+            fillOpacity={labelOpacity}
+          >
+            {name}
+          </Text>
+        </Billboard>
       )}
     </group>
   );
@@ -172,17 +173,18 @@ export function Sun({ radius = 2.0, viewMode = "explorer" }: SunProps) {
       </mesh>
 
       {/* Label */}
-      <Text
-        position={[0, radius * 2.1, 0]}
-        fontSize={radius * 0.18}
-        color="#ffcc66"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.02}
-        outlineColor="#000"
-      >
-        Sun
-      </Text>
+      <Billboard follow lockX={false} lockY={false} lockZ={false} position={[0, radius * 2.1, 0]}>
+        <Text
+          fontSize={radius * 0.18}
+          color="#ffcc66"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.02}
+          outlineColor="#000"
+        >
+          Sun
+        </Text>
+      </Billboard>
     </group>
   );
 }
