@@ -13,7 +13,7 @@ interface PlaybackRecorderProps {
 }
 
 export function PlaybackRecorder({
-  enabled = false,
+  enabled: _enabled = false, // for future use
   duration = 10,
   onComplete,
 }: PlaybackRecorderProps) {
@@ -22,7 +22,6 @@ export function PlaybackRecorder({
   const [recordedFrames, setRecordedFrames] = useState<string[]>([]);
   const [showPlayback, setShowPlayback] = useState(false);
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const startTimeRef = useRef<number>(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);

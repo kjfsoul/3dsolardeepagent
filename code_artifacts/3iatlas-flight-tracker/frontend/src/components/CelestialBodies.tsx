@@ -6,9 +6,9 @@
  */
 
 import { VectorData } from '@/types/trajectory';
-import { Text, useTexture } from '@react-three/drei';
+import { Text } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 interface CelestialBodyProps {
@@ -79,17 +79,25 @@ export function Sun({ radius = 0.1, viewMode = 'explorer' }: SunProps) {
   const brightness = viewMode === 'true-scale' ? 0.3 : viewMode === 'ride-atlas' ? 0.12 : 1.0;
   const glow = viewMode === 'true-scale' ? 0.08 : viewMode === 'ride-atlas' ? 0.02 : 0.25;
 
-  // Optional texture; if not found, material still looks good.
-  const tex = useTexture(
-    { color: '/textures/sun.jpg' },
-    (t) => {
-      if (t && typeof t === 'object' && 'color' in t) {
-        const colorTex = t.color as THREE.Texture;
-        colorTex.wrapS = colorTex.wrapT = THREE.RepeatWrapping;
-        colorTex.anisotropy = 8;
+  // Optional texture; graceful fallback if not found
+  const [tex, setTex] = useState<THREE.Texture | null>(null);
+  
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    loader.load(
+      '/textures/sun.jpg',
+      (texture) => {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.anisotropy = 8;
+        setTex(texture);
+      },
+      undefined,
+      () => {
+        // Gracefully fail - use procedural color instead
+        console.log('Sun texture not found, using procedural material');
       }
-    }
-  ).color as THREE.Texture | undefined;
+    );
+  }, []);
 
   // Animated UV scroll to fake convection cells
   const surfRef = useRef<THREE.Mesh>(null!);
