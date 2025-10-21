@@ -37,7 +37,7 @@ export function TimelinePanel({
     <>
       {/* Timeline Buttons */}
       <div
-        className={`fixed left-4 top-20 space-y-2 z-10 ${className}`}
+        className={`fixed left-4 top-32 space-y-2 z-10 ${className}`}
       >
         {events.map((event) => (
           <button
@@ -49,7 +49,7 @@ export function TimelinePanel({
                 : 'bg-blue-600/80 hover:bg-blue-500'
             } text-white text-left backdrop-blur-md`}
             style={{
-              minWidth: '200px',
+              minWidth: '250px',
               border: `2px solid ${
                 event.type === 'milestone' ? '#00ff88' : '#00aaff'
               }`,

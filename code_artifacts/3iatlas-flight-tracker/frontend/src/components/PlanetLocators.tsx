@@ -26,7 +26,7 @@ export function PlanetLocators({ bodies }: { bodies: Body[] }) {
 
   return (
     // Html renders normal DOM safely within <Canvas>
-    <Html fullscreen pointerEvents="none">
+    <Html fullscreen pointerEvents="none" style={{ zIndex: 1 }}>
       <div style={{ position: 'absolute', inset: 0, fontFamily: 'system-ui, sans-serif' }}>
         {bodies.map((b) => {
           const s = project(b.world);

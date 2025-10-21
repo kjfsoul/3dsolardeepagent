@@ -12,7 +12,7 @@ function App() {
       <Atlas3DTrackerEnhanced
         autoPlay={true}
         initialSpeed={2}
-        initialViewMode="explorer"
+        initialViewMode="ride-atlas"
       />
     </div>
   );
