@@ -106,7 +106,7 @@ export function PlaybackControls({
           {showSpeedMenu && (
             <div
               className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-              style={{ zIndex: 10000, pointerEvents: "auto" }}
+              style={{ zIndex: 99999, pointerEvents: "auto" }}
             >
               {speedOptions.map((s) => (
                 <button
@@ -139,7 +139,7 @@ export function PlaybackControls({
           {showViewMenu && (
             <div
               className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-              style={{ zIndex: 10000, pointerEvents: "auto" }}
+              style={{ zIndex: 99999, pointerEvents: "auto" }}
             >
               {Object.entries(viewModeLabels).map(([mode, label]) => (
                 <button
@@ -163,21 +163,24 @@ export function PlaybackControls({
 
         {/* Zoom Controls */}
         {onZoomIn && onZoomOut && (
-          <div className="flex gap-2">
-            <button
-              onClick={onZoomOut}
-              className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-              title="Zoom Out"
-            >
-              ➖
-            </button>
-            <button
-              onClick={onZoomIn}
-              className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-              title="Zoom In"
-            >
-              ➕
-            </button>
+          <div className="flex flex-col items-center gap-1">
+            <div className="text-xs text-gray-300 font-medium">Zoom</div>
+            <div className="flex gap-2">
+              <button
+                onClick={onZoomOut}
+                className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                title="Zoom Out"
+              >
+                ➖
+              </button>
+              <button
+                onClick={onZoomIn}
+                className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                title="Zoom In"
+              >
+                ➕
+              </button>
+            </div>
           </div>
         )}
       </div>

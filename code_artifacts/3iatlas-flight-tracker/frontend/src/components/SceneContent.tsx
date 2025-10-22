@@ -6,7 +6,7 @@
 
 import { OrbitControls } from '@react-three/drei';
 import { useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef, useEffect } from 'react';
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 import { AsteroidBelt } from './AsteroidBelt';
@@ -508,9 +508,9 @@ export function SceneContent({
           panSpeed={1.0}
           rotateSpeed={1.0}
           mouseButtons={{
-            LEFT: THREE.MOUSE.ROTATE,
+            LEFT: THREE.MOUSE.PAN,
             MIDDLE: THREE.MOUSE.DOLLY,
-            RIGHT: THREE.MOUSE.PAN,
+            RIGHT: THREE.MOUSE.ROTATE,
           }}
           touches={{
             ONE: THREE.TOUCH.ROTATE,

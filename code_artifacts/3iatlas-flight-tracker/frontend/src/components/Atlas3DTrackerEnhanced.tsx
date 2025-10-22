@@ -393,13 +393,16 @@ export function Atlas3DTrackerEnhanced({
         <div className="font-bold text-cyan-400 mb-2">🎮 Camera Controls</div>
         <div className="space-y-1">
           <div>
-            <span className="text-cyan-300">Left Click + Drag:</span> Rotate
+            <span className="text-cyan-300">Left Click + Drag:</span> Pan
           </div>
           <div>
             <span className="text-cyan-300">Scroll Wheel:</span> Zoom In/Out
           </div>
           <div>
-            <span className="text-cyan-300">Right Click + Drag:</span> Pan
+            <span className="text-cyan-300">Right Click + Drag:</span> Rotate
+          </div>
+          <div>
+            <span className="text-cyan-300">+ / - Buttons:</span> Zoom Controls
           </div>
           {viewMode === "ride-atlas" && (
             <div className="mt-2 pt-2 border-t border-cyan-500/30">
