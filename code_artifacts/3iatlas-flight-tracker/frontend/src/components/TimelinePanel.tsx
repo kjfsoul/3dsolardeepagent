@@ -37,11 +37,12 @@ export function TimelinePanel({
     <>
       {/* Timeline Buttons */}
       <div
-        className={`fixed left-4 top-20 space-y-2 z-10 ${className}`}
+        className={`space-y-2 ${className}`}
         style={{
-          maxHeight: 'calc(100vh - 220px)',
+          maxHeight: 'calc(100% - 220px)',
           overflowY: 'auto',
           paddingBottom: '1rem',
+          pointerEvents: 'none',
         }}
       >
         {events.map((event) => (
@@ -58,6 +59,7 @@ export function TimelinePanel({
               border: `2px solid ${
                 event.type === 'milestone' ? '#00ff88' : '#00aaff'
               }`,
+              pointerEvents: 'auto',
             }}
             title={event.description}
           >

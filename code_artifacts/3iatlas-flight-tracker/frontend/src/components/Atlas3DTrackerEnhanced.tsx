@@ -344,89 +344,97 @@ export function Atlas3DTrackerEnhanced({
   }
 
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden">
-      {/* Preload textures on mount */}
-      <TexturePreloader />
+    <div className="flex flex-col min-h-screen bg-black">
+      <div className="relative flex-1 overflow-hidden">
+        {/* Preload textures on mount */}
+        <TexturePreloader />
 
-      {/* 3D Canvas */}
-      <Canvas
-        className="w-full h-full border-2 border-blue-500/30 rounded-lg"
-        gl={{ antialias: true, alpha: false }}
-        dpr={[1, 2]}
-      >
-        {/* Lighting */}
-        <ambientLight intensity={0.3} />
+        {/* 3D Canvas */}
+        <Canvas
+          className="w-full h-full border-2 border-blue-500/30"
+          gl={{ antialias: true, alpha: false }}
+          dpr={[1, 2]}
+        >
+          {/* Lighting */}
+          <ambientLight intensity={0.3} />
 
-        {/* Camera */}
-        <PerspectiveCamera
-          makeDefault
-          position={viewMode === "true-scale" ? [0, 0, 5] : [6, 4, 6]}
-          fov={viewMode === "true-scale" ? 45 : 50}
+          {/* Camera */}
+          <PerspectiveCamera
+            makeDefault
+            position={viewMode === "true-scale" ? [0, 0, 5] : [6, 4, 6]}
+            fov={viewMode === "true-scale" ? 45 : 50}
+          />
+
+          {/* Scene */}
+          <Suspense fallback={null}>
+            <SceneContent
+              trajectoryData={trajectoryData}
+              currentIndex={currentIndex}
+              currentFrame={currentFrame}
+              viewMode={viewMode}
+              cometPosition={cometPosition}
+              cometVelocity={cometVelocity}
+              isPerihelion={isPerihelion}
+              cinematicActive={cinematicActive}
+              cometPositionVec={cometPositionVec}
+              rideAlongCamera={rideAlongCamera}
+              focusBody={focusBody}
+              setCinematicActive={setCinematicActive}
+              setCinematicEvent={setCinematicEvent}
+              cinematicEvent={cinematicEvent}
+            />
+          </Suspense>
+        </Canvas>
+
+        {/* Telemetry HUD */}
+        <TelemetryHUD
+          currentFrame={currentFrame}
+          className="absolute left-4 bottom-28 sm:left-6 sm:bottom-32 lg:left-10"
         />
 
-        {/* Scene */}
-        <Suspense fallback={null}>
-          <SceneContent
-            trajectoryData={trajectoryData}
-            currentIndex={currentIndex}
-            currentFrame={currentFrame}
-            viewMode={viewMode}
-            cometPosition={cometPosition}
-            cometVelocity={cometVelocity}
-            isPerihelion={isPerihelion}
-            cinematicActive={cinematicActive}
-            cometPositionVec={cometPositionVec}
-            rideAlongCamera={rideAlongCamera}
-            focusBody={focusBody}
-            setCinematicActive={setCinematicActive}
-            setCinematicEvent={setCinematicEvent}
-            cinematicEvent={cinematicEvent}
-          />
-        </Suspense>
-      </Canvas>
-
-      {/* UI Overlays */}
-      <TelemetryHUD currentFrame={currentFrame} />
-      {/* <PlaybackRecorder enabled={true} duration={30} /> - Hidden for testing only */}
-
-      {/* Controls Help - Always show since we have full camera controls */}
-      <div className="absolute top-20 right-4 bg-black/70 text-white text-xs p-3 rounded border border-cyan-500/30 backdrop-blur-sm pointer-events-none">
-        <div className="font-bold text-cyan-400 mb-2">🎮 Camera Controls</div>
-         <div className="space-y-1">
-           <div>
-             <span className="text-cyan-300">Left Click + Drag:</span> Rotate
-           </div>
-           <div>
-             <span className="text-cyan-300">Scroll Wheel:</span> Zoom In/Out
-           </div>
-           <div>
-             <span className="text-cyan-300">Right Click + Drag:</span> Pan
-           </div>
-           <div>
-             <span className="text-cyan-300">+ / - Buttons:</span> Zoom Controls
-           </div>
-          {viewMode === "ride-atlas" && (
-            <div className="mt-2 pt-2 border-t border-cyan-500/30">
-              <div className="text-yellow-400 font-bold">
-                🚀 Ride With ATLAS Mode
-              </div>
-              <div className="text-yellow-300">
-                Camera follows comet + full controls
-              </div>
+        {/* Controls Help - Always show since we have full camera controls */}
+        <div className="absolute top-20 right-4 bg-black/70 text-white text-xs p-3 rounded border border-cyan-500/30 backdrop-blur-sm pointer-events-none">
+          <div className="font-bold text-cyan-400 mb-2">🎮 Camera Controls</div>
+          <div className="space-y-1">
+            <div>
+              <span className="text-cyan-300">Left Click + Drag:</span> Rotate
             </div>
-          )}
-          {viewMode === "true-scale" && (
-            <div className="mt-2 pt-2 border-t border-cyan-500/30">
-              <div className="text-green-400 font-bold">📏 True Scale Mode</div>
-              <div className="text-green-300">
-                Realistic distances and sizes
-              </div>
+            <div>
+              <span className="text-cyan-300">Scroll Wheel:</span> Zoom In/Out
             </div>
-          )}
+            <div>
+              <span className="text-cyan-300">Right Click + Drag:</span> Pan
+            </div>
+            <div>
+              <span className="text-cyan-300">+ / - Buttons:</span> Zoom Controls
+            </div>
+            {viewMode === "ride-atlas" && (
+              <div className="mt-2 pt-2 border-t border-cyan-500/30">
+                <div className="text-yellow-400 font-bold">
+                  🚀 Ride With ATLAS Mode
+                </div>
+                <div className="text-yellow-300">
+                  Camera follows comet + full controls
+                </div>
+              </div>
+            )}
+            {viewMode === "true-scale" && (
+              <div className="mt-2 pt-2 border-t border-cyan-500/30">
+                <div className="text-green-400 font-bold">📏 True Scale Mode</div>
+                <div className="text-green-300">
+                  Realistic distances and sizes
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      <TimelinePanel events={events} onEventClick={handleEventClick} />
+        <TimelinePanel
+          events={events}
+          onEventClick={handleEventClick}
+          className="absolute left-4 top-20 z-30 max-w-xs"
+        />
+      </div>
 
       <PlaybackControls
         isPlaying={isPlaying}
@@ -441,6 +449,7 @@ export function Atlas3DTrackerEnhanced({
         onSpeedChange={setSpeed}
         onSeek={setCurrentIndex}
         onViewModeChange={setViewMode}
+        layout="inline"
       />
     </div>
   );
