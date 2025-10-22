@@ -5,7 +5,7 @@
  * User controls for playback, speed, and camera
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
 import { createPortal } from 'react-dom';
 
 interface PlaybackControlsProps {
@@ -65,11 +65,13 @@ export function PlaybackControls({
 
   return (
     <div
-      className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-md text-white p-4 rounded-lg shadow-2xl playback-controls"
+      className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md text-white p-3 rounded-lg shadow-2xl playback-controls"
       style={{
-        minWidth: "600px",
+        minWidth: "500px",
+        maxWidth: "90vw",
         border: "1px solid rgba(0, 255, 136, 0.3)",
-        zIndex: 9999, // Very high z-index to ensure controls are above everything
+        zIndex: 99999, // Even higher z-index
+        pointerEvents: "auto", // Ensure it captures events
       }}
     >
       {/* Timeline Slider */}
@@ -93,11 +95,11 @@ export function PlaybackControls({
       </div>
 
       {/* Control Buttons */}
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center gap-3 flex-wrap">
         {/* Reset Button */}
         <button
           onClick={onReset}
-          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+          className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm whitespace-nowrap"
           title="Reset to beginning"
         >
           ⏮️ Reset
@@ -106,7 +108,7 @@ export function PlaybackControls({
         {/* Play/Pause Button */}
         <button
           onClick={onPlayPause}
-          className="px-6 py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors font-semibold"
+          className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors font-semibold text-sm whitespace-nowrap"
         >
           {isPlaying ? "⏸️ Pause" : "▶️ Play"}
         </button>
@@ -115,7 +117,7 @@ export function PlaybackControls({
         <div className="relative">
           <button
             onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+            className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm whitespace-nowrap"
           >
             Speed: {speed}x
           </button>
@@ -157,7 +159,7 @@ export function PlaybackControls({
         <div className="relative">
           <button
             onClick={() => setShowViewMenu(!showViewMenu)}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+            className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm whitespace-nowrap"
             title="Change view scale"
           >
             View: {viewModeLabels[viewMode]}
@@ -202,17 +204,17 @@ export function PlaybackControls({
         {onZoomIn && onZoomOut && (
           <div className="flex flex-col items-center gap-1">
             <div className="text-xs text-gray-300 font-medium">Zoom</div>
-            <div className="flex gap-2">
+            <div className="flex gap-1">
               <button
                 onClick={onZoomOut}
-                className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
                 title="Zoom Out"
               >
                 ➖
               </button>
               <button
                 onClick={onZoomIn}
-                className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
                 title="Zoom In"
               >
                 ➕

@@ -26,8 +26,13 @@ export function PlanetLocators({ bodies }: { bodies: Body[] }) {
 
   return (
     // Html renders normal DOM safely within <Canvas>
-    <Html fullscreen pointerEvents="none" style={{ zIndex: 1 }}>
-      <div style={{ position: 'absolute', inset: 0, fontFamily: 'system-ui, sans-serif' }}>
+    <Html fullscreen pointerEvents="none" style={{ zIndex: 1, pointerEvents: "none" }}>
+      <div style={{ 
+        position: 'absolute', 
+        inset: 0, 
+        fontFamily: 'system-ui, sans-serif',
+        pointerEvents: "none" // Ensure no pointer events
+      }}>
         {bodies.map((b) => {
           const s = project(b.world);
           const left = Math.max(12, Math.min(size.width - 12, s.x));
