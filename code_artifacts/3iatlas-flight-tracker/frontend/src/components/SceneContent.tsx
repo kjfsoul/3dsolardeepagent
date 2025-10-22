@@ -214,10 +214,27 @@ export function SceneContent({
     };
   }, []);
 
+  // Add user interaction detection for ride-along camera
+  useEffect(() => {
+    if (!controlsRef.current) return;
+    const c = controlsRef.current;
+    const onStart = () => (c.userIsInteracting = true);
+    const onEnd = () => (c.userIsInteracting = false);
+    c.addEventListener?.('start', onStart);
+    c.addEventListener?.('end', onEnd);
+    return () => {
+      c.removeEventListener?.('start', onStart);
+      c.removeEventListener?.('end', onEnd);
+    };
+  }, []);
+
   useFrame((state, dt) => {
     if (!controlsRef.current) return;
 
-    if (viewMode === "ride-atlas" && cometVelocity && cometPosition) {
+    const c = controlsRef.current as any;
+    const userBusy = !!c.userIsInteracting;
+
+    if (viewMode === "ride-atlas" && !userBusy && cometVelocity && cometPosition) {
       // Comet world position & forward (from velocity)
       const comet = new THREE.Vector3(...cometPosition);
       const fwd = new THREE.Vector3(...cometVelocity).normalize();
@@ -250,9 +267,7 @@ export function SceneContent({
       controlsRef.current.target.copy(targetRef.current);
       controlsRef.current.update();
     } else {
-      // Non-ride mode: reset target to origin
-      targetRef.current.lerp(new THREE.Vector3(0, 0, 0), 1 - Math.exp(-6 * dt));
-      controlsRef.current.target.copy(targetRef.current);
+      // Outside ride mode or while user interacting: do NOT override camera.position
       controlsRef.current.update();
     }
   });
@@ -508,9 +523,9 @@ export function SceneContent({
           panSpeed={1.0}
           rotateSpeed={1.0}
           mouseButtons={{
-            LEFT: THREE.MOUSE.PAN,
+            LEFT: THREE.MOUSE.ROTATE,
             MIDDLE: THREE.MOUSE.DOLLY,
-            RIGHT: THREE.MOUSE.ROTATE,
+            RIGHT: THREE.MOUSE.PAN,
           }}
           touches={{
             ONE: THREE.TOUCH.ROTATE,

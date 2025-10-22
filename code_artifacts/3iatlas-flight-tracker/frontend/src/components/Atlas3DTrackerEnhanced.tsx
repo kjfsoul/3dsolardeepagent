@@ -389,21 +389,21 @@ export function Atlas3DTrackerEnhanced({
       <PlaybackRecorder enabled={true} duration={30} />
 
       {/* Controls Help - Always show since we have full camera controls */}
-      <div className="absolute top-20 right-4 bg-black/70 text-white text-xs p-3 rounded border border-cyan-500/30 backdrop-blur-sm">
+      <div className="absolute top-20 right-4 bg-black/70 text-white text-xs p-3 rounded border border-cyan-500/30 backdrop-blur-sm pointer-events-none">
         <div className="font-bold text-cyan-400 mb-2">🎮 Camera Controls</div>
-        <div className="space-y-1">
-          <div>
-            <span className="text-cyan-300">Left Click + Drag:</span> Pan
-          </div>
-          <div>
-            <span className="text-cyan-300">Scroll Wheel:</span> Zoom In/Out
-          </div>
-          <div>
-            <span className="text-cyan-300">Right Click + Drag:</span> Rotate
-          </div>
-          <div>
-            <span className="text-cyan-300">+ / - Buttons:</span> Zoom Controls
-          </div>
+         <div className="space-y-1">
+           <div>
+             <span className="text-cyan-300">Left Click + Drag:</span> Rotate
+           </div>
+           <div>
+             <span className="text-cyan-300">Scroll Wheel:</span> Zoom In/Out
+           </div>
+           <div>
+             <span className="text-cyan-300">Right Click + Drag:</span> Pan
+           </div>
+           <div>
+             <span className="text-cyan-300">+ / - Buttons:</span> Zoom Controls
+           </div>
           {viewMode === "ride-atlas" && (
             <div className="mt-2 pt-2 border-t border-cyan-500/30">
               <div className="text-yellow-400 font-bold">

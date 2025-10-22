@@ -26,34 +26,38 @@ export function PlanetLocators({ bodies }: { bodies: Body[] }) {
 
   return (
     // Html renders normal DOM safely within <Canvas>
-    <Html fullscreen pointerEvents="none" style={{ zIndex: 1, pointerEvents: "none" }}>
-      <div style={{ 
-        position: 'absolute', 
-        inset: 0, 
-        fontFamily: 'system-ui, sans-serif',
-        pointerEvents: "none" // Ensure no pointer events
-      }}>
+    <Html
+      fullscreen
+      pointerEvents="none"
+      style={{ zIndex: 1, pointerEvents: "none" }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          fontFamily: "system-ui, sans-serif",
+          pointerEvents: "none", // Ensure no pointer events
+        }}
+      >
         {bodies.map((b) => {
           const s = project(b.world);
           const left = Math.max(12, Math.min(size.width - 12, s.x));
           const top = Math.max(12, Math.min(size.height - 12, s.y));
           const style: React.CSSProperties = {
-            position: 'absolute',
+            position: "absolute",
             left,
             top,
-            transform: 'translate(-50%,-50%)',
+            transform: "translate(-50%,-50%)",
             color: b.color,
-            textShadow: '0 1px 2px rgba(0,0,0,0.9)',
+            textShadow: "0 1px 2px rgba(0,0,0,0.9)",
             fontSize: 12,
-            whiteSpace: 'nowrap',
-            pointerEvents: 'none',
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
           };
 
           return (
             <div key={b.name} style={style}>
-              {s.inView ? (
-                null // Don't show locator when planet is in view - let the 3D label handle it
-              ) : (
+              {s.inView ? null : ( // Don't show locator when planet is in view - let the 3D label handle it
                 <>➜ {b.name}</>
               )}
             </div>

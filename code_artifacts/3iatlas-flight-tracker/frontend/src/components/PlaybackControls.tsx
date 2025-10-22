@@ -81,7 +81,9 @@ export function PlaybackControls({
           min="0"
           max={maxIndex}
           value={currentIndex}
+          onMouseDown={() => onPlayPause()} // Pause while scrubbing
           onChange={(e) => onSeek(parseFloat(e.target.value))}
+          onMouseUp={() => {/* Keep paused or resume with another call */}}
           className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
           style={{
             accentColor: "#00ff88",

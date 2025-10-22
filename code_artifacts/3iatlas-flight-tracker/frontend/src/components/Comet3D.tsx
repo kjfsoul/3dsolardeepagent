@@ -62,6 +62,12 @@ export function Comet3D({
     const sun = new THREE.Vector3(...sunPosition);
     const awayFromSun = comet.clone().sub(sun).normalize();
     groupRef.current.lookAt(comet.clone().add(awayFromSun));
+
+    // Distance-reactive emissive intensity (near Sun = brighter)
+    const dist = Math.max(0.2, comet.distanceTo(sun));
+    const mesh = groupRef.current.children[0] as THREE.Mesh;
+    const m = mesh.material as THREE.MeshPhysicalMaterial;
+    m.emissiveIntensity = THREE.MathUtils.clamp(2 / dist, 0.25, 1.25);
   });
 
   // Very cheap dust particles
@@ -92,6 +98,19 @@ export function Comet3D({
   return (
     <group ref={groupRef} position={position}>
       <mesh geometry={geom} material={mat} />
+      
+      {/* Inner glow core */}
+      <mesh>
+        <sphereGeometry args={[scale * 0.6, 32, 32]} />
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.4}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
+      
       <primitive object={dust} />
       <Billboard follow lockX={false} lockY={false} lockZ={false} position={[0, scale * 2.0, 0]}>
         <Text
