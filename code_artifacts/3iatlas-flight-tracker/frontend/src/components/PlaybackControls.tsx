@@ -45,7 +45,7 @@ export function PlaybackControls({
   const isFloating = layout === 'floating';
   const containerClassName = isFloating
     ? "playback-controls fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md text-white rounded-lg shadow-2xl"
-    : "playback-controls w-full bg-black/90 backdrop-blur-md text-white border-t border-emerald-400/30";
+    : "playback-controls w-full rounded-xl border border-emerald-400/20 bg-black/70 backdrop-blur";
   const containerStyle = isFloating
     ? {
         minWidth: "500px",
@@ -57,7 +57,7 @@ export function PlaybackControls({
     : {
         pointerEvents: "auto" as const,
       };
-  const innerWrapperClass = isFloating ? "p-3" : "max-w-5xl mx-auto px-4 py-4";
+  const innerWrapperClass = isFloating ? "p-3" : "mx-auto w-full max-w-5xl px-4 py-4";
 
   const updateSpeedMenuPosition = () => {
     if (!speedButtonRef.current) return;

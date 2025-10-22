@@ -9,16 +9,20 @@ import { TimelineEvent } from '@/types/trajectory';
 import { useState } from "react";
 import ReactMarkdown from 'react-markdown';
 
+type TimelinePanelVariant = 'overlay' | 'inline';
+
 interface TimelinePanelProps {
   events: TimelineEvent[];
   onEventClick: (event: TimelineEvent) => void;
   className?: string;
+  variant?: TimelinePanelVariant;
 }
 
 export function TimelinePanel({
   events,
   onEventClick,
   className = '',
+  variant = 'overlay',
 }: TimelinePanelProps) {
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -33,17 +37,106 @@ export function TimelinePanel({
     setIsPanelOpen(false);
   };
 
+  if (variant === 'inline') {
+    return (
+      <div
+        className={`bg-black/60 border border-emerald-500/20 rounded-xl p-4 text-white shadow-lg backdrop-blur ${className}`}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold uppercase tracking-wide text-emerald-300">
+            Mission Timeline
+          </h3>
+          {selectedEvent && (
+            <button
+              onClick={closePanel}
+              className="text-xs text-gray-400 hover:text-white transition-colors"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-3 lg:h-[260px]">
+          <div className="space-y-2 overflow-y-auto pr-1">
+            {events.map((event) => (
+              <button
+                key={event.id}
+                onClick={() => handleEventClick(event)}
+                className={`w-full px-3 py-2 rounded-lg transition-all text-left border ${
+                  selectedEvent?.id === event.id
+                    ? 'bg-emerald-600/70 border-emerald-400'
+                    : event.type === 'milestone'
+                      ? 'bg-emerald-700/40 border-emerald-500/40 hover:bg-emerald-600/40'
+                      : 'bg-sky-700/30 border-sky-500/30 hover:bg-sky-600/30'
+                }`}
+                title={event.description}
+              >
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-xs tracking-wide uppercase">
+                    {event.name}
+                  </span>
+                  <span className="text-xs text-gray-300">
+                    {new Date(event.date).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex-1 rounded-lg border border-emerald-500/20 bg-black/50 p-3 text-sm overflow-y-auto">
+            {selectedEvent ? (
+              <div className="space-y-2">
+                <div className="text-lg font-semibold text-emerald-200">
+                  {selectedEvent.name}
+                </div>
+                <div className="text-xs text-gray-400 uppercase tracking-wide">
+                  {new Date(selectedEvent.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </div>
+                <div className="flex flex-wrap gap-3 text-xs">
+                  {selectedEvent.distance_au && (
+                    <span className="text-emerald-300">
+                      Distance: {selectedEvent.distance_au} AU
+                    </span>
+                  )}
+                  {selectedEvent.max_velocity_kms && (
+                    <span className="text-amber-300">
+                      Velocity: {selectedEvent.max_velocity_kms} km/s
+                    </span>
+                  )}
+                </div>
+                <div className="prose prose-invert prose-sm max-w-none">
+                  {selectedEvent.educational_content ? (
+                    <ReactMarkdown>
+                      {selectedEvent.educational_content}
+                    </ReactMarkdown>
+                  ) : (
+                    <p>{selectedEvent.description}</p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-gray-400 text-xs">
+                Select a milestone to view mission details.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Timeline Buttons */}
       <div
-        className={`space-y-2 ${className}`}
-        style={{
-          maxHeight: 'calc(100% - 220px)',
-          overflowY: 'auto',
-          paddingBottom: '1rem',
-          pointerEvents: 'none',
-        }}
+        className={`fixed left-4 top-20 space-y-2 z-10 ${className}`}
       >
         {events.map((event) => (
           <button
@@ -59,7 +152,6 @@ export function TimelinePanel({
               border: `2px solid ${
                 event.type === 'milestone' ? '#00ff88' : '#00aaff'
               }`,
-              pointerEvents: 'auto',
             }}
             title={event.description}
           >

@@ -344,28 +344,25 @@ export function Atlas3DTrackerEnhanced({
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-black">
-      <div className="relative flex-1 overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-black text-white">
+      <div className="relative flex-1 min-h-[60vh] overflow-hidden">
         {/* Preload textures on mount */}
         <TexturePreloader />
 
         {/* 3D Canvas */}
         <Canvas
-          className="w-full h-full border-2 border-blue-500/30"
+          className="h-full w-full border-2 border-emerald-500/30"
           gl={{ antialias: true, alpha: false }}
           dpr={[1, 2]}
         >
-          {/* Lighting */}
           <ambientLight intensity={0.3} />
 
-          {/* Camera */}
           <PerspectiveCamera
             makeDefault
             position={viewMode === "true-scale" ? [0, 0, 5] : [6, 4, 6]}
             fov={viewMode === "true-scale" ? 45 : 50}
           />
 
-          {/* Scene */}
           <Suspense fallback={null}>
             <SceneContent
               trajectoryData={trajectoryData}
@@ -385,72 +382,81 @@ export function Atlas3DTrackerEnhanced({
             />
           </Suspense>
         </Canvas>
-
-        {/* Telemetry HUD */}
-        <TelemetryHUD
-          currentFrame={currentFrame}
-          className="absolute left-4 bottom-28 sm:left-6 sm:bottom-32 lg:left-10"
-        />
-
-        {/* Controls Help - Always show since we have full camera controls */}
-        <div className="absolute top-20 right-4 bg-black/70 text-white text-xs p-3 rounded border border-cyan-500/30 backdrop-blur-sm pointer-events-none">
-          <div className="font-bold text-cyan-400 mb-2">🎮 Camera Controls</div>
-          <div className="space-y-1">
-            <div>
-              <span className="text-cyan-300">Left Click + Drag:</span> Rotate
-            </div>
-            <div>
-              <span className="text-cyan-300">Scroll Wheel:</span> Zoom In/Out
-            </div>
-            <div>
-              <span className="text-cyan-300">Right Click + Drag:</span> Pan
-            </div>
-            <div>
-              <span className="text-cyan-300">+ / - Buttons:</span> Zoom Controls
-            </div>
-            {viewMode === "ride-atlas" && (
-              <div className="mt-2 pt-2 border-t border-cyan-500/30">
-                <div className="text-yellow-400 font-bold">
-                  🚀 Ride With ATLAS Mode
-                </div>
-                <div className="text-yellow-300">
-                  Camera follows comet + full controls
-                </div>
-              </div>
-            )}
-            {viewMode === "true-scale" && (
-              <div className="mt-2 pt-2 border-t border-cyan-500/30">
-                <div className="text-green-400 font-bold">📏 True Scale Mode</div>
-                <div className="text-green-300">
-                  Realistic distances and sizes
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <TimelinePanel
-          events={events}
-          onEventClick={handleEventClick}
-          className="absolute left-4 top-20 z-30 max-w-xs"
-        />
       </div>
 
-      <PlaybackControls
-        isPlaying={isPlaying}
-        speed={speed}
-        currentIndex={currentIndex}
-        maxIndex={
-          (trajectoryData.atlas || trajectoryData["3iatlas"] || []).length - 1
-        }
-        viewMode={viewMode}
-        onPlayPause={() => setIsPlaying(!isPlaying)}
-        onReset={() => setCurrentIndex(0)}
-        onSpeedChange={setSpeed}
-        onSeek={setCurrentIndex}
-        onViewModeChange={setViewMode}
-        layout="inline"
-      />
+      <div className="border-t border-emerald-500/20 bg-black/90 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <TimelinePanel
+              events={events}
+              onEventClick={handleEventClick}
+              variant="inline"
+            />
+            <TelemetryHUD
+              currentFrame={currentFrame}
+              className="h-full border border-emerald-500/20 bg-black/60"
+            />
+            <CameraHelpCard viewMode={viewMode} />
+          </div>
+
+          <PlaybackControls
+            isPlaying={isPlaying}
+            speed={speed}
+            currentIndex={currentIndex}
+            maxIndex={
+              (trajectoryData.atlas || trajectoryData["3iatlas"] || []).length - 1
+            }
+            viewMode={viewMode}
+            onPlayPause={() => setIsPlaying(!isPlaying)}
+            onReset={() => setCurrentIndex(0)}
+            onSpeedChange={setSpeed}
+            onSeek={setCurrentIndex}
+            onViewModeChange={setViewMode}
+            layout="inline"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CameraHelpCard({ viewMode }: { viewMode: ViewMode }) {
+  return (
+    <div className="h-full rounded-xl border border-cyan-500/20 bg-black/60 p-4 text-xs shadow-lg backdrop-blur">
+      <div className="mb-3 text-sm font-bold uppercase tracking-wide text-cyan-300">
+        Camera Controls
+      </div>
+      <ul className="space-y-2 text-gray-200">
+        <li><span className="text-cyan-300">Left Click + Drag</span>: Rotate</li>
+        <li><span className="text-cyan-300">Scroll Wheel</span>: Zoom In/Out</li>
+        <li><span className="text-cyan-300">Right Click + Drag</span>: Pan</li>
+        <li><span className="text-cyan-300">+ / - Buttons</span>: Zoom Controls</li>
+      </ul>
+
+      <div className="mt-4 rounded-lg border border-cyan-500/20 bg-black/50 p-3 text-xs text-cyan-100">
+        {viewMode === 'ride-atlas' ? (
+          <>
+            <div className="font-semibold text-amber-300">🚀 Ride With ATLAS Mode</div>
+            <p className="mt-1 text-gray-300">
+              Camera follows the comet automatically while leaving full manual overrides available.
+            </p>
+          </>
+        ) : viewMode === 'true-scale' ? (
+          <>
+            <div className="font-semibold text-emerald-300">📏 True Scale Mode</div>
+            <p className="mt-1 text-gray-300">
+              Distances and planetary sizes are rendered at realistic proportions for comparison.
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="font-semibold text-cyan-300">🛰️ Explorer Mode</div>
+            <p className="mt-1 text-gray-300">
+              Freely orbit the solar system with balanced scale and visibility for each body.
+            </p>
+          </>
+        )}
+      </div>
     </div>
   );
 }

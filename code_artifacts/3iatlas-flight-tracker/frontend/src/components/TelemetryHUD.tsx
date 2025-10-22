@@ -53,7 +53,7 @@ export function TelemetryHUD({ currentFrame, className = '' }: TelemetryHUDProps
 
   return (
     <div
-      className={`bg-black/70 backdrop-blur-md text-white p-4 rounded-lg font-mono text-sm z-30 ${className}`}
+      className={`w-full bg-black/70 backdrop-blur-md text-white p-4 rounded-lg font-mono text-sm z-30 ${className}`}
       style={{
         minWidth: '280px',
         border: '1px solid rgba(0, 255, 136, 0.3)',
