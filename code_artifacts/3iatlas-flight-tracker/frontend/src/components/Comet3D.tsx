@@ -98,7 +98,7 @@ export function Comet3D({
   return (
     <group ref={groupRef} position={position}>
       <mesh geometry={geom} material={mat} />
-      
+
       {/* Inner glow core */}
       <mesh>
         <sphereGeometry args={[scale * 0.6, 32, 32]} />
@@ -110,9 +110,15 @@ export function Comet3D({
           depthWrite={false}
         />
       </mesh>
-      
+
       <primitive object={dust} />
-      <Billboard follow lockX={false} lockY={false} lockZ={false} position={[0, scale * 2.0, 0]}>
+      <Billboard
+        follow
+        lockX={false}
+        lockY={false}
+        lockZ={false}
+        position={[0, scale * 2.0, 0]}
+      >
         <Text
           fontSize={Math.max(0.12, scale * 0.5)}
           color="#ffffff"
