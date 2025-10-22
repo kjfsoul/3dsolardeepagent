@@ -8,6 +8,7 @@ import { OrbitControls } from '@react-three/drei';
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 import { AsteroidBelt } from './AsteroidBelt';
 import { Planet, Sun } from './CelestialBodies';
@@ -18,6 +19,8 @@ import { FullTrajectoryLine, TrajectoryTrail } from './TrajectoryTrail';
 
 import { TrajectoryData, VectorData } from "@/types/trajectory";
 import { PlanetLocators } from "./PlanetLocators";
+
+type OrbitControlsWithState = OrbitControlsImpl & { userIsInteracting?: boolean };
 
 type ViewMode = "explorer" | "true-scale" | "ride-atlas";
 
@@ -185,7 +188,7 @@ export function SceneContent({
   }, [viewMode, trajectoryData, currentIndex]);
 
   // Stable chase camera for Ride mode (no sway)
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsWithState | null>(null);
   const targetRef = useRef(new THREE.Vector3());
   const camPosRef = useRef(new THREE.Vector3(6, 4, 6)); // initial position
 
@@ -216,23 +219,27 @@ export function SceneContent({
 
   // Add user interaction detection for ride-along camera
   useEffect(() => {
-    if (!controlsRef.current) return;
-    const c = controlsRef.current;
-    const onStart = () => (c.userIsInteracting = true);
-    const onEnd = () => (c.userIsInteracting = false);
-    c.addEventListener?.('start', onStart);
-    c.addEventListener?.('end', onEnd);
+    const controls = controlsRef.current;
+    if (!controls) return;
+    const onStart = () => {
+      if (controlsRef.current) controlsRef.current.userIsInteracting = true;
+    };
+    const onEnd = () => {
+      if (controlsRef.current) controlsRef.current.userIsInteracting = false;
+    };
+    controls.addEventListener?.('start', onStart);
+    controls.addEventListener?.('end', onEnd);
     return () => {
-      c.removeEventListener?.('start', onStart);
-      c.removeEventListener?.('end', onEnd);
+      controls.removeEventListener?.('start', onStart);
+      controls.removeEventListener?.('end', onEnd);
     };
   }, []);
 
   useFrame((state, dt) => {
-    if (!controlsRef.current) return;
+    const controls = controlsRef.current;
+    if (!controls) return;
 
-    const c = controlsRef.current as any;
-    const userBusy = !!c.userIsInteracting;
+    const userBusy = Boolean(controls.userIsInteracting);
 
     if (viewMode === "ride-atlas" && !userBusy && cometVelocity && cometPosition) {
       // Comet world position & forward (from velocity)
@@ -264,11 +271,11 @@ export function SceneContent({
 
       // Apply
       state.camera.position.copy(camPosRef.current);
-      controlsRef.current.target.copy(targetRef.current);
-      controlsRef.current.update();
+      controls.target.copy(targetRef.current);
+      controls.update();
     } else {
       // Outside ride mode or while user interacting: do NOT override camera.position
-      controlsRef.current.update();
+      controls.update();
     }
   });
 

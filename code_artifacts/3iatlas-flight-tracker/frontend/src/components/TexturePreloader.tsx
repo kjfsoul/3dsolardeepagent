@@ -21,6 +21,9 @@ const PLANET_TEXTURES = [
   '/textures/uranus.jpg',
   '/textures/neptune.jpg',
   '/textures/pluto.jpg',
+  '/textures/ceres.jpg',
+  '/textures/vesta.jpg',
+  '/textures/pallas.jpg',
 ];
 
 export function TexturePreloader() {

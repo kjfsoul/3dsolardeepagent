@@ -19,8 +19,6 @@ interface PlaybackControlsProps {
   onSpeedChange: (speed: number) => void;
   onSeek: (index: number) => void;
   onViewModeChange: (mode: 'explorer' | 'true-scale' | 'ride-atlas') => void;
-  onZoomIn?: () => void;
-  onZoomOut?: () => void;
 }
 
 export function PlaybackControls({
@@ -34,8 +32,6 @@ export function PlaybackControls({
   onSpeedChange,
   onSeek,
   onViewModeChange,
-  onZoomIn,
-  onZoomOut,
 }: PlaybackControlsProps) {
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showViewMenu, setShowViewMenu] = useState(false);
@@ -61,6 +57,10 @@ export function PlaybackControls({
     explorer: "Explorer",
     "true-scale": "True Scale",
     "ride-atlas": "Ride With ATLAS",
+  };
+
+  const dispatchZoomEvent = (type: 'zoom-in' | 'zoom-out') => {
+    window.dispatchEvent(new CustomEvent(type));
   };
 
   return (
@@ -203,27 +203,25 @@ export function PlaybackControls({
         </div>
 
         {/* Zoom Controls */}
-        {onZoomIn && onZoomOut && (
-          <div className="flex flex-col items-center gap-1">
-            <div className="text-xs text-gray-300 font-medium">Zoom</div>
-            <div className="flex gap-1">
-              <button
-                onClick={onZoomOut}
-                className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
-                title="Zoom Out"
-              >
-                ➖
-              </button>
-              <button
-                onClick={onZoomIn}
-                className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
-                title="Zoom In"
-              >
-                ➕
-              </button>
-            </div>
+        <div className="flex flex-col items-center gap-1">
+          <div className="text-xs text-gray-300 font-medium">Zoom</div>
+          <div className="flex gap-1">
+            <button
+              onClick={() => dispatchZoomEvent('zoom-out')}
+              className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
+              title="Zoom Out"
+            >
+              ➖
+            </button>
+            <button
+              onClick={() => dispatchZoomEvent('zoom-in')}
+              className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
+              title="Zoom In"
+            >
+              ➕
+            </button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

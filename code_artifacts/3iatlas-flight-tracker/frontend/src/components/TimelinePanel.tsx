@@ -5,8 +5,8 @@
  * Interactive timeline with milestone buttons and educational content
  */
 
-import { useState } from 'react';
 import { TimelineEvent } from '@/types/trajectory';
+import { useState } from "react";
 import ReactMarkdown from 'react-markdown';
 
 interface TimelinePanelProps {
@@ -38,6 +38,11 @@ export function TimelinePanel({
       {/* Timeline Buttons */}
       <div
         className={`fixed left-4 top-20 space-y-2 z-10 ${className}`}
+        style={{
+          maxHeight: 'calc(100vh - 220px)',
+          overflowY: 'auto',
+          paddingBottom: '1rem',
+        }}
       >
         {events.map((event) => (
           <button

@@ -52,11 +52,11 @@ export function Atlas3DTrackerEnhanced({
 
   // Log state changes for debugging
   useEffect(() => {
-    console.log('View mode changed to:', viewMode);
+    console.log('viewMode=', viewMode);
   }, [viewMode]);
 
   useEffect(() => {
-    console.log('Speed changed to:', speed);
+    console.log('speed=', speed);
   }, [speed]);
   const [error, setError] = useState<string | null>(null);
 
@@ -231,17 +231,6 @@ export function Atlas3DTrackerEnhanced({
     [cometPosition]
   );
 
-  // Zoom functions
-  const handleZoomIn = () => {
-    // Direct zoom - will be handled by SceneContent
-    window.dispatchEvent(new CustomEvent('zoom-in'));
-  };
-
-  const handleZoomOut = () => {
-    // Direct zoom - will be handled by SceneContent
-    window.dispatchEvent(new CustomEvent('zoom-out'));
-  };
-
   // Handle event timeline clicks
   const handleEventClick = (event: TimelineEvent) => {
     if (!trajectoryData) return;
@@ -358,7 +347,7 @@ export function Atlas3DTrackerEnhanced({
     <div className="relative w-full h-screen bg-black overflow-hidden">
       {/* Preload textures on mount */}
       <TexturePreloader />
-      
+
       {/* 3D Canvas */}
       <Canvas
         className="w-full h-full border-2 border-blue-500/30 rounded-lg"
@@ -452,8 +441,6 @@ export function Atlas3DTrackerEnhanced({
         onSpeedChange={setSpeed}
         onSeek={setCurrentIndex}
         onViewModeChange={setViewMode}
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
       />
     </div>
   );
