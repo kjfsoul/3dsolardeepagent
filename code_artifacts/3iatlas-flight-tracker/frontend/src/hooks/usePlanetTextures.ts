@@ -1,7 +1,7 @@
 // src/hooks/usePlanetTextures.ts
+import { fetchPlanetTextures, PlanetTextureSet } from "@/utils/planetTextures";
 import { useEffect, useState } from "react";
 import type * as THREE from "three";
-import { fetchPlanetTextures, PlanetTextureSet } from "@/utils/planetTextures";
 
 export function usePlanetTextures(name: string) {
   const [textures, setTextures] = useState<PlanetTextureSet>({});

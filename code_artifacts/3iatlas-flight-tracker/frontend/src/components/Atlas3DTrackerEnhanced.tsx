@@ -349,7 +349,7 @@ export function Atlas3DTrackerEnhanced({
     <div className="relative w-full h-screen bg-black overflow-hidden">
       {/* 3D Canvas */}
       <Canvas
-        className="w-full h-full"
+        className="w-full h-full border-2 border-blue-500/30 rounded-lg"
         gl={{ antialias: true, alpha: false }}
         dpr={[1, 2]}
       >

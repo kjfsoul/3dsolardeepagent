@@ -5,7 +5,7 @@
  * User controls for playback, speed, and camera
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 interface PlaybackControlsProps {
@@ -40,6 +40,22 @@ export function PlaybackControls({
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showViewMenu, setShowViewMenu] = useState(false);
 
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.playback-controls')) {
+        setShowSpeedMenu(false);
+        setShowViewMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const speedOptions = [0.5, 1, 2, 5, 10, 25];
   const viewModeLabels = {
     explorer: "Explorer",
@@ -49,7 +65,7 @@ export function PlaybackControls({
 
   return (
     <div
-      className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-md text-white p-4 rounded-lg shadow-2xl"
+      className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-md text-white p-4 rounded-lg shadow-2xl playback-controls"
       style={{
         minWidth: "600px",
         border: "1px solid rgba(0, 255, 136, 0.3)",
@@ -107,11 +123,11 @@ export function PlaybackControls({
           {showSpeedMenu &&
             createPortal(
               <div
-                className="fixed bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+                className="fixed bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-600"
                 style={{
                   zIndex: 999999,
                   pointerEvents: "auto",
-                  bottom: "120px",
+                  bottom: "140px",
                   left: "50%",
                   transform: "translateX(-50%)",
                   minWidth: "150px",
@@ -150,11 +166,11 @@ export function PlaybackControls({
           {showViewMenu &&
             createPortal(
               <div
-                className="fixed bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+                className="fixed bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-600"
                 style={{
                   zIndex: 999999,
                   pointerEvents: "auto",
-                  bottom: "120px",
+                  bottom: "140px",
                   left: "50%",
                   transform: "translateX(-50%)",
                   minWidth: "200px",
