@@ -19,6 +19,9 @@ interface CelestialBodyProps {
   emissive?: string;
   emissiveIntensity?: number;
   showLabel?: boolean;
+  texture?: THREE.Texture | null;
+  normalMap?: THREE.Texture | null;
+  alphaMap?: THREE.Texture | null;
 }
 
 export function CelestialBody({
@@ -29,6 +32,9 @@ export function CelestialBody({
   emissive,
   emissiveIntensity = 0,
   showLabel = true,
+  texture,
+  normalMap,
+  alphaMap,
 }: CelestialBodyProps) {
   const { camera } = useThree();
 
@@ -45,10 +51,14 @@ export function CelestialBody({
       <mesh>
         <sphereGeometry args={[radius, 32, 32]} />
         <meshStandardMaterial
+          map={texture || undefined}
+          normalMap={normalMap || undefined}
+          alphaMap={alphaMap || undefined}
           color={color}
           emissive={emissive || color}
           emissiveIntensity={emissiveIntensity}
-          roughness={0.7}
+          roughness={0.6}
+          metalness={0.1}
         />
       </mesh>
 
@@ -82,11 +92,12 @@ export function Sun({ radius = 2.0, viewMode = "explorer" }: SunProps) {
   useEffect(() => {
     let mounted = true;
     new THREE.TextureLoader().load(
-      "/textures/sun_4k.jpg",
+      "/textures/sun.jpg",
       (tex) => {
         if (!mounted) return;
         tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
         tex.anisotropy = 8;
+        tex.colorSpace = THREE.SRGBColorSpace;
         setSunTex(tex);
       },
       undefined,
@@ -206,6 +217,46 @@ export function Planet({
   color,
   showOrbit = true,
 }: PlanetProps) {
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  const [normalMap, setNormalMap] = useState<THREE.Texture | null>(null);
+  const [cloudTexture, setCloudTexture] = useState<THREE.Texture | null>(null);
+  const [ringTexture, setRingTexture] = useState<THREE.Texture | null>(null);
+
+  // Load textures based on planet name
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    const nameLC = name.toLowerCase();
+
+    const tryLoad = (path: string, setter: (t: THREE.Texture) => void) => {
+      loader.load(
+        path,
+        (t) => {
+          t.anisotropy = 8;
+          t.colorSpace = THREE.SRGBColorSpace;
+          setter(t);
+        },
+        undefined,
+        () => {
+          // Texture not found, keep null
+        }
+      );
+    };
+
+    // Load diffuse texture
+    tryLoad(`/textures/${nameLC}.jpg`, setTexture);
+
+    // Load Earth normal map
+    if (name === "Earth") {
+      tryLoad(`/textures/earth_normal.jpg`, setNormalMap);
+      tryLoad(`/textures/earth_clouds.png`, setCloudTexture);
+    }
+
+    // Load Saturn rings
+    if (name === "Saturn") {
+      tryLoad(`/textures/saturn_rings.png`, setRingTexture);
+    }
+  }, [name]);
+
   if (trajectoryData.length === 0) return null;
 
   // Get current position
@@ -227,7 +278,35 @@ export function Planet({
         position={position}
         radius={radius}
         color={color}
+        texture={texture}
+        normalMap={normalMap}
       />
+
+      {/* Earth clouds layer */}
+      {name === "Earth" && cloudTexture && (
+        <mesh position={position}>
+          <sphereGeometry args={[radius * 1.02, 64, 64]} />
+          <meshStandardMaterial
+            map={cloudTexture}
+            transparent
+            depthWrite={false}
+            opacity={0.8}
+          />
+        </mesh>
+      )}
+
+      {/* Saturn rings */}
+      {name === "Saturn" && ringTexture && (
+        <mesh position={position} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[radius * 1.25, radius * 2.3, 128]} />
+          <meshBasicMaterial
+            map={ringTexture}
+            transparent
+            side={THREE.DoubleSide}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
 
       {/* Orbital path (simplified) */}
       {showOrbit && (
