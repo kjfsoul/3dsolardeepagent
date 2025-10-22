@@ -8,8 +8,9 @@
 import { VectorData } from '@/types/trajectory';
 import { Billboard, Text } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import { usePlanetTextures } from '@/hooks/usePlanetTextures';
 
 interface CelestialBodyProps {
   name: string;
@@ -87,29 +88,7 @@ interface SunProps {
 }
 
 export function Sun({ radius = 2.0, viewMode = "explorer" }: SunProps) {
-  // Graceful texture loading (no Suspense, no crash on 404)
-  const [sunTex, setSunTex] = useState<THREE.Texture | null>(null);
-  useEffect(() => {
-    let mounted = true;
-    new THREE.TextureLoader().load(
-      "/textures/sun.jpg",
-      (tex) => {
-        if (!mounted) return;
-        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-        tex.anisotropy = 8;
-        tex.colorSpace = THREE.SRGBColorSpace;
-        setSunTex(tex);
-      },
-      undefined,
-      () => {
-        // optional: console.info("Sun texture not found; using procedural material.");
-        if (mounted) setSunTex(null);
-      }
-    );
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const { map: sunTex } = usePlanetTextures("sun");
 
   // Mode-based brightness
   const { brightness, coronaOpacity } = useMemo(() => {
@@ -217,45 +196,7 @@ export function Planet({
   color,
   showOrbit = true,
 }: PlanetProps) {
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
-  const [normalMap, setNormalMap] = useState<THREE.Texture | null>(null);
-  const [cloudTexture, setCloudTexture] = useState<THREE.Texture | null>(null);
-  const [ringTexture, setRingTexture] = useState<THREE.Texture | null>(null);
-
-  // Load textures based on planet name
-  useEffect(() => {
-    const loader = new THREE.TextureLoader();
-    const nameLC = name.toLowerCase();
-
-    const tryLoad = (path: string, setter: (t: THREE.Texture) => void) => {
-      loader.load(
-        path,
-        (t) => {
-          t.anisotropy = 8;
-          t.colorSpace = THREE.SRGBColorSpace;
-          setter(t);
-        },
-        undefined,
-        () => {
-          // Texture not found, keep null
-        }
-      );
-    };
-
-    // Load diffuse texture
-    tryLoad(`/textures/${nameLC}.jpg`, setTexture);
-
-    // Load Earth normal map
-    if (name === "Earth") {
-      tryLoad(`/textures/earth_normal.jpg`, setNormalMap);
-      tryLoad(`/textures/earth_clouds.png`, setCloudTexture);
-    }
-
-    // Load Saturn rings
-    if (name === "Saturn") {
-      tryLoad(`/textures/saturn_rings.png`, setRingTexture);
-    }
-  }, [name]);
+  const { map, normal, clouds, rings } = usePlanetTextures(name);
 
   if (trajectoryData.length === 0) return null;
 
@@ -278,29 +219,31 @@ export function Planet({
         position={position}
         radius={radius}
         color={color}
-        texture={texture}
-        normalMap={normalMap}
+        texture={map || null}
+        normalMap={normal || null}
       />
 
       {/* Earth clouds layer */}
-      {name === "Earth" && cloudTexture && (
-        <mesh position={position}>
-          <sphereGeometry args={[radius * 1.02, 64, 64]} />
-          <meshStandardMaterial
-            map={cloudTexture}
-            transparent
-            depthWrite={false}
-            opacity={0.8}
-          />
-        </mesh>
+      {name === "Earth" && clouds && (
+        <group position={position}>
+          <mesh>
+            <sphereGeometry args={[radius * 1.02, 64, 64]} />
+            <meshStandardMaterial
+              map={clouds}
+              transparent
+              depthWrite={false}
+              opacity={0.85}
+            />
+          </mesh>
+        </group>
       )}
 
       {/* Saturn rings */}
-      {name === "Saturn" && ringTexture && (
+      {name === "Saturn" && rings && (
         <mesh position={position} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[radius * 1.25, radius * 2.3, 128]} />
           <meshBasicMaterial
-            map={ringTexture}
+            map={rings}
             transparent
             side={THREE.DoubleSide}
             depthWrite={false}
