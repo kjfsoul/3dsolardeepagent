@@ -472,7 +472,8 @@ export function SceneContent({
       {!cinematicActive && (
         <OrbitControls
           ref={controlsRef}
-          enableDamping={false}
+          enableDamping={true}
+          dampingFactor={0.05}
           enablePan={true}
           enableRotate={true}
           enableZoom={true}
@@ -485,6 +486,10 @@ export function SceneContent({
             LEFT: THREE.MOUSE.ROTATE,
             MIDDLE: THREE.MOUSE.DOLLY,
             RIGHT: THREE.MOUSE.PAN,
+          }}
+          touches={{
+            ONE: THREE.TOUCH.ROTATE,
+            TWO: THREE.TOUCH.DOLLY_PAN,
           }}
         />
       )}
