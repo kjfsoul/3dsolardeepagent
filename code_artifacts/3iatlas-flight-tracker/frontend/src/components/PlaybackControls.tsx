@@ -18,6 +18,8 @@ interface PlaybackControlsProps {
   onSpeedChange: (speed: number) => void;
   onSeek: (index: number) => void;
   onViewModeChange: (mode: 'explorer' | 'true-scale' | 'ride-atlas') => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
 }
 
 export function PlaybackControls({
@@ -31,6 +33,8 @@ export function PlaybackControls({
   onSpeedChange,
   onSeek,
   onViewModeChange,
+  onZoomIn,
+  onZoomOut,
 }: PlaybackControlsProps) {
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showViewMenu, setShowViewMenu] = useState(false);
@@ -156,6 +160,26 @@ export function PlaybackControls({
             </div>
           )}
         </div>
+
+        {/* Zoom Controls */}
+        {onZoomIn && onZoomOut && (
+          <div className="flex gap-2">
+            <button
+              onClick={onZoomOut}
+              className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              title="Zoom Out"
+            >
+              ➖
+            </button>
+            <button
+              onClick={onZoomIn}
+              className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              title="Zoom In"
+            >
+              ➕
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

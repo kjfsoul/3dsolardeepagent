@@ -222,6 +222,17 @@ export function Atlas3DTrackerEnhanced({
     [cometPosition]
   );
 
+  // Zoom functions
+  const handleZoomIn = () => {
+    // This will be handled by the OrbitControls in SceneContent
+    // We'll dispatch a custom event that SceneContent can listen to
+    window.dispatchEvent(new CustomEvent('zoom-in'));
+  };
+
+  const handleZoomOut = () => {
+    window.dispatchEvent(new CustomEvent('zoom-out'));
+  };
+
   // Handle event timeline clicks
   const handleEventClick = (event: TimelineEvent) => {
     if (!trajectoryData) return;
@@ -426,6 +437,8 @@ export function Atlas3DTrackerEnhanced({
         onSpeedChange={setSpeed}
         onSeek={setCurrentIndex}
         onViewModeChange={setViewMode}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
       />
     </div>
   );

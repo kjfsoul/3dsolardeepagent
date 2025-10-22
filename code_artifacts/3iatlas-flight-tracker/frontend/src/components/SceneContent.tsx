@@ -6,7 +6,7 @@
 
 import { OrbitControls } from '@react-three/drei';
 import { useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import * as THREE from "three";
 
 import { AsteroidBelt } from './AsteroidBelt';
@@ -188,6 +188,31 @@ export function SceneContent({
   const controlsRef = useRef<any>(null);
   const targetRef = useRef(new THREE.Vector3());
   const camPosRef = useRef(new THREE.Vector3(6, 4, 6)); // initial position
+
+  // Add zoom event listeners
+  useEffect(() => {
+    const handleZoomIn = () => {
+      if (controlsRef.current) {
+        controlsRef.current.dollyIn(0.5);
+        controlsRef.current.update();
+      }
+    };
+
+    const handleZoomOut = () => {
+      if (controlsRef.current) {
+        controlsRef.current.dollyOut(0.5);
+        controlsRef.current.update();
+      }
+    };
+
+    window.addEventListener('zoom-in', handleZoomIn);
+    window.addEventListener('zoom-out', handleZoomOut);
+
+    return () => {
+      window.removeEventListener('zoom-in', handleZoomIn);
+      window.removeEventListener('zoom-out', handleZoomOut);
+    };
+  }, []);
 
   useFrame((state, dt) => {
     if (!controlsRef.current) return;
@@ -491,6 +516,12 @@ export function SceneContent({
             ONE: THREE.TOUCH.ROTATE,
             TWO: THREE.TOUCH.DOLLY_PAN,
           }}
+          enableZoom={true}
+          zoomSpeed={2.0}
+          enablePan={true}
+          panSpeed={1.0}
+          enableRotate={true}
+          rotateSpeed={1.0}
         />
       )}
 
