@@ -516,12 +516,6 @@ export function SceneContent({
             ONE: THREE.TOUCH.ROTATE,
             TWO: THREE.TOUCH.DOLLY_PAN,
           }}
-          enableZoom={true}
-          zoomSpeed={2.0}
-          enablePan={true}
-          panSpeed={1.0}
-          enableRotate={true}
-          rotateSpeed={1.0}
         />
       )}
 
