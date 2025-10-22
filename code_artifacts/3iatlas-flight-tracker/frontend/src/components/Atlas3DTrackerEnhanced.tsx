@@ -19,9 +19,9 @@ import * as THREE from 'three';
 
 // Component imports
 import { PlaybackControls } from './PlaybackControls';
-import { PlaybackRecorder } from './PlaybackRecorder';
 import { SceneContent } from './SceneContent';
 import { TelemetryHUD } from './TelemetryHUD';
+import { TexturePreloader } from './TexturePreloader';
 import { TimelinePanel } from './TimelinePanel';
 
 // Type imports
@@ -49,6 +49,15 @@ export function Atlas3DTrackerEnhanced({
   // Removed followMode - always use free cam with zoom/pan/rotate
   const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode);
   const [loading, setLoading] = useState(true);
+
+  // Log state changes for debugging
+  useEffect(() => {
+    console.log('View mode changed to:', viewMode);
+  }, [viewMode]);
+
+  useEffect(() => {
+    console.log('Speed changed to:', speed);
+  }, [speed]);
   const [error, setError] = useState<string | null>(null);
 
   // Cinematic camera state
@@ -224,12 +233,12 @@ export function Atlas3DTrackerEnhanced({
 
   // Zoom functions
   const handleZoomIn = () => {
-    // This will be handled by the OrbitControls in SceneContent
-    // We'll dispatch a custom event that SceneContent can listen to
+    // Direct zoom - will be handled by SceneContent
     window.dispatchEvent(new CustomEvent('zoom-in'));
   };
 
   const handleZoomOut = () => {
+    // Direct zoom - will be handled by SceneContent
     window.dispatchEvent(new CustomEvent('zoom-out'));
   };
 
@@ -347,6 +356,9 @@ export function Atlas3DTrackerEnhanced({
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
+      {/* Preload textures on mount */}
+      <TexturePreloader />
+      
       {/* 3D Canvas */}
       <Canvas
         className="w-full h-full border-2 border-blue-500/30 rounded-lg"
@@ -386,7 +398,7 @@ export function Atlas3DTrackerEnhanced({
 
       {/* UI Overlays */}
       <TelemetryHUD currentFrame={currentFrame} />
-      <PlaybackRecorder enabled={true} duration={30} />
+      {/* <PlaybackRecorder enabled={true} duration={30} /> - Hidden for testing only */}
 
       {/* Controls Help - Always show since we have full camera controls */}
       <div className="absolute top-20 right-4 bg-black/70 text-white text-xs p-3 rounded border border-cyan-500/30 backdrop-blur-sm pointer-events-none">

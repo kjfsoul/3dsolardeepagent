@@ -37,7 +37,7 @@ export function TimelinePanel({
     <>
       {/* Timeline Buttons */}
       <div
-        className={`fixed left-4 top-32 space-y-2 z-10 ${className}`}
+        className={`fixed left-4 top-20 space-y-2 z-10 ${className}`}
       >
         {events.map((event) => (
           <button
