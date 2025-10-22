@@ -104,36 +104,37 @@ export function PlaybackControls({
             Speed: {speed}x
           </button>
 
-          {showSpeedMenu && createPortal(
-            <div
-              className="fixed bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-              style={{ 
-                zIndex: 999999, 
-                pointerEvents: "auto",
-                bottom: "120px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                minWidth: "150px"
-              }}
-            >
-              {speedOptions.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => {
-                    onSpeedChange(s);
-                    setShowSpeedMenu(false);
-                  }}
-                  className={`block w-full px-4 py-2 text-left hover:bg-gray-700 transition-colors ${
-                    speed === s ? "bg-green-600" : ""
-                  }`}
-                  style={{ pointerEvents: "auto", zIndex: 1000000 }}
-                >
-                  {s}x
-                </button>
-              ))}
-            </div>,
-            document.body
-          )}
+          {showSpeedMenu &&
+            createPortal(
+              <div
+                className="fixed bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+                style={{
+                  zIndex: 999999,
+                  pointerEvents: "auto",
+                  bottom: "120px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  minWidth: "150px",
+                }}
+              >
+                {speedOptions.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => {
+                      onSpeedChange(s);
+                      setShowSpeedMenu(false);
+                    }}
+                    className={`block w-full px-4 py-2 text-left hover:bg-gray-700 transition-colors ${
+                      speed === s ? "bg-green-600" : ""
+                    }`}
+                    style={{ pointerEvents: "auto", zIndex: 1000000 }}
+                  >
+                    {s}x
+                  </button>
+                ))}
+              </div>,
+              document.body
+            )}
         </div>
 
         {/* View Mode Toggle */}
@@ -146,38 +147,39 @@ export function PlaybackControls({
             View: {viewModeLabels[viewMode]}
           </button>
 
-          {showViewMenu && createPortal(
-            <div
-              className="fixed bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-              style={{ 
-                zIndex: 999999, 
-                pointerEvents: "auto",
-                bottom: "120px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                minWidth: "200px"
-              }}
-            >
-              {Object.entries(viewModeLabels).map(([mode, label]) => (
-                <button
-                  key={mode}
-                  onClick={() => {
-                    onViewModeChange(
-                      mode as "explorer" | "true-scale" | "ride-atlas"
-                    );
-                    setShowViewMenu(false);
-                  }}
-                  className={`block w-full px-4 py-2 text-left hover:bg-gray-700 transition-colors ${
-                    viewMode === mode ? "bg-green-600" : ""
-                  }`}
-                  style={{ pointerEvents: "auto", zIndex: 1000000 }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>,
-            document.body
-          )}
+          {showViewMenu &&
+            createPortal(
+              <div
+                className="fixed bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+                style={{
+                  zIndex: 999999,
+                  pointerEvents: "auto",
+                  bottom: "120px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  minWidth: "200px",
+                }}
+              >
+                {Object.entries(viewModeLabels).map(([mode, label]) => (
+                  <button
+                    key={mode}
+                    onClick={() => {
+                      onViewModeChange(
+                        mode as "explorer" | "true-scale" | "ride-atlas"
+                      );
+                      setShowViewMenu(false);
+                    }}
+                    className={`block w-full px-4 py-2 text-left hover:bg-gray-700 transition-colors ${
+                      viewMode === mode ? "bg-green-600" : ""
+                    }`}
+                    style={{ pointerEvents: "auto", zIndex: 1000000 }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>,
+              document.body
+            )}
         </div>
 
         {/* Zoom Controls */}
