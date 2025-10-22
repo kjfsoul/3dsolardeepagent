@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface PlaybackControlsProps {
   isPlaying: boolean;
@@ -103,10 +104,17 @@ export function PlaybackControls({
             Speed: {speed}x
           </button>
 
-          {showSpeedMenu && (
+          {showSpeedMenu && createPortal(
             <div
-              className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-              style={{ zIndex: 99999, pointerEvents: "auto" }}
+              className="fixed bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+              style={{ 
+                zIndex: 999999, 
+                pointerEvents: "auto",
+                bottom: "120px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                minWidth: "150px"
+              }}
             >
               {speedOptions.map((s) => (
                 <button
@@ -118,11 +126,13 @@ export function PlaybackControls({
                   className={`block w-full px-4 py-2 text-left hover:bg-gray-700 transition-colors ${
                     speed === s ? "bg-green-600" : ""
                   }`}
+                  style={{ pointerEvents: "auto", zIndex: 1000000 }}
                 >
                   {s}x
                 </button>
               ))}
-            </div>
+            </div>,
+            document.body
           )}
         </div>
 
@@ -136,10 +146,17 @@ export function PlaybackControls({
             View: {viewModeLabels[viewMode]}
           </button>
 
-          {showViewMenu && (
+          {showViewMenu && createPortal(
             <div
-              className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-              style={{ zIndex: 99999, pointerEvents: "auto" }}
+              className="fixed bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+              style={{ 
+                zIndex: 999999, 
+                pointerEvents: "auto",
+                bottom: "120px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                minWidth: "200px"
+              }}
             >
               {Object.entries(viewModeLabels).map(([mode, label]) => (
                 <button
@@ -153,11 +170,13 @@ export function PlaybackControls({
                   className={`block w-full px-4 py-2 text-left hover:bg-gray-700 transition-colors ${
                     viewMode === mode ? "bg-green-600" : ""
                   }`}
+                  style={{ pointerEvents: "auto", zIndex: 1000000 }}
                 >
                   {label}
                 </button>
               ))}
-            </div>
+            </div>,
+            document.body
           )}
         </div>
 
