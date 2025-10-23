@@ -50,12 +50,11 @@ export function PlaybackControls({
   const isFloating = layout === 'floating';
   const containerClassName = isFloating
     ? "playback-controls relative fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md text-white rounded-lg shadow-2xl"
-    : "playback-controls relative w-full rounded-xl border border-emerald-400/20 bg-black/70 backdrop-blur";
+    : "playback-controls relative w-full rounded-xl bg-black/70 backdrop-blur";
   const containerStyle = isFloating
     ? {
         minWidth: "320px", // Reduced from 500px for mobile
         maxWidth: "90vw",
-        border: "1px solid rgba(0, 255, 136, 0.3)",
         zIndex: 99999,
         pointerEvents: "auto" as const,
         margin: "0 16px", // Add horizontal margin
@@ -64,7 +63,7 @@ export function PlaybackControls({
         pointerEvents: "auto" as const,
         margin: "0 16px", // Add horizontal margin for non-floating
       };
-  const innerWrapperClass = isFloating ? "p-2 sm:p-3" : "mx-auto w-full max-w-5xl px-2 sm:px-4 py-3 sm:py-4";
+  const innerWrapperClass = isFloating ? "p-2 sm:p-3" : "mx-auto w-full max-w-5xl px-2 sm:px-4 py-1 sm:py-2";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -104,7 +103,7 @@ export function PlaybackControls({
     <div className={containerClassName} style={containerStyle}>
       <div className={innerWrapperClass}>
         {/* Timeline Slider Row */}
-        <div className={`mb-0 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
+        <div className={`-mb-2 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
           {/* Slider with percentage overlay */}
           <div className="flex items-center gap-2 sm:gap-4 text-xs text-white/70 relative">
             <span className="w-16 text-left sm:w-24 md:w-32 text-xs sm:text-sm">July 1, 2025</span>
