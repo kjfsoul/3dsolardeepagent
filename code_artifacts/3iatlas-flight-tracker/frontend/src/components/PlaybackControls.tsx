@@ -53,7 +53,7 @@ export function PlaybackControls({
     : "playback-controls relative w-full rounded-xl border border-emerald-400/20 bg-black/70 backdrop-blur";
   const containerStyle = isFloating
     ? {
-        minWidth: "500px",
+        minWidth: "320px", // Reduced from 500px for mobile
         maxWidth: "90vw",
         border: "1px solid rgba(0, 255, 136, 0.3)",
         zIndex: 99999,
@@ -62,7 +62,7 @@ export function PlaybackControls({
     : {
         pointerEvents: "auto" as const,
       };
-  const innerWrapperClass = isFloating ? "p-3" : "mx-auto w-full max-w-5xl px-4 py-4";
+  const innerWrapperClass = isFloating ? "p-2 sm:p-3" : "mx-auto w-full max-w-5xl px-2 sm:px-4 py-3 sm:py-4";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -102,9 +102,9 @@ export function PlaybackControls({
     <div className={containerClassName} style={containerStyle}>
       <div className={innerWrapperClass}>
         {/* Timeline Slider Row */}
-        <div className={`mb-6 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
-          <div className="flex items-center gap-4 text-xs text-white/70">
-            <span className="w-24 text-left sm:w-32">July 1, 2025</span>
+        <div className={`mb-4 sm:mb-6 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
+          <div className="flex items-center gap-2 sm:gap-4 text-xs text-white/70">
+            <span className="w-16 text-left sm:w-24 md:w-32 text-xs sm:text-sm">July 1, 2025</span>
             <input
               type="range"
               min="0"
@@ -116,19 +116,19 @@ export function PlaybackControls({
               className="h-2 flex-1 cursor-pointer appearance-none rounded-full bg-gray-700"
               style={{ accentColor: '#00ff88' }}
             />
-            <span className="w-24 text-right sm:w-32">March 31, 2026</span>
+            <span className="w-16 text-right sm:w-24 md:w-32 text-xs sm:text-sm">March 31, 2026</span>
           </div>
-          <div className="mt-2 text-center text-sm font-semibold text-white">
+          <div className="mt-1 sm:mt-2 text-center text-xs sm:text-sm font-semibold text-white">
             {progressPercent}%
           </div>
         </div>
 
         {/* Control Buttons */}
-        <div className={`flex flex-wrap items-center justify-center gap-3 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
+        <div className={`flex flex-wrap items-center justify-center gap-2 sm:gap-3 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
           <button
             type="button"
             onClick={onReset}
-            className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm whitespace-nowrap"
+            className="px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap"
             title="Reset to beginning"
           >
             ⏮️ Reset
@@ -137,7 +137,7 @@ export function PlaybackControls({
           <button
             type="button"
             onClick={onPlayPause}
-            className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors font-semibold text-sm whitespace-nowrap"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors font-semibold text-xs sm:text-sm whitespace-nowrap"
           >
             {isPlaying ? "⏸️ Pause" : "▶️ Play"}
           </button>
@@ -150,13 +150,13 @@ export function PlaybackControls({
                 setShowSpeedMenu((prev) => !prev);
                 setShowViewMenu(false);
               }}
-              className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm whitespace-nowrap"
+              className="px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap"
             >
               Speed: {speed}x
             </button>
 
             {showSpeedMenu && (
-              <div className="absolute left-1/2 bottom-full z-[1000] mb-2 w-40 -translate-x-1/2 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
+              <div className="absolute left-1/2 bottom-full z-[1000] mb-2 w-32 sm:w-40 -translate-x-1/2 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
                 {SPEED_OPTIONS.map((option) => (
                   <button
                     key={option}
@@ -165,7 +165,7 @@ export function PlaybackControls({
                       onSpeedChange(option);
                       setShowSpeedMenu(false);
                     }}
-                    className={`block w-full px-4 py-2 text-left text-sm transition hover:bg-gray-700 ${
+                    className={`block w-full px-3 sm:px-4 py-1.5 sm:py-2 text-left text-xs sm:text-sm transition hover:bg-gray-700 ${
                       speed === option ? 'bg-green-600 text-white' : 'text-white'
                     }`}
                   >
@@ -184,14 +184,14 @@ export function PlaybackControls({
                 setShowViewMenu((prev) => !prev);
                 setShowSpeedMenu(false);
               }}
-              className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm whitespace-nowrap"
+              className="px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap"
               title="Change view scale"
             >
-              View: {VIEW_MODE_LABELS[viewMode]}
+              <span className="hidden sm:inline">View: </span>{VIEW_MODE_LABELS[viewMode]}
             </button>
 
             {showViewMenu && (
-              <div className="absolute left-1/2 bottom-full z-[1000] mb-2 w-52 -translate-x-1/2 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
+              <div className="absolute left-1/2 bottom-full z-[1000] mb-2 w-40 sm:w-52 -translate-x-1/2 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
                 {VIEW_OPTIONS.map(({ mode, label }) => (
                   <button
                     key={mode}
@@ -200,7 +200,7 @@ export function PlaybackControls({
                       onViewModeChange(mode);
                       setShowViewMenu(false);
                     }}
-                    className={`block w-full px-4 py-2 text-left text-sm transition hover:bg-gray-700 ${
+                    className={`block w-full px-3 sm:px-4 py-1.5 sm:py-2 text-left text-xs sm:text-sm transition hover:bg-gray-700 ${
                       viewMode === mode ? 'bg-green-600 text-white' : 'text-white'
                     }`}
                   >
@@ -212,15 +212,16 @@ export function PlaybackControls({
           </div>
 
           {/* Zoom Controls */}
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-col items-center gap-0.5 sm:gap-1">
             <div className={`text-xs font-medium ${zoomEnabled ? 'text-white' : 'text-gray-400'}`}>
-              Zoom
+              <span className="hidden sm:inline">Zoom</span>
+              <span className="sm:hidden">Z</span>
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-0.5 sm:gap-1">
               <button
                 type="button"
                 onClick={() => zoomEnabled && dispatchZoomEvent('zoom-out')}
-                className={`px-2 py-1 rounded-lg border transition-colors text-sm ${
+                className={`px-1.5 sm:px-2 py-1 rounded-lg border transition-colors text-xs sm:text-sm ${
                   zoomEnabled
                     ? 'border-emerald-400 bg-gray-800 text-white hover:bg-emerald-500/20'
                     : 'border-gray-700 bg-gray-700 text-gray-400 cursor-not-allowed'
@@ -232,7 +233,7 @@ export function PlaybackControls({
               <button
                 type="button"
                 onClick={() => zoomEnabled && dispatchZoomEvent('zoom-in')}
-                className={`px-2 py-1 rounded-lg border transition-colors text-sm ${
+                className={`px-1.5 sm:px-2 py-1 rounded-lg border transition-colors text-xs sm:text-sm ${
                   zoomEnabled
                     ? 'border-emerald-400 bg-gray-800 text-white hover:bg-emerald-500/20'
                     : 'border-gray-700 bg-gray-700 text-gray-400 cursor-not-allowed'
