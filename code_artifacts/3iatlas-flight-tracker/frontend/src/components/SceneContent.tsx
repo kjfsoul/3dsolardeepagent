@@ -114,7 +114,10 @@ export function SceneContent({
     trajectory: VectorData[],
     idx: number
   ): [number, number, number] {
-    const frame = trajectory[Math.floor(idx)];
+    // Calculate the correct index based on the trajectory length
+    // Planet data is daily, comet data is 6-hourly
+    const planetIndex = Math.floor((idx / 4) % trajectory.length);
+    const frame = trajectory[planetIndex];
     if (!frame) return [0, 0, 0];
     return [frame.position.x, frame.position.z, -frame.position.y];
   }
