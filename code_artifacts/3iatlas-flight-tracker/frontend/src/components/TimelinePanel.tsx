@@ -40,7 +40,7 @@ export function TimelinePanel({
   if (variant === 'inline') {
     return (
       <div
-        className={`bg-black/60 border border-emerald-500/20 rounded-xl p-4 text-white shadow-lg backdrop-blur ${className}`}
+        className={`bg-black/60 rounded-xl p-4 text-white shadow-lg backdrop-blur ${className}`}
       >
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-bold uppercase tracking-wide text-emerald-300">
@@ -62,12 +62,12 @@ export function TimelinePanel({
               <button
                 key={event.id}
                 onClick={() => handleEventClick(event)}
-                className={`w-full px-3 py-2 rounded-lg transition-all text-left border ${
+                className={`w-full px-3 py-2 rounded-lg transition-all text-left ${
                   selectedEvent?.id === event.id
-                    ? 'bg-emerald-600/70 border-emerald-400'
-                    : event.type === 'milestone'
-                      ? 'bg-emerald-700/40 border-emerald-500/40 hover:bg-emerald-600/40'
-                      : 'bg-sky-700/30 border-sky-500/30 hover:bg-sky-600/30'
+                    ? "bg-emerald-600/70"
+                    : event.type === "milestone"
+                    ? "bg-emerald-700/40 hover:bg-emerald-600/40"
+                    : "bg-sky-700/30 hover:bg-sky-600/30"
                 }`}
                 title={event.description}
               >
@@ -76,9 +76,9 @@ export function TimelinePanel({
                     {event.name}
                   </span>
                   <span className="text-xs text-gray-300">
-                    {new Date(event.date).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
+                    {new Date(event.date).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
                     })}
                   </span>
                 </div>
@@ -86,17 +86,17 @@ export function TimelinePanel({
             ))}
           </div>
 
-          <div className="flex-1 rounded-lg border border-emerald-500/20 bg-black/50 p-3 text-sm overflow-y-auto">
+          <div className="flex-1 rounded-lg bg-black/50 p-3 text-sm overflow-y-auto">
             {selectedEvent ? (
               <div className="space-y-2">
                 <div className="text-lg font-semibold text-emerald-200">
                   {selectedEvent.name}
                 </div>
                 <div className="text-xs text-gray-400 uppercase tracking-wide">
-                  {new Date(selectedEvent.date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
+                  {new Date(selectedEvent.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
                 </div>
                 <div className="flex flex-wrap gap-3 text-xs">
@@ -135,32 +135,27 @@ export function TimelinePanel({
   return (
     <>
       {/* Timeline Buttons */}
-      <div
-        className={`fixed left-4 top-20 space-y-2 z-10 ${className}`}
-      >
+      <div className={`fixed left-4 top-20 space-y-2 z-10 ${className}`}>
         {events.map((event) => (
           <button
             key={event.id}
             onClick={() => handleEventClick(event)}
             className={`block w-full px-3 py-2 rounded-lg transition-all ${
-              event.type === 'milestone'
-                ? 'bg-green-600/80 hover:bg-green-500'
-                : 'bg-blue-600/80 hover:bg-blue-500'
+              event.type === "milestone"
+                ? "bg-green-600/80 hover:bg-green-500"
+                : "bg-blue-600/80 hover:bg-blue-500"
             } text-white text-left backdrop-blur-md`}
             style={{
-              minWidth: '250px',
-              border: `2px solid ${
-                event.type === 'milestone' ? '#00ff88' : '#00aaff'
-              }`,
+              minWidth: "250px",
             }}
             title={event.description}
           >
             <div className="flex justify-between items-center">
               <span className="font-bold text-xs">{event.name}</span>
               <span className="text-xs opacity-80">
-                {new Date(event.date).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
+                {new Date(event.date).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
                 })}
               </span>
             </div>
@@ -181,8 +176,7 @@ export function TimelinePanel({
           <div
             className="fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-6 rounded-t-2xl shadow-2xl z-30 max-h-[60vh] overflow-y-auto"
             style={{
-              border: '2px solid #00ff88',
-              animation: 'slideUp 0.3s ease-out',
+              animation: "slideUp 0.3s ease-out",
             }}
           >
             {/* Close Button */}
@@ -200,10 +194,10 @@ export function TimelinePanel({
             </h2>
 
             <div className="text-sm text-gray-400 mb-4">
-              {new Date(selectedEvent.date).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
+              {new Date(selectedEvent.date).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
               })}
             </div>
 

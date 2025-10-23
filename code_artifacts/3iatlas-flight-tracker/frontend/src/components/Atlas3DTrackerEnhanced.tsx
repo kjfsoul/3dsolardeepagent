@@ -418,7 +418,7 @@ export function Atlas3DTrackerEnhanced({
               key={item.id}
               type="button"
               onClick={() => handleMissionSelect(item.id)}
-              className="group rounded-lg border border-white/15 bg-white/5 px-3 sm:px-4 py-2 text-left font-semibold tracking-wide text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition hover:border-emerald-300 hover:bg-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-black"
+              className="group rounded-lg  bg-white/5 px-3 sm:px-4 py-2 text-left font-semibold tracking-wide text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition  hover:bg-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-black"
             >
               {item.label}
               <span className="ml-2 font-normal text-white/70 group-hover:text-emerald-200">{item.date}</span>
@@ -437,7 +437,7 @@ export function Atlas3DTrackerEnhanced({
               key={item.id}
               type="button"
               onClick={() => handleMissionSelect(item.id)}
-              className="group rounded-lg border border-white/15 bg-white/5 px-3 sm:px-4 py-2 text-left font-semibold tracking-wide text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition hover:border-emerald-300 hover:bg-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-black"
+              className="group rounded-lg  bg-white/5 px-3 sm:px-4 py-2 text-left font-semibold tracking-wide text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition  hover:bg-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-black"
             >
               {item.label}
               <span className="ml-2 font-normal text-white/70 group-hover:text-emerald-200">{item.date}</span>

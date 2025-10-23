@@ -201,7 +201,7 @@ export function PlaybackRecorder({
 
   return (
     <div className="absolute top-4 left-4 z-20">
-      <div className="bg-black/70 backdrop-blur-sm text-white p-3 rounded-lg border border-cyan-500/30 max-w-xs">
+      <div className="bg-black/70 backdrop-blur-sm text-white p-3 rounded-lg max-w-xs">
         <div className="font-bold text-cyan-400 mb-2">🎥 Video Recording</div>
 
         <button
@@ -221,7 +221,7 @@ export function PlaybackRecorder({
         )}
 
         {showPlayback && (
-          <div className="mt-2 pt-2 border-t border-gray-600">
+          <div className="mt-2 pt-2">
             <div className="text-green-400 text-sm mb-2">
               ✅ Recording Complete
             </div>
@@ -248,7 +248,12 @@ export function PlaybackRecorder({
               </button>
             </div>
             <div className="text-xs text-gray-400 mt-2">
-              Video: {videoBlob ? `${(videoBlob.size / 1024 / 1024).toFixed(1)}MB (${videoBlob.type.split('/')[1]})` : 'Processing...'}
+              Video:{" "}
+              {videoBlob
+                ? `${(videoBlob.size / 1024 / 1024).toFixed(1)}MB (${
+                    videoBlob.type.split("/")[1]
+                  })`
+                : "Processing..."}
             </div>
           </div>
         )}

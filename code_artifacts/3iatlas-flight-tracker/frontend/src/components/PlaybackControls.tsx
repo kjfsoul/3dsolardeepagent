@@ -161,7 +161,7 @@ export function PlaybackControls({
             </button>
 
             {showSpeedMenu && (
-              <div className="absolute left-1/2 bottom-full z-[1000] mb-2 w-32 sm:w-40 -translate-x-1/2 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
+              <div className="absolute left-1/2 bottom-full z-[1000] mb-2 w-32 sm:w-40 -translate-x-1/2 overflow-hidden rounded-lg bg-gray-800 shadow-xl">
                 {SPEED_OPTIONS.map((option) => (
                   <button
                     key={option}
@@ -196,7 +196,7 @@ export function PlaybackControls({
             </button>
 
             {showViewMenu && (
-              <div className="absolute left-1/2 bottom-full z-[1000] mb-2 w-40 sm:w-52 -translate-x-1/2 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
+              <div className="absolute left-1/2 bottom-full z-[1000] mb-2 w-40 sm:w-52 -translate-x-1/2 overflow-hidden rounded-lg bg-gray-800 shadow-xl">
                 {VIEW_OPTIONS.map(({ mode, label }) => (
                   <button
                     key={mode}
@@ -228,8 +228,8 @@ export function PlaybackControls({
                 onClick={() => zoomEnabled && dispatchZoomEvent('zoom-out')}
                 className={`px-1 sm:px-1.5 md:px-2 py-0.5 sm:py-1 rounded-lg border transition-colors text-xs sm:text-sm ${
                   zoomEnabled
-                    ? 'border-emerald-400 bg-gray-800 text-white hover:bg-emerald-500/20'
-                    : 'border-gray-700 bg-gray-700 text-gray-400 cursor-not-allowed'
+                    ? ' bg-gray-800 text-white hover:bg-emerald-500/20'
+                    : ' bg-gray-700 text-gray-400 cursor-not-allowed'
                 }`}
                 title="Zoom Out"
               >
@@ -240,8 +240,8 @@ export function PlaybackControls({
                 onClick={() => zoomEnabled && dispatchZoomEvent('zoom-in')}
                 className={`px-1 sm:px-1.5 md:px-2 py-0.5 sm:py-1 rounded-lg border transition-colors text-xs sm:text-sm ${
                   zoomEnabled
-                    ? 'border-emerald-400 bg-gray-800 text-white hover:bg-emerald-500/20'
-                    : 'border-gray-700 bg-gray-700 text-gray-400 cursor-not-allowed'
+                    ? ' bg-gray-800 text-white hover:bg-emerald-500/20'
+                    : ' bg-gray-700 text-gray-400 cursor-not-allowed'
                 }`}
                 title="Zoom In"
               >
