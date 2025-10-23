@@ -98,13 +98,18 @@ export function PlaybackControls({
   };
 
   const progressPercent = maxIndex > 0 ? Math.floor((currentIndex / maxIndex) * 100) : 0;
-  const zoomEnabled = viewMode === 'true-scale' || viewMode === 'ride-atlas';
+  const zoomEnabled = true; // Enable zoom for all view modes
 
   return (
     <div className={containerClassName} style={containerStyle}>
       <div className={innerWrapperClass}>
         {/* Timeline Slider Row */}
-        <div className={`mb-4 sm:mb-6 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
+        <div className={`mb-2 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
+          {/* Progress Percentage - Above slider */}
+          <div className="text-center text-xs sm:text-sm font-semibold text-white mb-1">
+            {progressPercent}%
+          </div>
+          {/* Slider */}
           <div className="flex items-center gap-2 sm:gap-4 text-xs text-white/70">
             <span className="w-16 text-left sm:w-24 md:w-32 text-xs sm:text-sm">July 1, 2025</span>
             <input
@@ -120,13 +125,10 @@ export function PlaybackControls({
             />
             <span className="w-16 text-right sm:w-24 md:w-32 text-xs sm:text-sm">March 31, 2026</span>
           </div>
-          <div className="mt-1 sm:mt-2 text-center text-xs sm:text-sm font-semibold text-white">
-            {progressPercent}%
-          </div>
         </div>
 
         {/* Control Buttons */}
-        <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 md:gap-3 ${isFloating ? '' : 'max-w-full mx-auto px-4 sm:px-6 md:px-8'}`}>
+        <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 ${isFloating ? '' : 'max-w-full mx-auto px-2 sm:px-4'}`}>
           <button
             type="button"
             onClick={onReset}
@@ -214,7 +216,7 @@ export function PlaybackControls({
           </div>
 
           {/* Zoom Controls */}
-          <div className="flex flex-col items-center gap-0.5 mb-4">
+          <div className="flex flex-col items-center gap-0.5 mb-1">
             <div className={`text-xs font-medium ${zoomEnabled ? 'text-white' : 'text-gray-400'}`}>
               <span className="hidden sm:inline">Zoom</span>
               <span className="sm:hidden">Z</span>
