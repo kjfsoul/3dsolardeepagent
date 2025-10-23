@@ -10,14 +10,23 @@ function convertHorizonsDateToISO(horizonsDate: string): string {
   // Convert "A.D. 2025-Jul-01 00:00:00.0000" to "2025-07-01T00:00:00.000Z"
   const match = horizonsDate.match(/A\.D\. (\d{4})-(\w{3})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
   if (!match) return horizonsDate;
-  
+
   const [, year, month, day, hour, minute, second] = match;
   const monthMap: Record<string, string> = {
-    'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
-    'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
-    'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+    Jan: "01",
+    Feb: "02",
+    Mar: "03",
+    Apr: "04",
+    May: "05",
+    Jun: "06",
+    Jul: "07",
+    Aug: "08",
+    Sep: "09",
+    Oct: "10",
+    Nov: "11",
+    Dec: "12",
   };
-  
+
   return `${year}-${monthMap[month]}-${day.padStart(2, '0')}T${hour}:${minute}:${second}.000Z`;
 }
 
@@ -26,6 +35,9 @@ function convertHorizonsDateToISO(horizonsDate: string): string {
 // ============================================================================
 
 export const SOLAR_SYSTEM_OBJECTS = {
+  // Sun
+  sun: { command: '10', name: 'Sun', color: 0xffff00, size: 0.15 },
+
   // Inner Planets
   mercury: { command: '199', name: 'Mercury', color: 0x8c7853, size: 0.025 },
   venus: { command: '299', name: 'Venus', color: 0xffc649, size: 0.038 },
@@ -99,14 +111,14 @@ async function loadObjectData({
 
   try {
     console.log(`[Solar System] 🌌 Loading real NASA data for ${obj.name}...`);
-    
+
     let vectors: VectorData[] = [];
-    
+
     if (objKey === 'atlas') {
       // Load 3I/ATLAS data from the real NASA Horizons file
       const response = await fetch('/data/3I_ATLAS_positions_parsed.json');
       if (!response.ok) throw new Error('Failed to load 3I/ATLAS data');
-      
+
       const atlasData = await response.json();
       vectors = atlasData.map((item: any) => ({
         jd: item.jd,
@@ -122,27 +134,43 @@ async function loadObjectData({
           z: item.velocity.vz,
         },
       }));
+    } else if (objKey === 'sun') {
+      // Sun is at origin - create static data
+      const startDateObj = new Date(startDate);
+      const endDateObj = new Date(endDate);
+      const daysDiff = Math.ceil((endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24));
+      
+      vectors = Array.from({ length: daysDiff }, (_, i) => {
+        const date = new Date(startDateObj);
+        date.setDate(date.getDate() + i);
+        return {
+          jd: 0,
+          date: date.toISOString(),
+          position: { x: 0, y: 0, z: 0 },
+          velocity: { x: 0, y: 0, z: 0 },
+        };
+      });
     } else {
       // Load planet data from the real NASA Horizons file
-      const response = await fetch('/data/SOLAR_SYSTEM_POSITIONS.json');
-      if (!response.ok) throw new Error('Failed to load solar system data');
-      
+      const response = await fetch("/data/SOLAR_SYSTEM_POSITIONS.json");
+      if (!response.ok) throw new Error("Failed to load solar system data");
+
       const allData = await response.json();
-      const planetData = allData.filter((item: any) => {
-        // Map our object keys to the NASA data object names
-        const nameMapping: Record<string, string> = {
-          mercury: 'Mercury',
-          venus: 'Venus',
-          earth: 'Earth',
-          mars: 'Mars',
-          jupiter: 'Jupiter',
-          saturn: 'Saturn',
-          uranus: 'Uranus',
-          neptune: 'Neptune',
-        };
-        return item.object === nameMapping[objKey];
-      });
-      
+        const planetData = allData.filter((item: any) => {
+          // Map our object keys to the NASA data object names (with numbers)
+          const nameMapping: Record<string, string> = {
+            mercury: "Mercury (199)",
+            venus: "Venus (299)",
+            earth: "Earth (399)",
+            mars: "Mars (499)",
+            jupiter: "Jupiter (599)",
+            saturn: "Saturn (699)",
+            uranus: "Uranus (799)",
+            neptune: "Neptune (899)",
+          };
+          return item.object === nameMapping[objKey];
+        });
+
       vectors = planetData.map((item: any) => ({
         jd: 0, // Not provided in this format, will calculate if needed
         date: convertHorizonsDateToISO(item.date),
@@ -158,7 +186,7 @@ async function loadObjectData({
         },
       }));
     }
-    
+
     if (vectors.length > 0) {
       results[objKey] = vectors;
       console.log(
@@ -169,7 +197,7 @@ async function loadObjectData({
     }
   } catch (error) {
     console.warn(`[Solar System] ⚠️ Failed to load NASA data for ${obj.name}, using fallback:`, error);
-    
+
     // Fallback to generated data if NASA data fails
     const fallbackData = createMinimalFallbackData(
       objKey,

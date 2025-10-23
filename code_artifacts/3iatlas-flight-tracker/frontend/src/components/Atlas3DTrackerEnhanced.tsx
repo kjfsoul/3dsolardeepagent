@@ -115,12 +115,15 @@ export function Atlas3DTrackerEnhanced({
         // Load planet data using existing infrastructure
         console.log("🪐 Loading planet data...");
         const planetObjects: SolarSystemObjectKey[] = [
+          "sun",
           "mercury",
           "venus",
           "earth",
           "mars",
           "jupiter",
           "saturn",
+          "uranus",
+          "neptune",
         ];
 
         const solarSystemData = await fetchSolarSystemData(
