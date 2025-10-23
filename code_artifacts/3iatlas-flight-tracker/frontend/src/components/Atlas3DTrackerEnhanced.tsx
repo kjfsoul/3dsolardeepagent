@@ -454,7 +454,7 @@ export function Atlas3DTrackerEnhanced({
         </div>
       </div>
 
-      <div className="relative h-[65vh] min-h-[500px] w-full overflow-hidden rounded-2xl border border-white/20 bg-black">
+      <div className="relative h-[65vh] min-h-[500px] w-full overflow-hidden rounded-2xl bg-black">
         <TexturePreloader />
         <Canvas
           className="absolute inset-0 h-full w-full"
