@@ -20,7 +20,7 @@ interface PlaybackControlsProps {
   layout?: 'floating' | 'inline';
 }
 
-const SPEED_OPTIONS = [1, 10, 25];
+const SPEED_OPTIONS = [10, 25]; // Temporarily removing 1x to test default behavior
 const VIEW_OPTIONS: Array<{ mode: 'true-scale' | 'ride-atlas'; label: string }> = [
   { mode: 'true-scale', label: 'True Scale' },
   { mode: 'ride-atlas', label: 'Ride With 3I/ATLAS' },
