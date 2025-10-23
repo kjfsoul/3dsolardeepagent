@@ -17,9 +17,12 @@ import { CinematicCamera } from './FollowCamera';
 import { Starfield } from './Starfield';
 import { FullTrajectoryLine, TrajectoryTrail } from './TrajectoryTrail';
 
+import {
+  SOLAR_SYSTEM_OBJECTS,
+  SolarSystemObjectKey,
+} from "@/lib/solar-system-data";
 import { TrajectoryData, VectorData } from "@/types/trajectory";
 import { PlanetLocators } from "./PlanetLocators";
-import { SOLAR_SYSTEM_OBJECTS, SolarSystemObjectKey } from "@/lib/solar-system-data";
 
 type OrbitControlsWithState = OrbitControlsImpl & { userIsInteracting?: boolean };
 

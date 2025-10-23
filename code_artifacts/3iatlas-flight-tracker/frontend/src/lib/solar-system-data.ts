@@ -4,6 +4,7 @@
  */
 
 import { type VectorData } from '@/types/trajectory';
+import { get3IAtlasVectors, lookupObject, getEphemerisVectors, parseVectorData, type HorizonsQueryParams } from './horizons-api';
 
 // ============================================================================
 // SOLAR SYSTEM OBJECTS (NASA Horizons COMMAND codes)
@@ -81,18 +82,59 @@ async function loadObjectData({
   const obj = SOLAR_SYSTEM_OBJECTS[objKey];
   if (!obj) return;
 
-  // For now, use fallback data since we don't have the full Horizons API in the tracker
-  const fallbackData = createMinimalFallbackData(
-    objKey,
-    startDate,
-    endDate,
-    stepHours
-  );
-  if (fallbackData.length > 0) {
-    results[objKey] = fallbackData;
-    console.log(
-      `[Solar System] ✅ Generated ${fallbackData.length} positions for ${obj.name}`
+  try {
+    console.log(`[Solar System] 🌌 Fetching real NASA data for ${obj.name}...`);
+    
+    let vectors: VectorData[] = [];
+    
+    if (objKey === 'atlas') {
+      // Special handling for 3I/ATLAS - use the dedicated function
+      vectors = await get3IAtlasVectors(startDate, endDate, `${stepHours}h`);
+    } else {
+      // Standard planets - use direct command
+      const stepSize = `${stepHours}h`;
+      const ephemerisParams: HorizonsQueryParams = {
+        COMMAND: obj.command,
+        EPHEM_TYPE: 'VECTOR',
+        CENTER: '@sun',
+        START_TIME: startDate,
+        STOP_TIME: endDate,
+        STEP_SIZE: stepSize,
+        format: 'json',
+        OUT_UNITS: 'AU-D',
+        REF_SYSTEM: 'ICRF',
+        VEC_TABLE: '2',
+        OBJ_DATA: 'YES',
+      };
+
+      const response = await getEphemerisVectors(ephemerisParams);
+      vectors = parseVectorData(response.result);
+    }
+    
+    if (vectors.length > 0) {
+      results[objKey] = vectors;
+      console.log(
+        `[Solar System] ✅ Got ${vectors.length} real positions for ${obj.name} from NASA Horizons`
+      );
+    } else {
+      throw new Error('No data returned from NASA Horizons');
+    }
+  } catch (error) {
+    console.warn(`[Solar System] ⚠️ NASA Horizons failed for ${obj.name}, using fallback:`, error);
+    
+    // Fallback to generated data if NASA API fails
+    const fallbackData = createMinimalFallbackData(
+      objKey,
+      startDate,
+      endDate,
+      stepHours
     );
+    if (fallbackData.length > 0) {
+      results[objKey] = fallbackData;
+      console.log(
+        `[Solar System] ✅ Generated ${fallbackData.length} fallback positions for ${obj.name}`
+      );
+    }
   }
 }
 
