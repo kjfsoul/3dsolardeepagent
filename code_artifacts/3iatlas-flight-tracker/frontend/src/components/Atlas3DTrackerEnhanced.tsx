@@ -464,7 +464,7 @@ export function Atlas3DTrackerEnhanced({
           <ambientLight intensity={0.3} />
           <PerspectiveCamera
             makeDefault
-            position={viewMode === 'true-scale' ? [0, 0, 5] : [6, 4, 6]}
+            position={viewMode === 'true-scale' ? [2, 2, 5] : [6, 4, 6]}
             fov={viewMode === 'true-scale' ? 45 : 50}
           />
           <Suspense fallback={null}>
