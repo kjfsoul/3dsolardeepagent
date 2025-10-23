@@ -26,7 +26,7 @@ import { TexturePreloader } from './TexturePreloader';
 // Type imports
 import { TimelineEvent, TrajectoryData } from '@/types/trajectory';
 
-type ViewMode = 'explorer' | 'true-scale' | 'ride-atlas';
+type ViewMode = /* 'explorer' | */ 'true-scale' | 'ride-atlas'; // Explorer commented out - no textures
 type MissionId = 'discovery' | 'mars_flyby' | 'perihelion' | 'jupiter_approach';
 
 interface Atlas3DTrackerEnhancedProps {

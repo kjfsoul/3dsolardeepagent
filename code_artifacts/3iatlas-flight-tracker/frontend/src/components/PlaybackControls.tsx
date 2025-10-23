@@ -26,7 +26,7 @@ const VIEW_OPTIONS: Array<{ mode: 'true-scale' | 'ride-atlas'; label: string }> 
   { mode: 'ride-atlas', label: 'Ride With 3I/ATLAS' },
 ];
 const VIEW_MODE_LABELS = {
-  explorer: "Explorer",
+  // explorer: "Explorer", // COMMENTED OUT - No textures, deactivated
   "true-scale": "True Scale",
   "ride-atlas": "Ride With 3I/ATLAS",
 };

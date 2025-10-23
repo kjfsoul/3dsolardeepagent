@@ -11,7 +11,7 @@ function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const autoPlay = urlParams.get('autoPlay') !== 'false';
   const initialSpeed = parseInt(urlParams.get('speed') || '10', 10);
-  const initialViewMode = (urlParams.get('view') as 'explorer' | 'true-scale' | 'ride-atlas') || 'ride-atlas';
+  const initialViewMode = (urlParams.get('view') as /* 'explorer' | */ 'true-scale' | 'ride-atlas') || 'ride-atlas'; // Explorer commented out
 
   return (
     <div className="App">
