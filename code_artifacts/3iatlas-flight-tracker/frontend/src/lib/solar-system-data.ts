@@ -6,6 +6,22 @@
 import { type VectorData } from '@/types/trajectory';
 import { get3IAtlasVectors, getEphemerisVectors, parseVectorData, type HorizonsQueryParams } from './horizons-api';
 
+// Helper function to convert Horizons date format to ISO
+function convertHorizonsDateToISO(horizonsDate: string): string {
+  // Convert "A.D. 2025-Jul-01 00:00:00.0000" to "2025-07-01T00:00:00.000Z"
+  const match = horizonsDate.match(/A\.D\. (\d{4})-(\w{3})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+  if (!match) return horizonsDate;
+  
+  const [, year, month, day, hour, minute, second] = match;
+  const monthMap: Record<string, string> = {
+    'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+    'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+    'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+  };
+  
+  return `${year}-${monthMap[month]}-${day.padStart(2, '0')}T${hour}:${minute}:${second}.000Z`;
+}
+
 // ============================================================================
 // SOLAR SYSTEM OBJECTS (NASA Horizons COMMAND codes)
 // ============================================================================
@@ -83,46 +99,79 @@ async function loadObjectData({
   if (!obj) return;
 
   try {
-    console.log(`[Solar System] 🌌 Fetching real NASA data for ${obj.name}...`);
+    console.log(`[Solar System] 🌌 Loading real NASA data for ${obj.name}...`);
     
     let vectors: VectorData[] = [];
     
     if (objKey === 'atlas') {
-      // Special handling for 3I/ATLAS - use the dedicated function
-      vectors = await get3IAtlasVectors(startDate, endDate, `${stepHours}h`);
+      // Load 3I/ATLAS data from the real NASA Horizons file
+      const response = await fetch('/data/3I_ATLAS_positions_parsed.json');
+      if (!response.ok) throw new Error('Failed to load 3I/ATLAS data');
+      
+      const atlasData = await response.json();
+      vectors = atlasData.map((item: any) => ({
+        jd: item.jd,
+        date: convertHorizonsDateToISO(item.date),
+        position: {
+          x: item.position.x,
+          y: item.position.y,
+          z: item.position.z,
+        },
+        velocity: {
+          x: item.velocity.vx,
+          y: item.velocity.vy,
+          z: item.velocity.vz,
+        },
+      }));
     } else {
-      // Standard planets - use direct command
-      const stepSize = `${stepHours}h`;
-      const ephemerisParams: HorizonsQueryParams = {
-        COMMAND: obj.command,
-        EPHEM_TYPE: 'VECTOR',
-        CENTER: '@sun',
-        START_TIME: startDate,
-        STOP_TIME: endDate,
-        STEP_SIZE: stepSize,
-        format: 'json',
-        OUT_UNITS: 'AU-D',
-        REF_SYSTEM: 'ICRF',
-        VEC_TABLE: '2',
-        OBJ_DATA: 'YES',
-      };
-
-      const response = await getEphemerisVectors(ephemerisParams);
-      vectors = parseVectorData(response.result);
+      // Load planet data from the real NASA Horizons file
+      const response = await fetch('/data/SOLAR_SYSTEM_POSITIONS.json');
+      if (!response.ok) throw new Error('Failed to load solar system data');
+      
+      const allData = await response.json();
+      const planetData = allData.filter((item: any) => {
+        // Map our object keys to the NASA data object names
+        const nameMapping: Record<string, string> = {
+          mercury: 'Mercury',
+          venus: 'Venus',
+          earth: 'Earth',
+          mars: 'Mars',
+          jupiter: 'Jupiter',
+          saturn: 'Saturn',
+          uranus: 'Uranus',
+          neptune: 'Neptune',
+        };
+        return item.object === nameMapping[objKey];
+      });
+      
+      vectors = planetData.map((item: any) => ({
+        jd: 0, // Not provided in this format, will calculate if needed
+        date: convertHorizonsDateToISO(item.date),
+        position: {
+          x: item.position_au.x,
+          y: item.position_au.y,
+          z: item.position_au.z,
+        },
+        velocity: {
+          x: item.velocity_au_per_day.vx,
+          y: item.velocity_au_per_day.vy,
+          z: item.velocity_au_per_day.vz,
+        },
+      }));
     }
     
     if (vectors.length > 0) {
       results[objKey] = vectors;
       console.log(
-        `[Solar System] ✅ Got ${vectors.length} real positions for ${obj.name} from NASA Horizons`
+        `[Solar System] ✅ Loaded ${vectors.length} real positions for ${obj.name} from NASA Horizons data`
       );
     } else {
-      throw new Error('No data returned from NASA Horizons');
+      throw new Error('No data found for object');
     }
   } catch (error) {
-    console.warn(`[Solar System] ⚠️ NASA Horizons failed for ${obj.name}, using fallback:`, error);
+    console.warn(`[Solar System] ⚠️ Failed to load NASA data for ${obj.name}, using fallback:`, error);
     
-    // Fallback to generated data if NASA API fails
+    // Fallback to generated data if NASA data fails
     const fallbackData = createMinimalFallbackData(
       objKey,
       startDate,
