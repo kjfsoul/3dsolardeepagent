@@ -82,7 +82,7 @@ export function PlaybackControls({
 
   useEffect(() => {
     if (!SPEED_OPTIONS.includes(speed)) {
-      onSpeedChange(SPEED_OPTIONS[0]);
+      onSpeedChange(10); // Default to 10x instead of first option (1x)
     }
   }, [speed, onSpeedChange]);
 
