@@ -22,7 +22,6 @@ import { PlaybackControls } from './PlaybackControls';
 import { SceneContent } from './SceneContent';
 import { TelemetryHUD } from './TelemetryHUD';
 import { TexturePreloader } from './TexturePreloader';
-import { TimelinePanel } from './TimelinePanel';
 
 // Type imports
 import { TimelineEvent, TrajectoryData } from '@/types/trajectory';
@@ -231,36 +230,6 @@ export function Atlas3DTrackerEnhanced({
     [cometPosition]
   );
 
-  // Handle event timeline clicks
-  const handleEventClick = (event: TimelineEvent) => {
-    if (!trajectoryData) return;
-
-    // Find the index corresponding to the event date
-    const eventDate = new Date(event.date);
-    const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'] || [];
-    const eventIndex = atlasData.findIndex((frame) => {
-      const frameDate = new Date(frame.date);
-      return frameDate >= eventDate;
-    });
-
-    if (eventIndex !== -1) {
-      setCurrentIndex(eventIndex);
-      setIsPlaying(false);
-
-      // Trigger cinematic camera if appropriate
-      if (event.id === 'mars_flyby') {
-        setCinematicEvent('mars_flyby');
-        setCinematicActive(true);
-      } else if (event.id === 'perihelion') {
-        setCinematicEvent('perihelion');
-        setCinematicActive(true);
-      } else if (event.id === 'jupiter_approach') {
-        setCinematicEvent('jupiter_approach');
-        setCinematicActive(true);
-      }
-    }
-  };
-
   // Camera preset for Ride With ATLAS mode
   useEffect(() => {
     if (viewMode === "ride-atlas" && trajectoryData) {
@@ -317,6 +286,67 @@ export function Atlas3DTrackerEnhanced({
   }, [currentFrame, trajectoryData]);
 
   // Loading state
+  const missionHighlights = useMemo(() => {
+    const missionDates: Record<string, string> = {
+      discovery: 'Jun 30',
+      perihelion: 'Oct 28',
+      mars_flyby: 'Oct 2',
+      jupiter_approach: 'Mar 15',
+    };
+
+    const formatDate = (value: string | undefined, fallback: string) => {
+      if (!value) return fallback;
+      try {
+        const formatted = new Intl.DateTimeFormat('en-US', {
+          month: 'short',
+          day: 'numeric',
+        }).format(new Date(value));
+        return formatted;
+      } catch (err) {
+        console.warn('Failed to format date', value, err);
+        return fallback;
+      }
+    };
+
+    const lookup = (id: string) => {
+      const event = events.find((entry) => entry.id === id);
+      return formatDate(event?.date, missionDates[id] ?? '—');
+    };
+
+    return {
+      discovery: lookup('discovery'),
+      perihelion: lookup('perihelion'),
+      marsFlyby: lookup('mars_flyby'),
+      jupiterApproach: lookup('jupiter_approach'),
+    };
+  }, [events]);
+
+  const missionRowOne = useMemo(
+    () => [
+      { label: 'DISCOVERY', date: missionHighlights.discovery },
+      { label: 'PERIHELION', date: missionHighlights.perihelion },
+    ],
+    [missionHighlights.discovery, missionHighlights.perihelion]
+  );
+
+  const missionRowTwo = useMemo(
+    () => [
+      { label: 'MARS FLYBY', date: missionHighlights.marsFlyby },
+      { label: 'JUPITER APPROACH', date: missionHighlights.jupiterApproach },
+    ],
+    [missionHighlights.jupiterApproach, missionHighlights.marsFlyby]
+  );
+
+  const cameraRowOne = [
+    'Left Click + Drag: Rotate',
+    'Right Click + Drag: Pan',
+  ];
+
+  const cameraRowTwo = [
+    'Scroll Wheel: Zoom In/Out',
+    '+/- Buttons: Zoom Controls',
+  ];
+
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-black text-white">
@@ -344,25 +374,55 @@ export function Atlas3DTrackerEnhanced({
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white">
-      <div className="relative flex-1 min-h-[60vh] overflow-hidden">
-        {/* Preload textures on mount */}
-        <TexturePreloader />
+    <div className="flex flex-col gap-6 bg-black text-white">
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4 text-center text-xs font-semibold uppercase tracking-[0.3em] text-white/80">
+          <div>Mission Timeline</div>
+          <div>Camera Controls</div>
+        </div>
 
-        {/* 3D Canvas */}
+        <div className="grid grid-cols-4 gap-4 text-sm">
+          {missionRowOne.map((item) => (
+            <div key={item.label} className="text-left font-semibold tracking-wide">
+              {item.label}
+              <span className="ml-2 font-normal text-white/80">{item.date}</span>
+            </div>
+          ))}
+          {cameraRowOne.map((item) => (
+            <div key={item} className="text-right text-white/80">
+              {item}
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-4 gap-4 text-sm">
+          {missionRowTwo.map((item) => (
+            <div key={item.label} className="text-left font-semibold tracking-wide">
+              {item.label}
+              <span className="ml-2 font-normal text-white/80">{item.date}</span>
+            </div>
+          ))}
+          {cameraRowTwo.map((item) => (
+            <div key={item} className="text-right text-white/80">
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="relative min-h-[60vh] overflow-hidden rounded-2xl border border-white/20 bg-black">
+        <TexturePreloader />
         <Canvas
-          className="h-full w-full border-2 border-emerald-500/30"
+          className="h-full w-full"
           gl={{ antialias: true, alpha: false }}
           dpr={[1, 2]}
         >
           <ambientLight intensity={0.3} />
-
           <PerspectiveCamera
             makeDefault
-            position={viewMode === "true-scale" ? [0, 0, 5] : [6, 4, 6]}
-            fov={viewMode === "true-scale" ? 45 : 50}
+            position={viewMode === 'true-scale' ? [0, 0, 5] : [6, 4, 6]}
+            fov={viewMode === 'true-scale' ? 45 : 50}
           />
-
           <Suspense fallback={null}>
             <SceneContent
               trajectoryData={trajectoryData}
@@ -382,81 +442,27 @@ export function Atlas3DTrackerEnhanced({
             />
           </Suspense>
         </Canvas>
+
+        <TelemetryHUD
+          currentFrame={currentFrame}
+          variant="overlay"
+          className="absolute left-6 top-6 w-64"
+        />
       </div>
 
-      <div className="border-t border-emerald-500/20 bg-black/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <TimelinePanel
-              events={events}
-              onEventClick={handleEventClick}
-              variant="inline"
-            />
-            <TelemetryHUD
-              currentFrame={currentFrame}
-              className="h-full border border-emerald-500/20 bg-black/60"
-            />
-            <CameraHelpCard viewMode={viewMode} />
-          </div>
-
-          <PlaybackControls
-            isPlaying={isPlaying}
-            speed={speed}
-            currentIndex={currentIndex}
-            maxIndex={
-              (trajectoryData.atlas || trajectoryData["3iatlas"] || []).length - 1
-            }
-            viewMode={viewMode}
-            onPlayPause={() => setIsPlaying(!isPlaying)}
-            onReset={() => setCurrentIndex(0)}
-            onSpeedChange={setSpeed}
-            onSeek={setCurrentIndex}
-            onViewModeChange={setViewMode}
-            layout="inline"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CameraHelpCard({ viewMode }: { viewMode: ViewMode }) {
-  return (
-    <div className="h-full rounded-xl border border-cyan-500/20 bg-black/60 p-4 text-xs shadow-lg backdrop-blur">
-      <div className="mb-3 text-sm font-bold uppercase tracking-wide text-cyan-300">
-        Camera Controls
-      </div>
-      <ul className="space-y-2 text-gray-200">
-        <li><span className="text-cyan-300">Left Click + Drag</span>: Rotate</li>
-        <li><span className="text-cyan-300">Scroll Wheel</span>: Zoom In/Out</li>
-        <li><span className="text-cyan-300">Right Click + Drag</span>: Pan</li>
-        <li><span className="text-cyan-300">+ / - Buttons</span>: Zoom Controls</li>
-      </ul>
-
-      <div className="mt-4 rounded-lg border border-cyan-500/20 bg-black/50 p-3 text-xs text-cyan-100">
-        {viewMode === 'ride-atlas' ? (
-          <>
-            <div className="font-semibold text-amber-300">🚀 Ride With ATLAS Mode</div>
-            <p className="mt-1 text-gray-300">
-              Camera follows the comet automatically while leaving full manual overrides available.
-            </p>
-          </>
-        ) : viewMode === 'true-scale' ? (
-          <>
-            <div className="font-semibold text-emerald-300">📏 True Scale Mode</div>
-            <p className="mt-1 text-gray-300">
-              Distances and planetary sizes are rendered at realistic proportions for comparison.
-            </p>
-          </>
-        ) : (
-          <>
-            <div className="font-semibold text-cyan-300">🛰️ Explorer Mode</div>
-            <p className="mt-1 text-gray-300">
-              Freely orbit the solar system with balanced scale and visibility for each body.
-            </p>
-          </>
-        )}
-      </div>
+      <PlaybackControls
+        isPlaying={isPlaying}
+        speed={speed}
+        currentIndex={currentIndex}
+        maxIndex={(trajectoryData.atlas || trajectoryData['3iatlas'] || []).length - 1}
+        viewMode={viewMode}
+        onPlayPause={() => setIsPlaying(!isPlaying)}
+        onReset={() => setCurrentIndex(0)}
+        onSpeedChange={setSpeed}
+        onSeek={setCurrentIndex}
+        onViewModeChange={setViewMode}
+        layout="inline"
+      />
     </div>
   );
 }

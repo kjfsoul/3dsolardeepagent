@@ -133,9 +133,7 @@ export function PlaybackControls({
     "ride-atlas": "Ride With ATLAS",
   };
 
-  const dispatchZoomEvent = (type: 'zoom-in' | 'zoom-out') => {
-    window.dispatchEvent(new CustomEvent(type));
-  };
+  const progressPercent = maxIndex > 0 ? Math.floor((currentIndex / maxIndex) * 100) : 0;
 
   const handleScrubStart = () => {
     if (isPlaying) {
@@ -146,31 +144,31 @@ export function PlaybackControls({
   return (
     <div className={containerClassName} style={containerStyle}>
       <div className={innerWrapperClass}>
-        {/* Timeline Slider */}
-        <div className={`mb-4 ${isFloating ? "" : "max-w-4xl mx-auto"}`}>
-          <input
-            type="range"
-            min="0"
-            max={maxIndex}
-            value={currentIndex}
-            onMouseDown={handleScrubStart}
-            onTouchStart={handleScrubStart}
-            onChange={(e) => onSeek(parseFloat(e.target.value))}
-            onMouseUp={() => {/* Keep paused or resume with another call */}}
-            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-            style={{
-              accentColor: "#00ff88",
-            }}
-          />
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
-            <span>July 1, 2025</span>
-            <span>{Math.floor((currentIndex / maxIndex) * 100)}%</span>
-            <span>March 31, 2026</span>
+        {/* Timeline Slider Row */}
+        <div className={`mb-6 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
+          <div className="flex items-center gap-4 text-xs text-white/70">
+            <span className="w-24 text-left sm:w-32">July 1, 2025</span>
+            <input
+              type="range"
+              min="0"
+              max={maxIndex}
+              value={currentIndex}
+              onMouseDown={handleScrubStart}
+              onTouchStart={handleScrubStart}
+              onChange={(e) => onSeek(parseFloat(e.target.value))}
+              onMouseUp={() => {/* Keep paused or resume with another call */}}
+              className="h-2 flex-1 cursor-pointer appearance-none rounded-full bg-gray-700"
+              style={{ accentColor: '#00ff88' }}
+            />
+            <span className="w-24 text-right sm:w-32">March 31, 2026</span>
+          </div>
+          <div className="mt-2 text-center text-sm font-semibold text-white">
+            {progressPercent}%
           </div>
         </div>
 
         {/* Control Buttons */}
-        <div className={`flex items-center justify-center gap-3 flex-wrap ${isFloating ? "" : "max-w-4xl mx-auto"}`}>
+        <div className={`flex flex-wrap items-center justify-center gap-3 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
           {/* Reset Button */}
           <button
             onClick={onReset}
@@ -281,27 +279,6 @@ export function PlaybackControls({
                 </div>,
                 document.body
               )}
-          </div>
-
-          {/* Zoom Controls */}
-          <div className="flex flex-col items-center gap-1">
-            <div className="text-xs text-gray-300 font-medium">Zoom</div>
-            <div className="flex gap-1">
-              <button
-                onClick={() => dispatchZoomEvent('zoom-out')}
-                className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
-                title="Zoom Out"
-              >
-                ➖
-              </button>
-              <button
-                onClick={() => dispatchZoomEvent('zoom-in')}
-                className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
-                title="Zoom In"
-              >
-                ➕
-              </button>
-            </div>
           </div>
         </div>
       </div>
