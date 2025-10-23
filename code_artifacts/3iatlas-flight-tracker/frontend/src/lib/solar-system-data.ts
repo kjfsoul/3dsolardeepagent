@@ -4,7 +4,6 @@
  */
 
 import { type VectorData } from '@/types/trajectory';
-import { get3IAtlasVectors, getEphemerisVectors, parseVectorData, type HorizonsQueryParams } from './horizons-api';
 
 // Helper function to convert Horizons date format to ISO
 function convertHorizonsDateToISO(horizonsDate: string): string {
