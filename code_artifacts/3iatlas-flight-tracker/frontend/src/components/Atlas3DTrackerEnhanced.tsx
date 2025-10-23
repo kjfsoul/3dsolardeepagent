@@ -37,7 +37,7 @@ interface Atlas3DTrackerEnhancedProps {
 
 export function Atlas3DTrackerEnhanced({
   autoPlay = true,
-  initialSpeed = 2,
+  initialSpeed = 10,
   initialViewMode = 'ride-atlas',
 }: Atlas3DTrackerEnhancedProps) {
   // State management

@@ -98,7 +98,7 @@ export function PlaybackControls({
   };
 
   const progressPercent = maxIndex > 0 ? Math.floor((currentIndex / maxIndex) * 100) : 0;
-  const zoomEnabled = viewMode === 'true-scale';
+  const zoomEnabled = viewMode === 'true-scale' || viewMode === 'ride-atlas';
 
   return (
     <div className={containerClassName} style={containerStyle}>
