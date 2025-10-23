@@ -14,7 +14,7 @@
 
 import { PerspectiveCamera } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 // Component imports
@@ -27,6 +27,7 @@ import { TexturePreloader } from './TexturePreloader';
 import { TimelineEvent, TrajectoryData } from '@/types/trajectory';
 
 type ViewMode = 'explorer' | 'true-scale' | 'ride-atlas';
+type MissionId = 'discovery' | 'mars_flyby' | 'perihelion' | 'jupiter_approach';
 
 interface Atlas3DTrackerEnhancedProps {
   autoPlay?: boolean;
@@ -323,16 +324,16 @@ export function Atlas3DTrackerEnhanced({
 
   const missionRowOne = useMemo(
     () => [
-      { label: 'DISCOVERY', date: missionHighlights.discovery },
-      { label: 'PERIHELION', date: missionHighlights.perihelion },
+      { id: 'discovery' as MissionId, label: 'DISCOVERY', date: missionHighlights.discovery },
+      { id: 'perihelion' as MissionId, label: 'PERIHELION', date: missionHighlights.perihelion },
     ],
     [missionHighlights.discovery, missionHighlights.perihelion]
   );
 
   const missionRowTwo = useMemo(
     () => [
-      { label: 'MARS FLYBY', date: missionHighlights.marsFlyby },
-      { label: 'JUPITER APPROACH', date: missionHighlights.jupiterApproach },
+      { id: 'mars_flyby' as MissionId, label: 'MARS FLYBY', date: missionHighlights.marsFlyby },
+      { id: 'jupiter_approach' as MissionId, label: 'JUPITER APPROACH', date: missionHighlights.jupiterApproach },
     ],
     [missionHighlights.jupiterApproach, missionHighlights.marsFlyby]
   );
@@ -346,6 +347,34 @@ export function Atlas3DTrackerEnhanced({
     'Scroll Wheel: Zoom In/Out',
     '+/- Buttons: Zoom Controls',
   ];
+
+  const handleMissionSelect = useCallback(
+    (id: MissionId) => {
+      if (!trajectoryData) return;
+      const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'] || [];
+      if (!atlasData.length) return;
+
+      const mission = events.find((event) => event.id === id);
+      if (!mission) return;
+
+      const missionDate = new Date(mission.date);
+      const eventIndex = atlasData.findIndex((frame) => new Date(frame.date) >= missionDate);
+      if (eventIndex === -1) return;
+
+      setCurrentIndex(eventIndex);
+      setIsPlaying(false);
+
+      const isSpecial = id === 'mars_flyby' || id === 'perihelion' || id === 'jupiter_approach';
+      if (isSpecial) {
+        setCinematicEvent(id as 'mars_flyby' | 'perihelion' | 'jupiter_approach');
+        setCinematicActive(true);
+      }
+
+      setFocusBody(mission.name);
+      setFocusUntil(performance.now() + 2000);
+    },
+    [events, trajectoryData]
+  );
 
   if (loading) {
     return (
@@ -383,10 +412,15 @@ export function Atlas3DTrackerEnhanced({
 
         <div className="grid grid-cols-4 gap-4 text-sm">
           {missionRowOne.map((item) => (
-            <div key={item.label} className="text-left font-semibold tracking-wide">
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => handleMissionSelect(item.id)}
+              className="text-left font-semibold tracking-wide text-white/90 transition hover:text-emerald-300 focus:outline-none"
+            >
               {item.label}
-              <span className="ml-2 font-normal text-white/80">{item.date}</span>
-            </div>
+              <span className="ml-2 font-normal text-white/70">{item.date}</span>
+            </button>
           ))}
           {cameraRowOne.map((item) => (
             <div key={item} className="text-right text-white/80">
@@ -397,10 +431,15 @@ export function Atlas3DTrackerEnhanced({
 
         <div className="grid grid-cols-4 gap-4 text-sm">
           {missionRowTwo.map((item) => (
-            <div key={item.label} className="text-left font-semibold tracking-wide">
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => handleMissionSelect(item.id)}
+              className="text-left font-semibold tracking-wide text-white/90 transition hover:text-emerald-300 focus:outline-none"
+            >
               {item.label}
-              <span className="ml-2 font-normal text-white/80">{item.date}</span>
-            </div>
+              <span className="ml-2 font-normal text-white/70">{item.date}</span>
+            </button>
           ))}
           {cameraRowTwo.map((item) => (
             <div key={item} className="text-right text-white/80">
@@ -410,10 +449,10 @@ export function Atlas3DTrackerEnhanced({
         </div>
       </div>
 
-      <div className="relative min-h-[60vh] overflow-hidden rounded-2xl border border-white/20 bg-black">
+      <div className="relative h-[60vh] min-h-[420px] w-full overflow-hidden rounded-2xl border border-white/20 bg-black">
         <TexturePreloader />
         <Canvas
-          className="h-full w-full"
+          className="absolute inset-0 h-full w-full"
           gl={{ antialias: true, alpha: false }}
           dpr={[1, 2]}
         >
