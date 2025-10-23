@@ -19,6 +19,7 @@ import { FullTrajectoryLine, TrajectoryTrail } from './TrajectoryTrail';
 
 import { TrajectoryData, VectorData } from "@/types/trajectory";
 import { PlanetLocators } from "./PlanetLocators";
+import { SOLAR_SYSTEM_OBJECTS, SolarSystemObjectKey } from "@/lib/solar-system-data";
 
 type OrbitControlsWithState = OrbitControlsImpl & { userIsInteracting?: boolean };
 
@@ -26,6 +27,7 @@ type ViewMode = "explorer" | "true-scale" | "ride-atlas";
 
 interface SceneContentProps {
   trajectoryData: TrajectoryData;
+  planetData: Record<string, VectorData[]>;
   currentIndex: number;
   currentFrame: VectorData | null;
   viewMode: ViewMode;
@@ -46,6 +48,7 @@ interface SceneContentProps {
 
 export function SceneContent({
   trajectoryData,
+  planetData,
   currentIndex,
   currentFrame: _currentFrame,
   viewMode,
@@ -303,186 +306,28 @@ export function SceneContent({
         />
       </group>
 
-      {/* Planets */}
-      {trajectoryData.mercury && trajectoryData.mercury.length > 0 && (
-        <Planet
-          name="Mercury"
-          trajectoryData={trajectoryData.mercury}
-          currentIndex={currentIndex / 4}
-          radius={sizeForView(
-            "Mercury",
-            0.012,
-            getPlanetPos(trajectoryData.mercury, currentIndex / 4)
-          )}
-          color="#8c7853"
-          showOrbit={true}
-        />
-      )}
+      {/* Planets - Using new planetData structure */}
+      {Object.entries(planetData).map(([key, positions]) => {
+        const planet = SOLAR_SYSTEM_OBJECTS[key as SolarSystemObjectKey];
+        if (!planet || key === 'atlas' || positions.length === 0) return null;
 
-      {trajectoryData.venus && trajectoryData.venus.length > 0 && (
-        <Planet
-          name="Venus"
-          trajectoryData={trajectoryData.venus}
-          currentIndex={currentIndex / 4}
-          radius={sizeForView(
-            "Venus",
-            0.034,
-            getPlanetPos(trajectoryData.venus, currentIndex / 4)
-          )}
-          color="#ffc649"
-          showOrbit={true}
-        />
-      )}
+        return (
+          <Planet
+            key={key}
+            name={planet.name}
+            trajectoryData={positions}
+            currentIndex={currentIndex}
+            radius={sizeForView(
+              planet.name,
+              planet.size,
+              getPlanetPos(positions, currentIndex)
+            )}
+            color={`#${planet.color.toString(16).padStart(6, '0')}`}
+            showOrbit={true}
+          />
+        );
+      })}
 
-      {trajectoryData.earth.length > 0 && (
-        <Planet
-          name="Earth"
-          trajectoryData={trajectoryData.earth}
-          currentIndex={currentIndex / 4}
-          radius={sizeForView(
-            "Earth",
-            0.036,
-            getPlanetPos(trajectoryData.earth, currentIndex / 4)
-          )}
-          color="#00aaff"
-          showOrbit={true}
-        />
-      )}
-
-      {trajectoryData.ceres && trajectoryData.ceres.length > 0 && (
-        <Planet
-          name="Ceres"
-          trajectoryData={trajectoryData.ceres}
-          currentIndex={currentIndex / 8}
-          radius={sizeForView(
-            "Ceres",
-            0.01,
-            getPlanetPos(trajectoryData.ceres, currentIndex / 8)
-          )}
-          color="#a89f91"
-          showOrbit={true}
-        />
-      )}
-
-      {trajectoryData.vesta && trajectoryData.vesta.length > 0 && (
-        <Planet
-          name="Vesta"
-          trajectoryData={trajectoryData.vesta}
-          currentIndex={currentIndex / 8}
-          radius={sizeForView(
-            "Vesta",
-            0.006,
-            getPlanetPos(trajectoryData.vesta, currentIndex / 8)
-          )}
-          color="#b5a88f"
-          showOrbit={true}
-        />
-      )}
-
-      {trajectoryData.pallas && trajectoryData.pallas.length > 0 && (
-        <Planet
-          name="Pallas"
-          trajectoryData={trajectoryData.pallas}
-          currentIndex={currentIndex / 8}
-          radius={sizeForView(
-            "Pallas",
-            0.006,
-            getPlanetPos(trajectoryData.pallas, currentIndex / 8)
-          )}
-          color="#9d9589"
-          showOrbit={true}
-        />
-      )}
-
-      {trajectoryData.mars.length > 0 && (
-        <Planet
-          name="Mars"
-          trajectoryData={trajectoryData.mars}
-          currentIndex={currentIndex / 4}
-          radius={sizeForView(
-            "Mars",
-            0.019,
-            getPlanetPos(trajectoryData.mars, currentIndex / 4)
-          )}
-          color="#ff6666"
-          showOrbit={true}
-        />
-      )}
-
-      {trajectoryData.jupiter.length > 0 && (
-        <Planet
-          name="Jupiter"
-          trajectoryData={trajectoryData.jupiter}
-          currentIndex={currentIndex / 8}
-          radius={sizeForView(
-            "Jupiter",
-            0.4,
-            getPlanetPos(trajectoryData.jupiter, currentIndex / 8)
-          )}
-          color="#ffbb88"
-          showOrbit={true}
-        />
-      )}
-
-      {trajectoryData.saturn && trajectoryData.saturn.length > 0 && (
-        <Planet
-          name="Saturn"
-          trajectoryData={trajectoryData.saturn}
-          currentIndex={currentIndex / 8}
-          radius={sizeForView(
-            "Saturn",
-            0.34,
-            getPlanetPos(trajectoryData.saturn, currentIndex / 8)
-          )}
-          color="#fad5a5"
-          showOrbit={true}
-        />
-      )}
-
-      {trajectoryData.uranus && trajectoryData.uranus.length > 0 && (
-        <Planet
-          name="Uranus"
-          trajectoryData={trajectoryData.uranus}
-          currentIndex={currentIndex / 16}
-          radius={sizeForView(
-            "Uranus",
-            0.14,
-            getPlanetPos(trajectoryData.uranus, currentIndex / 16)
-          )}
-          color="#4fd0e0"
-          showOrbit={true}
-        />
-      )}
-
-      {trajectoryData.neptune && trajectoryData.neptune.length > 0 && (
-        <Planet
-          name="Neptune"
-          trajectoryData={trajectoryData.neptune}
-          currentIndex={currentIndex / 16}
-          radius={sizeForView(
-            "Neptune",
-            0.14,
-            getPlanetPos(trajectoryData.neptune, currentIndex / 16)
-          )}
-          color="#4166f5"
-          showOrbit={true}
-        />
-      )}
-
-      {trajectoryData.pluto && trajectoryData.pluto.length > 0 && (
-        <Planet
-          name="Pluto"
-          trajectoryData={trajectoryData.pluto}
-          currentIndex={currentIndex / 16}
-          radius={sizeForView(
-            "Pluto",
-            0.007,
-            getPlanetPos(trajectoryData.pluto, currentIndex / 16)
-          )}
-          color="#b8a793"
-          showOrbit={true}
-        />
-      )}
 
       {/* 3I/ATLAS Comet */}
       <Comet3D
