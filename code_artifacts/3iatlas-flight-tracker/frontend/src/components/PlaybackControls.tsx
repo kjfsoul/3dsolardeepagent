@@ -214,7 +214,7 @@ export function PlaybackControls({
           </div>
 
           {/* Zoom Controls */}
-          <div className="flex flex-col items-center gap-0.5 mb-2">
+          <div className="flex flex-col items-center gap-0.5 mb-4">
             <div className={`text-xs font-medium ${zoomEnabled ? 'text-white' : 'text-gray-400'}`}>
               <span className="hidden sm:inline">Zoom</span>
               <span className="sm:hidden">Z</span>
