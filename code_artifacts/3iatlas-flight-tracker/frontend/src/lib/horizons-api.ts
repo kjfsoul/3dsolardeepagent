@@ -19,9 +19,9 @@ export interface VectorData {
     z: number;          // Z coordinate in AU
   };
   velocity: {
-    vx: number;         // X velocity in AU/day
-    vy: number;         // Y velocity in AU/day
-    vz: number;         // Z velocity in AU/day
+    x: number;          // X velocity in AU/day
+    y: number;          // Y velocity in AU/day
+    z: number;          // Z velocity in AU/day
   };
 }
 
@@ -233,9 +233,9 @@ export function parseVectorData(horizonsResult: string[]): VectorData[] {
         date: convertHorizonsDateToISO(currentDate),
         position: currentPosition,
         velocity: {
-          vx: parseFloat(velMatch[1]),
-          vy: parseFloat(velMatch[2]),
-          vz: parseFloat(velMatch[3]),
+          x: parseFloat(velMatch[1]),
+          y: parseFloat(velMatch[2]),
+          z: parseFloat(velMatch[3]),
         },
       });
       currentPosition = null; // Reset for next iteration
@@ -299,14 +299,12 @@ export async function get3IAtlasVectors(
   ];
 
   let lookupResult: HorizonsLookupResult | null = null;
-  let usedDesignation = '';
 
   for (const name of possibleNames) {
     try {
       const result = await lookupObject(name, 'com');
       if (result.count > 0) {
         lookupResult = result;
-        usedDesignation = name;
         console.log(`[Horizons] Found 3I/ATLAS using designation: "${name}"`);
         console.log(`[Horizons] Object name: ${result.result?.[0]?.name}`);
         break;

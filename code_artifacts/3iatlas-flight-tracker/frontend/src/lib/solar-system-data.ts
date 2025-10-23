@@ -4,7 +4,7 @@
  */
 
 import { type VectorData } from '@/types/trajectory';
-import { get3IAtlasVectors, lookupObject, getEphemerisVectors, parseVectorData, type HorizonsQueryParams } from './horizons-api';
+import { get3IAtlasVectors, getEphemerisVectors, parseVectorData, type HorizonsQueryParams } from './horizons-api';
 
 // ============================================================================
 // SOLAR SYSTEM OBJECTS (NASA Horizons COMMAND codes)
