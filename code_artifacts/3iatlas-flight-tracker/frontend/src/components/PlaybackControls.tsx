@@ -58,9 +58,11 @@ export function PlaybackControls({
         border: "1px solid rgba(0, 255, 136, 0.3)",
         zIndex: 99999,
         pointerEvents: "auto" as const,
+        margin: "0 16px", // Add horizontal margin
       }
     : {
         pointerEvents: "auto" as const,
+        margin: "0 16px", // Add horizontal margin for non-floating
       };
   const innerWrapperClass = isFloating ? "p-2 sm:p-3" : "mx-auto w-full max-w-5xl px-2 sm:px-4 py-3 sm:py-4";
 
@@ -124,7 +126,7 @@ export function PlaybackControls({
         </div>
 
         {/* Control Buttons */}
-        <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 md:gap-3 ${isFloating ? '' : 'max-w-full mx-auto px-2'}`}>
+        <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 md:gap-3 ${isFloating ? '' : 'max-w-full mx-auto px-4 sm:px-6 md:px-8'}`}>
           <button
             type="button"
             onClick={onReset}
