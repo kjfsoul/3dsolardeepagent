@@ -338,14 +338,16 @@ export function Atlas3DTrackerEnhanced({
     [missionHighlights.jupiterApproach, missionHighlights.marsFlyby]
   );
 
-  const cameraRowOne = [
-    'Left Click + Drag: Rotate',
-    'Right Click + Drag: Pan',
+  const zoomEnabled = viewMode === 'true-scale';
+
+  const cameraRowOne: Array<{ label: string }> = [
+    { label: 'Left Click + Drag: Rotate' },
+    { label: 'Right Click + Drag: Pan' },
   ];
 
-  const cameraRowTwo = [
-    'Scroll Wheel: Zoom In/Out',
-    '+/- Buttons: Zoom Controls',
+  const cameraRowTwo: Array<{ label: string; dim?: boolean }> = [
+    { label: 'Scroll Wheel: Zoom In/Out' },
+    { label: '+/- Buttons: Zoom Controls', dim: !zoomEnabled },
   ];
 
   const handleMissionSelect = useCallback(
@@ -416,15 +418,15 @@ export function Atlas3DTrackerEnhanced({
               key={item.id}
               type="button"
               onClick={() => handleMissionSelect(item.id)}
-              className="text-left font-semibold tracking-wide text-white/90 transition hover:text-emerald-300 focus:outline-none"
+              className="group rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-left font-semibold tracking-wide text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition hover:border-emerald-300 hover:bg-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-black"
             >
               {item.label}
-              <span className="ml-2 font-normal text-white/70">{item.date}</span>
+              <span className="ml-2 font-normal text-white/70 group-hover:text-emerald-200">{item.date}</span>
             </button>
           ))}
           {cameraRowOne.map((item) => (
-            <div key={item} className="text-right text-white/80">
-              {item}
+            <div key={item.label} className="text-right text-white/80">
+              {item.label}
             </div>
           ))}
         </div>
@@ -435,15 +437,18 @@ export function Atlas3DTrackerEnhanced({
               key={item.id}
               type="button"
               onClick={() => handleMissionSelect(item.id)}
-              className="text-left font-semibold tracking-wide text-white/90 transition hover:text-emerald-300 focus:outline-none"
+              className="group rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-left font-semibold tracking-wide text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition hover:border-emerald-300 hover:bg-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-black"
             >
               {item.label}
-              <span className="ml-2 font-normal text-white/70">{item.date}</span>
+              <span className="ml-2 font-normal text-white/70 group-hover:text-emerald-200">{item.date}</span>
             </button>
           ))}
           {cameraRowTwo.map((item) => (
-            <div key={item} className="text-right text-white/80">
-              {item}
+            <div
+              key={item.label}
+              className={`text-right ${item.dim ? 'text-white/40' : 'text-white/80'}`}
+            >
+              {item.label}
             </div>
           ))}
         </div>

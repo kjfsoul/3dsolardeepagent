@@ -20,11 +20,15 @@ interface PlaybackControlsProps {
   layout?: 'floating' | 'inline';
 }
 
-const SPEED_OPTIONS = [0.5, 1, 2, 5, 10, 25];
+const SPEED_OPTIONS = [1, 10, 25];
+const VIEW_OPTIONS: Array<{ mode: 'true-scale' | 'ride-atlas'; label: string }> = [
+  { mode: 'true-scale', label: 'True Scale' },
+  { mode: 'ride-atlas', label: 'Ride With 3I/ATLAS' },
+];
 const VIEW_MODE_LABELS = {
   explorer: "Explorer",
   "true-scale": "True Scale",
-  "ride-atlas": "Ride With ATLAS",
+  "ride-atlas": "Ride With 3I/ATLAS",
 };
 
 export function PlaybackControls({
@@ -45,8 +49,8 @@ export function PlaybackControls({
 
   const isFloating = layout === 'floating';
   const containerClassName = isFloating
-    ? "playback-controls fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md text-white rounded-lg shadow-2xl"
-    : "playback-controls w-full rounded-xl border border-emerald-400/20 bg-black/70 backdrop-blur";
+    ? "playback-controls relative fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md text-white rounded-lg shadow-2xl"
+    : "playback-controls relative w-full rounded-xl border border-emerald-400/20 bg-black/70 backdrop-blur";
   const containerStyle = isFloating
     ? {
         minWidth: "500px",
@@ -75,8 +79,14 @@ export function PlaybackControls({
     };
   }, []);
 
+  useEffect(() => {
+    if (!SPEED_OPTIONS.includes(speed)) {
+      onSpeedChange(SPEED_OPTIONS[0]);
+    }
+  }, [speed, onSpeedChange]);
+
   const dispatchZoomEvent = (type: 'zoom-in' | 'zoom-out') => {
-    window.dispatchEvent(new CustomEvent(type));
+    window.dispatchEvent(new Event(type));
   };
 
   const handleScrubStart = () => {
@@ -86,6 +96,7 @@ export function PlaybackControls({
   };
 
   const progressPercent = maxIndex > 0 ? Math.floor((currentIndex / maxIndex) * 100) : 0;
+  const zoomEnabled = viewMode === 'true-scale';
 
   return (
     <div className={containerClassName} style={containerStyle}>
@@ -145,7 +156,7 @@ export function PlaybackControls({
             </button>
 
             {showSpeedMenu && (
-              <div className="absolute left-1/2 top-full z-[1000] mt-2 w-40 -translate-x-1/2 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
+              <div className="absolute left-1/2 bottom-full z-[1000] mb-2 w-40 -translate-x-1/2 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
                 {SPEED_OPTIONS.map((option) => (
                   <button
                     key={option}
@@ -180,13 +191,13 @@ export function PlaybackControls({
             </button>
 
             {showViewMenu && (
-              <div className="absolute left-1/2 top-full z-[1000] mt-2 w-52 -translate-x-1/2 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
-                {Object.entries(VIEW_MODE_LABELS).map(([mode, label]) => (
+              <div className="absolute left-1/2 bottom-full z-[1000] mb-2 w-52 -translate-x-1/2 overflow-hidden rounded-lg border border-gray-600 bg-gray-800 shadow-xl">
+                {VIEW_OPTIONS.map(({ mode, label }) => (
                   <button
                     key={mode}
                     type="button"
                     onClick={() => {
-                      onViewModeChange(mode as 'explorer' | 'true-scale' | 'ride-atlas');
+                      onViewModeChange(mode);
                       setShowViewMenu(false);
                     }}
                     className={`block w-full px-4 py-2 text-left text-sm transition hover:bg-gray-700 ${
@@ -202,20 +213,30 @@ export function PlaybackControls({
 
           {/* Zoom Controls */}
           <div className="flex flex-col items-center gap-1">
-            <div className="text-xs text-gray-300 font-medium">Zoom</div>
+            <div className={`text-xs font-medium ${zoomEnabled ? 'text-white' : 'text-gray-400'}`}>
+              Zoom
+            </div>
             <div className="flex gap-1">
               <button
                 type="button"
-                onClick={() => dispatchZoomEvent('zoom-out')}
-                className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
+                onClick={() => zoomEnabled && dispatchZoomEvent('zoom-out')}
+                className={`px-2 py-1 rounded-lg border transition-colors text-sm ${
+                  zoomEnabled
+                    ? 'border-emerald-400 bg-gray-800 text-white hover:bg-emerald-500/20'
+                    : 'border-gray-700 bg-gray-700 text-gray-400 cursor-not-allowed'
+                }`}
                 title="Zoom Out"
               >
                 ➖
               </button>
               <button
                 type="button"
-                onClick={() => dispatchZoomEvent('zoom-in')}
-                className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm"
+                onClick={() => zoomEnabled && dispatchZoomEvent('zoom-in')}
+                className={`px-2 py-1 rounded-lg border transition-colors text-sm ${
+                  zoomEnabled
+                    ? 'border-emerald-400 bg-gray-800 text-white hover:bg-emerald-500/20'
+                    : 'border-gray-700 bg-gray-700 text-gray-400 cursor-not-allowed'
+                }`}
                 title="Zoom In"
               >
                 ➕
