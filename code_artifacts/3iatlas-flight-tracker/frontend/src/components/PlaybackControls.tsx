@@ -124,11 +124,11 @@ export function PlaybackControls({
         </div>
 
         {/* Control Buttons */}
-        <div className={`flex flex-wrap items-center justify-center gap-2 sm:gap-3 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
+        <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 md:gap-3 ${isFloating ? '' : 'max-w-full mx-auto px-2'}`}>
           <button
             type="button"
             onClick={onReset}
-            className="px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap"
+            className="px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap"
             title="Reset to beginning"
           >
             ⏮️ Reset
@@ -137,7 +137,7 @@ export function PlaybackControls({
           <button
             type="button"
             onClick={onPlayPause}
-            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors font-semibold text-xs sm:text-sm whitespace-nowrap"
+            className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors font-semibold text-xs sm:text-sm whitespace-nowrap"
           >
             {isPlaying ? "⏸️ Pause" : "▶️ Play"}
           </button>
@@ -150,7 +150,7 @@ export function PlaybackControls({
                 setShowSpeedMenu((prev) => !prev);
                 setShowViewMenu(false);
               }}
-              className="px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap"
+              className="px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap"
             >
               Speed: {speed}x
             </button>
@@ -184,7 +184,7 @@ export function PlaybackControls({
                 setShowViewMenu((prev) => !prev);
                 setShowSpeedMenu(false);
               }}
-              className="px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap"
+              className="px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap"
               title="Change view scale"
             >
               <span className="hidden sm:inline">View: </span>{VIEW_MODE_LABELS[viewMode]}
@@ -212,16 +212,16 @@ export function PlaybackControls({
           </div>
 
           {/* Zoom Controls */}
-          <div className="flex flex-col items-center gap-0.5 sm:gap-1">
+          <div className="flex flex-col items-center gap-0.5">
             <div className={`text-xs font-medium ${zoomEnabled ? 'text-white' : 'text-gray-400'}`}>
               <span className="hidden sm:inline">Zoom</span>
               <span className="sm:hidden">Z</span>
             </div>
-            <div className="flex gap-0.5 sm:gap-1">
+            <div className="flex gap-0.5">
               <button
                 type="button"
                 onClick={() => zoomEnabled && dispatchZoomEvent('zoom-out')}
-                className={`px-1.5 sm:px-2 py-1 rounded-lg border transition-colors text-xs sm:text-sm ${
+                className={`px-1 sm:px-1.5 md:px-2 py-0.5 sm:py-1 rounded-lg border transition-colors text-xs sm:text-sm ${
                   zoomEnabled
                     ? 'border-emerald-400 bg-gray-800 text-white hover:bg-emerald-500/20'
                     : 'border-gray-700 bg-gray-700 text-gray-400 cursor-not-allowed'
@@ -233,7 +233,7 @@ export function PlaybackControls({
               <button
                 type="button"
                 onClick={() => zoomEnabled && dispatchZoomEvent('zoom-in')}
-                className={`px-1.5 sm:px-2 py-1 rounded-lg border transition-colors text-xs sm:text-sm ${
+                className={`px-1 sm:px-1.5 md:px-2 py-0.5 sm:py-1 rounded-lg border transition-colors text-xs sm:text-sm ${
                   zoomEnabled
                     ? 'border-emerald-400 bg-gray-800 text-white hover:bg-emerald-500/20'
                     : 'border-gray-700 bg-gray-700 text-gray-400 cursor-not-allowed'
