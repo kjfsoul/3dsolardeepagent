@@ -11,12 +11,12 @@ interface PlaybackControlsProps {
   speed: number;
   currentIndex: number;
   maxIndex: number;
-  viewMode: 'explorer' | 'true-scale' | 'ride-atlas';
+  viewMode: /* 'explorer' | */ 'true-scale' | 'ride-atlas';
   onPlayPause: () => void;
   onReset: () => void;
   onSpeedChange: (speed: number) => void;
   onSeek: (index: number) => void;
-  onViewModeChange: (mode: 'explorer' | 'true-scale' | 'ride-atlas') => void;
+  onViewModeChange: (mode: /* 'explorer' | */ 'true-scale' | 'ride-atlas') => void;
   layout?: 'floating' | 'inline';
 }
 

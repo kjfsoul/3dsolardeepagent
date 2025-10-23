@@ -26,7 +26,7 @@ import { PlanetLocators } from "./PlanetLocators";
 
 type OrbitControlsWithState = OrbitControlsImpl & { userIsInteracting?: boolean };
 
-type ViewMode = "explorer" | "true-scale" | "ride-atlas";
+type ViewMode = /* "explorer" | */ "true-scale" | "ride-atlas";
 
 interface SceneContentProps {
   trajectoryData: TrajectoryData;

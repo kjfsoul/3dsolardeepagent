@@ -30,7 +30,7 @@ import {
 } from "@/lib/solar-system-data";
 import { TimelineEvent, TrajectoryData, VectorData } from "@/types/trajectory";
 
-type ViewMode = 'explorer' | 'true-scale' | 'ride-atlas'; // Explorer available but commented out in dropdown
+type ViewMode = /* 'explorer' | */ 'true-scale' | 'ride-atlas'; // Explorer commented out
 type MissionId = 'discovery' | 'mars_flyby' | 'perihelion' | 'jupiter_approach';
 
 interface Atlas3DTrackerEnhancedProps {

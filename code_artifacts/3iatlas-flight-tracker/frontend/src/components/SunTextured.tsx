@@ -4,11 +4,11 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { useTexture } from "@react-three/drei";
 
-type ViewMode = "explorer" | "true-scale" | "ride-atlas";
+type ViewMode = /* "explorer" | */ "true-scale" | "ride-atlas";
 
 export function SunTextured({
   radius = 2.0,
-  viewMode = "explorer",
+  viewMode = "true-scale",
 }: {
   radius?: number;
   viewMode?: ViewMode;
