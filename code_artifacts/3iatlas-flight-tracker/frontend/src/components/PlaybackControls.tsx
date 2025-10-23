@@ -104,25 +104,27 @@ export function PlaybackControls({
     <div className={containerClassName} style={containerStyle}>
       <div className={innerWrapperClass}>
         {/* Timeline Slider Row */}
-        <div className={`mb-2 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
-          {/* Progress Percentage - Above slider */}
-          <div className="text-center text-xs sm:text-sm font-semibold text-white mb-1">
-            {progressPercent}%
-          </div>
-          {/* Slider */}
-          <div className="flex items-center gap-2 sm:gap-4 text-xs text-white/70">
+        <div className={`mb-0 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
+          {/* Slider with percentage overlay */}
+          <div className="flex items-center gap-2 sm:gap-4 text-xs text-white/70 relative">
             <span className="w-16 text-left sm:w-24 md:w-32 text-xs sm:text-sm">July 1, 2025</span>
-            <input
-              type="range"
-              min="0"
-              max={maxIndex}
-              value={currentIndex}
-              onMouseDown={handleScrubStart}
-              onTouchStart={handleScrubStart}
-              onChange={(e) => onSeek(parseFloat(e.target.value))}
-              className="h-2 flex-1 cursor-pointer appearance-none rounded-full bg-gray-700"
-              style={{ accentColor: '#00ff88' }}
-            />
+            <div className="flex-1 relative">
+              <input
+                type="range"
+                min="0"
+                max={maxIndex}
+                value={currentIndex}
+                onMouseDown={handleScrubStart}
+                onTouchStart={handleScrubStart}
+                onChange={(e) => onSeek(parseFloat(e.target.value))}
+                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-700"
+                style={{ accentColor: '#00ff88' }}
+              />
+              {/* Percentage overlay on top of slider */}
+              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs sm:text-sm font-semibold text-white bg-black/50 px-2 py-1 rounded">
+                {progressPercent}%
+              </div>
+            </div>
             <span className="w-16 text-right sm:w-24 md:w-32 text-xs sm:text-sm">March 31, 2026</span>
           </div>
         </div>
