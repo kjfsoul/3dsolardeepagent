@@ -84,10 +84,10 @@ export function CelestialBody({
 
 interface SunProps {
   radius?: number;
-  viewMode?: 'explorer' | 'true-scale' | 'ride-atlas';
+  viewMode?: /* 'explorer' | */ 'true-scale' | 'ride-atlas';
 }
 
-export function Sun({ radius = 2.0, viewMode = "explorer" }: SunProps) {
+export function Sun({ radius = 2.0, viewMode = "true-scale" }: SunProps) {
   const { map: sunTex } = usePlanetTextures("sun");
 
   // Mode-based brightness

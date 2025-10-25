@@ -24,9 +24,13 @@ import { TelemetryHUD } from './TelemetryHUD';
 import { TexturePreloader } from './TexturePreloader';
 
 // Type imports
-import { TimelineEvent, TrajectoryData } from '@/types/trajectory';
+import {
+  fetchSolarSystemData,
+  SolarSystemObjectKey,
+} from "@/lib/solar-system-data";
+import { TimelineEvent, TrajectoryData, VectorData } from "@/types/trajectory";
 
-type ViewMode = /* 'explorer' | */ 'true-scale' | 'ride-atlas'; // Explorer commented out - no textures
+type ViewMode = /* 'explorer' | */ 'true-scale' | 'ride-atlas'; // Explorer commented out
 type MissionId = 'discovery' | 'mars_flyby' | 'perihelion' | 'jupiter_approach';
 
 interface Atlas3DTrackerEnhancedProps {
@@ -42,6 +46,9 @@ export function Atlas3DTrackerEnhanced({
 }: Atlas3DTrackerEnhancedProps) {
   // State management
   const [trajectoryData, setTrajectoryData] = useState<TrajectoryData | null>(null);
+  const [planetData, setPlanetData] = useState<Record<string, VectorData[]>>(
+    {}
+  );
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
@@ -84,28 +91,52 @@ export function Atlas3DTrackerEnhanced({
   useEffect(() => {
     async function loadData() {
       try {
-        console.log('🚀 Starting data load...');
+        console.log("🚀 Starting data load...");
         // Load trajectory data
-        const trajectoryResponse = await fetch('/data/trajectory_static.json');
-        console.log('📡 Trajectory response:', trajectoryResponse.status);
+        const trajectoryResponse = await fetch("/data/trajectory_static.json");
+        console.log("📡 Trajectory response:", trajectoryResponse.status);
         if (!trajectoryResponse.ok) {
-          throw new Error('Failed to load trajectory data');
+          throw new Error("Failed to load trajectory data");
         }
         const trajectoryJson = await trajectoryResponse.json();
-        console.log('✅ Trajectory data loaded:', Object.keys(trajectoryJson));
+        console.log("✅ Trajectory data loaded:", Object.keys(trajectoryJson));
         setTrajectoryData(trajectoryJson);
 
         // Load events
-        const eventsResponse = await fetch('/data/timeline_events.json');
-        console.log('📡 Events response:', eventsResponse.status);
+        const eventsResponse = await fetch("/data/timeline_events.json");
+        console.log("📡 Events response:", eventsResponse.status);
         if (!eventsResponse.ok) {
-          throw new Error('Failed to load events data');
+          throw new Error("Failed to load events data");
         }
         const eventsJson = await eventsResponse.json();
-        console.log('✅ Events data loaded:', eventsJson.events?.length || 0);
+        console.log("✅ Events data loaded:", eventsJson.events?.length || 0);
         setEvents(eventsJson.events);
 
-        console.log('🎉 All data loaded successfully!');
+        // Load planet data using existing infrastructure
+        console.log("🪐 Loading planet data...");
+        const planetObjects: SolarSystemObjectKey[] = [
+          "sun",
+          "mercury",
+          "venus",
+          "earth",
+          "mars",
+          "jupiter",
+          "saturn",
+          "uranus",
+          "neptune",
+        ];
+
+        const solarSystemData = await fetchSolarSystemData(
+          planetObjects,
+          "2025-07-01",
+          "2026-03-31",
+          "1d"
+        );
+
+        console.log("✅ Planet data loaded:", Object.keys(solarSystemData));
+        setPlanetData(solarSystemData);
+
+        console.log("🎉 All data loaded successfully!");
         setLoading(false);
       } catch (err) {
         console.error('❌ Error loading data:', err);
@@ -421,11 +452,16 @@ export function Atlas3DTrackerEnhanced({
               className="group rounded-lg  bg-white/5 px-3 sm:px-4 py-2 text-left font-semibold tracking-wide text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition  hover:bg-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-black"
             >
               {item.label}
-              <span className="ml-2 font-normal text-white/70 group-hover:text-emerald-200">{item.date}</span>
+              <span className="ml-2 font-normal text-white/70 group-hover:text-emerald-200">
+                {item.date}
+              </span>
             </button>
           ))}
           {cameraRowOne.map((item) => (
-            <div key={item.label} className="text-right text-white/80 pr-2 sm:pr-0">
+            <div
+              key={item.label}
+              className="text-right text-white/80 pr-2 sm:pr-0"
+            >
               {item.label}
             </div>
           ))}
@@ -440,13 +476,17 @@ export function Atlas3DTrackerEnhanced({
               className="group rounded-lg  bg-white/5 px-3 sm:px-4 py-2 text-left font-semibold tracking-wide text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition  hover:bg-emerald-500/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-black"
             >
               {item.label}
-              <span className="ml-2 font-normal text-white/70 group-hover:text-emerald-200">{item.date}</span>
+              <span className="ml-2 font-normal text-white/70 group-hover:text-emerald-200">
+                {item.date}
+              </span>
             </button>
           ))}
           {cameraRowTwo.map((item) => (
             <div
               key={item.label}
-              className={`text-right pr-2 sm:pr-0 ${item.dim ? 'text-white/40' : 'text-white/80'}`}
+              className={`text-right pr-2 sm:pr-0 ${
+                item.dim ? "text-white/40" : "text-white/80"
+              }`}
             >
               {item.label}
             </div>
@@ -464,12 +504,13 @@ export function Atlas3DTrackerEnhanced({
           <ambientLight intensity={0.3} />
           <PerspectiveCamera
             makeDefault
-            position={viewMode === 'true-scale' ? [2, 2, 5] : [6, 4, 6]}
-            fov={viewMode === 'true-scale' ? 45 : 50}
+            position={viewMode === "true-scale" ? [2, 2, 5] : [6, 4, 6]}
+            fov={viewMode === "true-scale" ? 45 : 50}
           />
           <Suspense fallback={null}>
             <SceneContent
               trajectoryData={trajectoryData}
+              planetData={planetData}
               currentIndex={currentIndex}
               currentFrame={currentFrame}
               viewMode={viewMode}
@@ -498,7 +539,9 @@ export function Atlas3DTrackerEnhanced({
         isPlaying={isPlaying}
         speed={speed}
         currentIndex={currentIndex}
-        maxIndex={(trajectoryData.atlas || trajectoryData['3iatlas'] || []).length - 1}
+        maxIndex={
+          (trajectoryData.atlas || trajectoryData["3iatlas"] || []).length - 1
+        }
         viewMode={viewMode}
         onPlayPause={() => setIsPlaying(!isPlaying)}
         onReset={() => setCurrentIndex(0)}

@@ -11,12 +11,12 @@ interface PlaybackControlsProps {
   speed: number;
   currentIndex: number;
   maxIndex: number;
-  viewMode: 'explorer' | 'true-scale' | 'ride-atlas';
+  viewMode: /* 'explorer' | */ 'true-scale' | 'ride-atlas';
   onPlayPause: () => void;
   onReset: () => void;
   onSpeedChange: (speed: number) => void;
   onSeek: (index: number) => void;
-  onViewModeChange: (mode: 'explorer' | 'true-scale' | 'ride-atlas') => void;
+  onViewModeChange: (mode: /* 'explorer' | */ 'true-scale' | 'ride-atlas') => void;
   layout?: 'floating' | 'inline';
 }
 
@@ -26,7 +26,7 @@ const VIEW_OPTIONS: Array<{ mode: 'true-scale' | 'ride-atlas'; label: string }> 
   { mode: 'ride-atlas', label: 'Ride With 3I/ATLAS' },
 ];
 const VIEW_MODE_LABELS = {
-  // explorer: "Explorer", // COMMENTED OUT - No textures, deactivated
+  explorer: "Explorer", // Available but not shown in dropdown
   "true-scale": "True Scale",
   "ride-atlas": "Ride With 3I/ATLAS",
 };
