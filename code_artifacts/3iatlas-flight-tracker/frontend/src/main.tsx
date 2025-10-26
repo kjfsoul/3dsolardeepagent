@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 
 const TRACKER_URL =
   (import.meta as any).env?.VITE_TRACKER_URL ||
-  "https://3dsolardeepagent.vercel.app"\; // fallback runtime endpoint
+  "https://tracker.3iatlas.mysticarcana.com"; // fallback runtime endpoint
 
 function App() {
   return (
@@ -11,7 +11,13 @@ function App() {
       <iframe
         src={TRACKER_URL}
         title="3I/ATLAS Tracker"
-        style={{ width: "100%", height: "100%", border: "0", display: "block", background: "black" }}
+        style={{
+          width: "100%",
+          height: "100%",
+          border: "0",
+          display: "block",
+          background: "black"
+        }}
         allow="accelerometer; gyroscope; fullscreen"
         referrerPolicy="no-referrer"
       />
