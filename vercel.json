@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "framework": null,
+  "installCommand": "npm --prefix code_artifacts/3iatlas-flight-tracker/frontend ci || npm --prefix code_artifacts/3iatlas-flight-tracker/frontend install",
+  "buildCommand": "npm --prefix code_artifacts/3iatlas-flight-tracker/frontend run build",
+  "outputDirectory": "code_artifacts/3iatlas-flight-tracker/frontend/dist"
+}
