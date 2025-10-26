@@ -4,5 +4,8 @@
   "scripts": {
     "build": "npm --prefix code_artifacts/3iatlas-flight-tracker/frontend run build",
     "postinstall": "npm --prefix code_artifacts/3iatlas-flight-tracker/frontend ci || npm --prefix code_artifacts/3iatlas-flight-tracker/frontend install"
+  },
+  "dependencies": {
+    "@genkit-ai/mcp": "^1.21.0"
   }
 }
