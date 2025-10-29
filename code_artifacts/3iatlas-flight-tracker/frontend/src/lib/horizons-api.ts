@@ -105,13 +105,13 @@ const horizonsCache = new Map<string, CacheEntry<unknown>>();
 function getCached<T>(key: string): T | null {
   const entry = horizonsCache.get(key);
   if (!entry) return null;
-  
+
   // Check if cache expired
   if (Date.now() - entry.timestamp > CACHE_TTL) {
     horizonsCache.delete(key);
     return null;
   }
-  
+
   return entry.data as T;
 }
 
@@ -132,19 +132,19 @@ function setCache<T>(key: string, data: T): void {
  */
 export async function lookupObject(
   searchString: string,
-  group?: 'ast' | 'com' | 'pln' | 'sat' | 'sct' | 'mb' | 'sb'
+  group?: "ast" | "com" | "pln" | "sat" | "sct" | "mb" | "sb"
 ): Promise<HorizonsLookupResult> {
   // Check cache first
-  const cacheKey = `lookup:${searchString}:${group || 'all'}`;
+  const cacheKey = `lookup:${searchString}:${group || "all"}`;
   const cached = getCached<HorizonsLookupResult>(cacheKey);
   if (cached) return cached;
   const params = new URLSearchParams({
     sstr: searchString,
-    format: 'json',
+    format: "json",
   });
 
   if (group) {
-    params.append('group', group);
+    params.append("group", group);
   }
 
   const url = `${HORIZONS_LOOKUP_ENDPOINT}?${params.toString()}`;
@@ -160,17 +160,19 @@ export async function lookupObject(
     }
 
     const data: HorizonsLookupResult = await response.json();
-    
+
     // Cache the result
     setCache(cacheKey, data);
-    
+
     return data;
   } catch (error) {
     if (error instanceof HorizonsAPIError) {
       throw error;
     }
     throw new HorizonsAPIError(
-      `Failed to lookup object "${searchString}": ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to lookup object "${searchString}": ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
     );
   }
 }
@@ -209,17 +211,19 @@ export async function getEphemerisVectors(
     }
 
     const data: HorizonsResponse = await response.json();
-    
+
     // Cache the result
     setCache(cacheKey, data);
-    
+
     return data;
   } catch (error) {
     if (error instanceof HorizonsAPIError) {
       throw error;
     }
     throw new HorizonsAPIError(
-      `Failed to fetch ephemeris data: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to fetch ephemeris data: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
     );
   }
 }
@@ -295,6 +299,37 @@ export function parseVectorData(horizonsResult: string[]): VectorData[] {
     }
   }
 
+  return vectors;
+}
+
+/**
+ * Smooth ephemeris data discontinuities for problematic date ranges
+ * Interpolates position vectors for Sept 7 and Nov 14 data gaps
+ */
+export function smoothEphemerisData(vectors: VectorData[]): VectorData[] {
+  const SMOOTH_DATES = ['2025-09-07', '2025-11-14'];
+  
+  for (let i = 1; i < vectors.length; i++) {
+    const prev = vectors[i - 1];
+    const curr = vectors[i];
+
+    const prevDate = prev.date.split(' ')[0];
+    const currDate = curr.date.split(' ')[0];
+
+    const dx = Math.abs(curr.position.x - prev.position.x);
+    const dy = Math.abs(curr.position.y - prev.position.y);
+    const dz = Math.abs(curr.position.z - prev.position.z);
+    const delta = Math.max(dx, dy, dz);
+
+    // Smooth if date matches known gaps OR sudden jump detected (> 0.3 AU)
+    if (SMOOTH_DATES.includes(prevDate) || SMOOTH_DATES.includes(currDate) || delta > 0.3) {
+      vectors[i].position.x = (curr.position.x + prev.position.x) / 2;
+      vectors[i].position.y = (curr.position.y + prev.position.y) / 2;
+      vectors[i].position.z = (curr.position.z + prev.position.z) / 2;
+      console.warn('[Horizons] Smoothed discontinuity near', prevDate, '→', currDate, `(Δ=${delta.toFixed(3)} AU)`);
+    }
+  }
+  
   return vectors;
 }
 

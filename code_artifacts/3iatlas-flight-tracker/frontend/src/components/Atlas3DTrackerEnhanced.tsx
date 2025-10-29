@@ -14,15 +14,22 @@
 
 import { PerspectiveCamera } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as THREE from 'three';
+import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import * as THREE from "three";
 
 // Component imports
-import { PlaybackControls } from './PlaybackControls';
-import { SceneContent } from './SceneContent';
-import { TelemetryHUD } from './TelemetryHUD';
-import { TexturePreloader } from './TexturePreloader';
+import { PlaybackControls } from "./PlaybackControls";
+import { SceneContent } from "./SceneContent";
+import { TelemetryHUD } from "./TelemetryHUD";
+import { TexturePreloader } from "./TexturePreloader";
 
 // Type imports
 import {
@@ -31,8 +38,8 @@ import {
 } from "@/lib/solar-system-data";
 import { TimelineEvent, TrajectoryData, VectorData } from "@/types/trajectory";
 
-type ViewMode = /* 'explorer' | */ 'true-scale' | 'ride-atlas'; // Explorer commented out
-type MissionId = 'discovery' | 'mars_flyby' | 'perihelion' | 'jupiter_approach';
+type ViewMode = /* 'explorer' | */ "true-scale" | "ride-atlas"; // Explorer commented out
+type MissionId = "discovery" | "mars_flyby" | "perihelion" | "jupiter_approach";
 
 interface Atlas3DTrackerEnhancedProps {
   autoPlay?: boolean;
@@ -43,10 +50,12 @@ interface Atlas3DTrackerEnhancedProps {
 export function Atlas3DTrackerEnhanced({
   autoPlay = true,
   initialSpeed = 10,
-  initialViewMode = 'ride-atlas',
+  initialViewMode = "ride-atlas",
 }: Atlas3DTrackerEnhancedProps) {
   // State management
-  const [trajectoryData, setTrajectoryData] = useState<TrajectoryData | null>(null);
+  const [trajectoryData, setTrajectoryData] = useState<TrajectoryData | null>(
+    null
+  );
   const [planetData, setPlanetData] = useState<Record<string, VectorData[]>>(
     {}
   );
@@ -60,17 +69,19 @@ export function Atlas3DTrackerEnhanced({
 
   // Log state changes for debugging
   useEffect(() => {
-    console.log('viewMode=', viewMode);
+    console.log("viewMode=", viewMode);
   }, [viewMode]);
 
   useEffect(() => {
-    console.log('speed=', speed);
+    console.log("speed=", speed);
   }, [speed]);
   const [error, setError] = useState<string | null>(null);
 
   // Cinematic camera state
   const [cinematicActive, setCinematicActive] = useState(false);
-  const [cinematicEvent, setCinematicEvent] = useState<'mars_flyby' | 'perihelion' | 'jupiter_approach' | null>(null);
+  const [cinematicEvent, setCinematicEvent] = useState<
+    "mars_flyby" | "perihelion" | "jupiter_approach" | null
+  >(null);
 
   // Auto fly-by zoom states
   const [focusBody, setFocusBody] = useState<string | null>(null);
@@ -140,8 +151,8 @@ export function Atlas3DTrackerEnhanced({
         console.log("🎉 All data loaded successfully!");
         setLoading(false);
       } catch (err) {
-        console.error('❌ Error loading data:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        console.error("❌ Error loading data:", err);
+        setError(err instanceof Error ? err.message : "Unknown error");
         setLoading(false);
       }
     }
@@ -154,7 +165,7 @@ export function Atlas3DTrackerEnhanced({
     if (!isPlaying || !trajectoryData) {
       return;
     }
-    const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'];
+    const atlasData = trajectoryData.atlas || trajectoryData["3iatlas"];
     if (!atlasData || atlasData.length === 0) {
       return;
     }
@@ -193,7 +204,7 @@ export function Atlas3DTrackerEnhanced({
   const currentFrame = useMemo(() => {
     if (!trajectoryData) return null;
     // Handle both 'atlas' and '3iatlas' keys from the data
-    const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'];
+    const atlasData = trajectoryData.atlas || trajectoryData["3iatlas"];
     if (!atlasData || atlasData.length === 0) return null;
     const index = Math.floor(currentIndex);
     return atlasData[index] || null;
@@ -210,9 +221,21 @@ export function Atlas3DTrackerEnhanced({
     );
 
     const cands = [
-      { name: "Mars", pos: bodyPositionAt(trajectoryData.mars, currentIndex / 4), r: 0.2 },
-      { name: "Earth", pos: bodyPositionAt(trajectoryData.earth, currentIndex / 4), r: 0.15 },
-      { name: "Jupiter", pos: bodyPositionAt(trajectoryData.jupiter, currentIndex / 8), r: 0.4 },
+      {
+        name: "Mars",
+        pos: bodyPositionAt(trajectoryData.mars, currentIndex / 4),
+        r: 0.2,
+      },
+      {
+        name: "Earth",
+        pos: bodyPositionAt(trajectoryData.earth, currentIndex / 4),
+        r: 0.15,
+      },
+      {
+        name: "Jupiter",
+        pos: bodyPositionAt(trajectoryData.jupiter, currentIndex / 8),
+        r: 0.4,
+      },
     ];
 
     let near: { name: string; d: number } | null = null;
@@ -236,7 +259,14 @@ export function Atlas3DTrackerEnhanced({
     } else if (!near && now > focusUntil) {
       setFocusBody(null);
     }
-  }, [trajectoryData, currentFrame, currentIndex, focusBody, focusUntil, setCinematicEvent]);
+  }, [
+    trajectoryData,
+    currentFrame,
+    currentIndex,
+    focusBody,
+    focusUntil,
+    setCinematicEvent,
+  ]);
 
   // Calculate comet position and velocity for 3D scene
   const cometPosition = useMemo((): [number, number, number] => {
@@ -302,7 +332,11 @@ export function Atlas3DTrackerEnhanced({
     const cameraPosition = cometPos.clone().add(cameraOffset);
 
     return {
-      position: [cameraPosition.x, cameraPosition.y, cameraPosition.z] as [number, number, number],
+      position: [cameraPosition.x, cameraPosition.y, cameraPosition.z] as [
+        number,
+        number,
+        number
+      ],
       target: [cometPos.x, cometPos.y, cometPos.z] as [number, number, number],
     };
   }, [viewMode, currentFrame]);
@@ -310,7 +344,7 @@ export function Atlas3DTrackerEnhanced({
   // Check if we're near perihelion for glow effect
   const isPerihelion = useMemo(() => {
     if (!currentFrame || !trajectoryData) return false;
-    const perihelionDate = new Date('2025-10-29');
+    const perihelionDate = new Date("2025-10-29");
     const currentDate = new Date(currentFrame.date);
     const daysDiff = Math.abs(
       (currentDate.getTime() - perihelionDate.getTime()) / (1000 * 60 * 60 * 24)
@@ -321,86 +355,107 @@ export function Atlas3DTrackerEnhanced({
   // Loading state
   const missionHighlights = useMemo(() => {
     const missionDates: Record<string, string> = {
-      discovery: 'Jun 30',
-      perihelion: 'Oct 28',
-      mars_flyby: 'Oct 2',
-      jupiter_approach: 'Mar 15',
+      discovery: "Jun 30",
+      perihelion: "Oct 28",
+      mars_flyby: "Oct 2",
+      jupiter_approach: "Mar 15",
     };
 
     const formatDate = (value: string | undefined, fallback: string) => {
       if (!value) return fallback;
       try {
-        const formatted = new Intl.DateTimeFormat('en-US', {
-          month: 'short',
-          day: 'numeric',
+        const formatted = new Intl.DateTimeFormat("en-US", {
+          month: "short",
+          day: "numeric",
         }).format(new Date(value));
         return formatted;
       } catch (err) {
-        console.warn('Failed to format date', value, err);
+        console.warn("Failed to format date", value, err);
         return fallback;
       }
     };
 
     const lookup = (id: string) => {
       const event = events.find((entry) => entry.id === id);
-      return formatDate(event?.date, missionDates[id] ?? '—');
+      return formatDate(event?.date, missionDates[id] ?? "—");
     };
 
     return {
-      discovery: lookup('discovery'),
-      perihelion: lookup('perihelion'),
-      marsFlyby: lookup('mars_flyby'),
-      jupiterApproach: lookup('jupiter_approach'),
+      discovery: lookup("discovery"),
+      perihelion: lookup("perihelion"),
+      marsFlyby: lookup("mars_flyby"),
+      jupiterApproach: lookup("jupiter_approach"),
     };
   }, [events]);
 
   const missionRowOne = useMemo(
     () => [
-      { id: 'discovery' as MissionId, label: 'DISCOVERY', date: missionHighlights.discovery },
-      { id: 'perihelion' as MissionId, label: 'PERIHELION', date: missionHighlights.perihelion },
+      {
+        id: "discovery" as MissionId,
+        label: "DISCOVERY",
+        date: missionHighlights.discovery,
+      },
+      {
+        id: "perihelion" as MissionId,
+        label: "PERIHELION",
+        date: missionHighlights.perihelion,
+      },
     ],
     [missionHighlights.discovery, missionHighlights.perihelion]
   );
 
   const missionRowTwo = useMemo(
     () => [
-      { id: 'mars_flyby' as MissionId, label: 'MARS FLYBY', date: missionHighlights.marsFlyby },
-      { id: 'jupiter_approach' as MissionId, label: 'JUPITER APPROACH', date: missionHighlights.jupiterApproach },
+      {
+        id: "mars_flyby" as MissionId,
+        label: "MARS FLYBY",
+        date: missionHighlights.marsFlyby,
+      },
+      {
+        id: "jupiter_approach" as MissionId,
+        label: "JUPITER APPROACH",
+        date: missionHighlights.jupiterApproach,
+      },
     ],
     [missionHighlights.jupiterApproach, missionHighlights.marsFlyby]
   );
 
-  const zoomEnabled = viewMode === 'true-scale' || viewMode === 'ride-atlas';
+  const zoomEnabled = viewMode === "true-scale" || viewMode === "ride-atlas";
 
   const cameraRowOne: Array<{ label: string }> = [
-    { label: 'Left Click + Drag: Rotate' },
-    { label: 'Right Click + Drag: Pan' },
+    { label: "Left Click + Drag: Rotate" },
+    { label: "Right Click + Drag: Pan" },
   ];
 
   const cameraRowTwo: Array<{ label: string; dim?: boolean }> = [
-    { label: 'Scroll Wheel: Zoom In/Out' },
-    { label: '+/- Buttons: Zoom Controls', dim: !zoomEnabled },
+    { label: "Scroll Wheel: Zoom In/Out" },
+    { label: "+/- Buttons: Zoom Controls", dim: !zoomEnabled },
   ];
 
   const handleMissionSelect = useCallback(
     (id: MissionId) => {
       if (!trajectoryData) return;
-      const atlasData = trajectoryData.atlas || trajectoryData['3iatlas'] || [];
+      const atlasData = trajectoryData.atlas || trajectoryData["3iatlas"] || [];
       if (!atlasData.length) return;
 
       const mission = events.find((event) => event.id === id);
       if (!mission) return;
 
       const missionDate = new Date(mission.date);
-      const eventIndex = atlasData.findIndex((frame) => new Date(frame.date) >= missionDate);
+      const eventIndex = atlasData.findIndex(
+        (frame) => new Date(frame.date) >= missionDate
+      );
       if (eventIndex === -1) return;
 
       setCurrentIndex(eventIndex);
       setIsPlaying(false);
 
-      const isSpecial = id === 'mars_flyby' || id === 'perihelion' || id === 'jupiter_approach';
+      const isSpecial =
+        id === "mars_flyby" || id === "perihelion" || id === "jupiter_approach";
       if (isSpecial) {
-        setCinematicEvent(id as 'mars_flyby' | 'perihelion' | 'jupiter_approach');
+        setCinematicEvent(
+          id as "mars_flyby" | "perihelion" | "jupiter_approach"
+        );
         setCinematicActive(true);
       }
 
@@ -430,7 +485,7 @@ export function Atlas3DTrackerEnhanced({
       <div className="w-full h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center text-red-400">
           <div className="text-xl mb-2">❌ Error Loading Data</div>
-          <div className="text-sm">{error || 'Unknown error'}</div>
+          <div className="text-sm">{error || "Unknown error"}</div>
         </div>
       </div>
     );
@@ -508,6 +563,12 @@ export function Atlas3DTrackerEnhanced({
             position={viewMode === "true-scale" ? [2, 2, 5] : [6, 4, 6]}
             fov={viewMode === "true-scale" ? 45 : 50}
           />
+
+          {/* Enhanced lighting for perihelion comet visibility and solar interaction */}
+          <directionalLight position={[10, 5, 10]} intensity={2.2} color="#fff8e1" />
+          <pointLight position={[0, 0, 0]} intensity={3.5} distance={25} color="#ffd180" />
+          <spotLight position={[0, 10, 10]} intensity={1.6} angle={0.3} penumbra={0.4} color="#b388ff" />
+
           <Suspense fallback={null}>
             <SceneContent
               trajectoryData={trajectoryData}
@@ -526,10 +587,14 @@ export function Atlas3DTrackerEnhanced({
               setCinematicEvent={setCinematicEvent}
               cinematicEvent={cinematicEvent}
             />
-            
+
             {/* Post-processing effects for cinematic quality */}
             <EffectComposer>
-              <Bloom intensity={1.1} luminanceThreshold={0.2} luminanceSmoothing={0.9} />
+              <Bloom
+                intensity={1.1}
+                luminanceThreshold={0.2}
+                luminanceSmoothing={0.9}
+              />
               <Vignette eskil={false} offset={0.1} darkness={0.8} />
             </EffectComposer>
           </Suspense>
