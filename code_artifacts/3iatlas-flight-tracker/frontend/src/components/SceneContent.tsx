@@ -47,6 +47,7 @@ interface SceneContentProps {
   setCinematicActive?: (active: boolean) => void;
   setCinematicEvent?: (event: any) => void;
   cinematicEvent?: any;
+  interact: boolean;
 }
 
 export function SceneContent({
@@ -65,6 +66,7 @@ export function SceneContent({
   setCinematicActive,
   setCinematicEvent,
   cinematicEvent,
+  interact,
 }: SceneContentProps) {
   const { camera } = useThree();
 
@@ -410,12 +412,14 @@ export function SceneContent({
       {!cinematicActive && (
         <OrbitControls
           ref={controlsRef}
+          enabled={interact}
           enableDamping={true}
           dampingFactor={0.05}
           enablePan={true}
           enableRotate={true}
           enableZoom={true}
           zoomSpeed={1.5}
+          makeDefault
           minDistance={0.02}
           maxDistance={focusBody ? 16 : viewMode === "ride-atlas" ? 12 : 50}
           panSpeed={1.0}

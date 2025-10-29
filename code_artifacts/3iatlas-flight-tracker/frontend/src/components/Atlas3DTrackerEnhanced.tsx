@@ -66,6 +66,7 @@ export function Atlas3DTrackerEnhanced({
   // Removed followMode - always use free cam with zoom/pan/rotate
   const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode);
   const [loading, setLoading] = useState(true);
+  const [interact, setInteract] = useState(false);
 
   // Log state changes for debugging
   useEffect(() => {
@@ -579,10 +580,10 @@ export function Atlas3DTrackerEnhanced({
         </div>
       </div>
 
-      <div className="relative h-[65vh] min-h-[500px] w-full overflow-hidden rounded-2xl bg-black">
+      <div className="sticky top-0 h-[100dvh]">
         <TexturePreloader />
         <Canvas
-          className="absolute inset-0 h-full w-full"
+          className={`w-full h-full ${interact ? 'touch-none' : 'touch-pan-y'}`}
           gl={{ antialias: true, alpha: false }}
           dpr={[1, 2]}
         >
@@ -611,6 +612,7 @@ export function Atlas3DTrackerEnhanced({
               cinematicActive={cinematicActive}
               cometPositionVec={cometPositionVec}
               rideAlongCamera={rideAlongCamera}
+              interact={interact}
               focusBody={focusBody}
               setCinematicActive={setCinematicActive}
               setCinematicEvent={setCinematicEvent}
@@ -650,6 +652,8 @@ export function Atlas3DTrackerEnhanced({
         onSeek={setCurrentIndex}
         onViewModeChange={setViewMode}
         layout="inline"
+        interact={interact}
+        onInteractChange={setInteract}
       />
     </div>
   );

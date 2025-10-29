@@ -18,6 +18,8 @@ interface PlaybackControlsProps {
   onSeek: (index: number) => void;
   onViewModeChange: (mode: /* 'explorer' | */ 'true-scale' | 'ride-atlas') => void;
   layout?: 'floating' | 'inline';
+  interact: boolean;
+  onInteractChange: (interact: boolean) => void;
 }
 
 const SPEED_OPTIONS = [10, 25]; // Temporarily removing 1x to test default behavior
@@ -43,27 +45,13 @@ export function PlaybackControls({
   onSeek,
   onViewModeChange,
   layout = 'floating',
+  interact,
+  onInteractChange,
 }: PlaybackControlsProps) {
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showViewMenu, setShowViewMenu] = useState(false);
 
-  const isFloating = layout === 'floating';
-  const containerClassName = isFloating
-    ? "playback-controls relative fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md text-white rounded-lg shadow-2xl"
-    : "playback-controls relative w-full rounded-xl bg-black/70 backdrop-blur";
-  const containerStyle = isFloating
-    ? {
-        minWidth: "320px", // Reduced from 500px for mobile
-        maxWidth: "90vw",
-        zIndex: 99999,
-        pointerEvents: "auto" as const,
-        margin: "0 16px", // Add horizontal margin
-      }
-    : {
-        pointerEvents: "auto" as const,
-        margin: "0 16px", // Add horizontal margin for non-floating
-      };
-  const innerWrapperClass = isFloating ? "p-2 sm:p-3" : "mx-auto w-full max-w-5xl px-2 sm:px-4 py-1 sm:py-2";
+  const containerClassName = "fixed left-0 right-0 bottom-0 z-[9999] h-[calc(var(--controls-h)+var(--safe-bottom))] px-3 pb-[calc(8px+var(--safe-bottom))] pt-2 bg-black/60 backdrop-blur flex items-center gap-2 overflow-x-auto whitespace-nowrap mx-auto max-w-[90vw] min-w-[320px]";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -100,40 +88,36 @@ export function PlaybackControls({
   const zoomEnabled = true; // Enable zoom for all view modes
 
   return (
-    <div className={containerClassName} style={containerStyle}>
-      <div className={innerWrapperClass}>
+    <div className={containerClassName}>
+      <div className="w-full flex flex-col gap-2">
         {/* Timeline Slider Row */}
-        <div className={`-mb-2 ${isFloating ? '' : 'max-w-4xl mx-auto'}`}>
-          {/* Slider with percentage overlay */}
-          <div className="flex items-center gap-2 sm:gap-4 text-xs text-white/70 relative">
-            <span className="w-16 text-left sm:w-24 md:w-32 text-xs sm:text-sm">July 1, 2025</span>
-            <div className="flex-1 relative">
-              <input
-                type="range"
-                min="0"
-                max={maxIndex}
-                value={currentIndex}
-                onMouseDown={handleScrubStart}
-                onTouchStart={handleScrubStart}
-                onChange={(e) => onSeek(parseFloat(e.target.value))}
-                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-700"
-                style={{ accentColor: '#00ff88' }}
-              />
-              {/* Percentage overlay on top of slider */}
-              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs sm:text-sm font-semibold text-white bg-black/50 px-2 py-1 rounded">
-                {progressPercent}%
-              </div>
+        <div className="flex items-center gap-2 sm:gap-4 text-xs text-white/70 relative">
+          <span className="w-16 text-left sm:w-24 md:w-32 text-xs sm:text-sm">July 1, 2025</span>
+          <div className="flex-1 relative">
+            <input
+              type="range"
+              min="0"
+              max={maxIndex}
+              value={currentIndex}
+              onMouseDown={handleScrubStart}
+              onTouchStart={handleScrubStart}
+              onChange={(e) => onSeek(parseFloat(e.target.value))}
+              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-700"
+              style={{ accentColor: '#00ff88' }}
+            />
+            <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs sm:text-sm font-semibold text-white bg-black/50 px-2 py-1 rounded">
+              {progressPercent}%
             </div>
-            <span className="w-16 text-right sm:w-24 md:w-32 text-xs sm:text-sm">March 31, 2026</span>
           </div>
+          <span className="w-16 text-right sm:w-24 md:w-32 text-xs sm:text-sm">March 31, 2026</span>
         </div>
 
         {/* Control Buttons */}
-        <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 ${isFloating ? '' : 'max-w-full mx-auto px-2 sm:px-4'} overflow-x-auto`}>
+        <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
           <button
             type="button"
             onClick={onReset}
-            className="px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap"
+            className="px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
             title="Reset to beginning"
           >
             ⏮️ Reset
@@ -145,6 +129,21 @@ export function PlaybackControls({
             className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 bg-green-600 hover:bg-green-500 rounded-lg transition-colors font-semibold text-xs sm:text-sm whitespace-nowrap"
           >
             {isPlaying ? "⏸️ Pause" : "▶️ Play"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const newState = !interact;
+              onInteractChange(newState);
+              console.log('Interact 3D toggled', newState ? 'ON' : 'OFF');
+            }}
+            className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors whitespace-nowrap ${
+              interact
+                ? 'bg-sky-500 text-white'
+                : 'bg-gray-700 hover:bg-gray-600 text-white'
+            }`}
+          >
+            Interact 3D: {interact ? 'ON' : 'OFF'}
           </button>
 
           {/* Speed Control */}

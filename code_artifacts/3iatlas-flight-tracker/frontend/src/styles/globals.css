@@ -9,10 +9,18 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+html, body {
+  overflow: auto;
+}
+
+:root {
+  --controls-h: 56px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+#root, #__next, #app-root {
+  min-height: 100dvh;
+  padding-bottom: calc(var(--controls-h) + var(--safe-bottom));
 }
 
 /* Layout container to prevent bottom controls clipping */
