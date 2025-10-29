@@ -9,13 +9,14 @@ import { useEffect, useState } from "react";
 interface PlaybackControlsProps {
   isPlaying: boolean;
   speed: number;
-  currentIndex: number;
-  maxIndex: number;
+  currentDate: Date | null;
+  startDate: Date | null;
+  endDate: Date | null;
   viewMode: /* 'explorer' | */ 'true-scale' | 'ride-atlas';
   onPlayPause: () => void;
   onReset: () => void;
   onSpeedChange: (speed: number) => void;
-  onSeek: (index: number) => void;
+  onSeek: (date: Date) => void;
   onViewModeChange: (mode: /* 'explorer' | */ 'true-scale' | 'ride-atlas') => void;
   layout?: 'floating' | 'inline';
 }
@@ -34,8 +35,9 @@ const VIEW_MODE_LABELS = {
 export function PlaybackControls({
   isPlaying,
   speed,
-  currentIndex,
-  maxIndex,
+  currentDate,
+  startDate,
+  endDate,
   viewMode,
   onPlayPause,
   onReset,
@@ -47,23 +49,14 @@ export function PlaybackControls({
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showViewMenu, setShowViewMenu] = useState(false);
 
-  const isFloating = layout === 'floating';
-  const containerClassName = isFloating
-    ? "playback-controls relative fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md text-white rounded-lg shadow-2xl"
-    : "playback-controls relative w-full rounded-xl bg-black/70 backdrop-blur";
-  const containerStyle = isFloating
-    ? {
-        minWidth: "320px", // Reduced from 500px for mobile
-        maxWidth: "90vw",
-        zIndex: 99999,
-        pointerEvents: "auto" as const,
-        margin: "0 16px", // Add horizontal margin
-      }
-    : {
-        pointerEvents: "auto" as const,
-        margin: "0 16px", // Add horizontal margin for non-floating
-      };
-  const innerWrapperClass = isFloating ? "p-2 sm:p-3" : "mx-auto w-full max-w-5xl px-2 sm:px-4 py-1 sm:py-2";
+  const containerClassName = `
+    fixed bottom-0 left-0 right-0 z-[9999] pointer-events-auto
+    bg-black/60 backdrop-blur-sm
+  `;
+  const innerWrapperClass = `
+    flex flex-col gap-2 items-center
+    w-full max-w-6xl mx-auto p-2 sm:px-4
+  `;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,7 +89,12 @@ export function PlaybackControls({
     }
   };
 
-  const progressPercent = maxIndex > 0 ? Math.floor((currentIndex / maxIndex) * 100) : 0;
+  const startTime = startDate?.getTime() ?? 0;
+  const endTime = endDate?.getTime() ?? 0;
+  const currentTime = currentDate?.getTime() ?? 0;
+
+  const progressPercent =
+    endTime > startTime ? Math.floor(((currentTime - startTime) / (endTime - startTime)) * 100) : 0;
   const zoomEnabled = true; // Enable zoom for all view modes
 
   return (
@@ -110,12 +108,15 @@ export function PlaybackControls({
             <div className="flex-1 relative">
               <input
                 type="range"
-                min="0"
-                max={maxIndex}
-                value={currentIndex}
+                min={startTime}
+                max={endTime}
+                value={currentTime}
                 onMouseDown={handleScrubStart}
                 onTouchStart={handleScrubStart}
-                onChange={(e) => onSeek(parseFloat(e.target.value))}
+                onChange={(e) => {
+                  const newDate = new Date(parseFloat(e.target.value));
+                  onSeek(newDate);
+                }}
                 className="h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-700"
                 style={{ accentColor: '#00ff88' }}
               />
