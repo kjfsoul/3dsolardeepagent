@@ -306,15 +306,16 @@ export function parseVectorData(horizonsResult: string[]): VectorData[] {
  * Smooth ephemeris data discontinuities for problematic date ranges
  * Interpolates position vectors for Sept 7 and Nov 14 data gaps
  */
-export function smoothEphemerisData(vectors: VectorData[]): VectorData[] {
+export function smoothEphemerisData<T extends { date: string; position: { x: number; y: number; z: number } }>(vectors: T[]): T[] {
   const SMOOTH_DATES = ['2025-09-07', '2025-11-14'];
-  
+
   for (let i = 1; i < vectors.length; i++) {
     const prev = vectors[i - 1];
     const curr = vectors[i];
 
-    const prevDate = prev.date.split(' ')[0];
-    const currDate = curr.date.split(' ')[0];
+    // Extract date portion (handle both ISO format and space-separated format)
+    const prevDate = prev.date.split("T")[0].split(" ")[0];
+    const currDate = curr.date.split("T")[0].split(" ")[0];
 
     const dx = Math.abs(curr.position.x - prev.position.x);
     const dy = Math.abs(curr.position.y - prev.position.y);
@@ -322,14 +323,24 @@ export function smoothEphemerisData(vectors: VectorData[]): VectorData[] {
     const delta = Math.max(dx, dy, dz);
 
     // Smooth if date matches known gaps OR sudden jump detected (> 0.3 AU)
-    if (SMOOTH_DATES.includes(prevDate) || SMOOTH_DATES.includes(currDate) || delta > 0.3) {
+    if (
+      SMOOTH_DATES.includes(prevDate) ||
+      SMOOTH_DATES.includes(currDate) ||
+      delta > 0.3
+    ) {
       vectors[i].position.x = (curr.position.x + prev.position.x) / 2;
       vectors[i].position.y = (curr.position.y + prev.position.y) / 2;
       vectors[i].position.z = (curr.position.z + prev.position.z) / 2;
-      console.warn('[Horizons] Smoothed discontinuity near', prevDate, '→', currDate, `(Δ=${delta.toFixed(3)} AU)`);
+      console.warn(
+        "[Horizons] Smoothed discontinuity near",
+        prevDate,
+        "→",
+        currDate,
+        `(Δ=${delta.toFixed(3)} AU)`
+      );
     }
   }
-  
+
   return vectors;
 }
 

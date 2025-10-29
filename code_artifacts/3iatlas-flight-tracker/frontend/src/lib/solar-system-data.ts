@@ -4,6 +4,7 @@
  */
 
 import { type VectorData } from '@/types/trajectory';
+import { smoothEphemerisData } from './horizons-api';
 
 // Helper function to convert Horizons date format to ISO
 function convertHorizonsDateToISO(horizonsDate: string): string {
@@ -134,6 +135,10 @@ async function loadObjectData({
           z: item.velocity.vz,
         },
       }));
+
+      // Apply smoothing to fix Sept 7 and Nov 14 discontinuities
+      vectors = smoothEphemerisData(vectors);
+      console.log('[Solar System] 🔧 Applied discontinuity smoothing to 3I/ATLAS trajectory');
     } else if (objKey === 'sun') {
       // Sun is at origin - create static data
       const startDateObj = new Date(startDate);
