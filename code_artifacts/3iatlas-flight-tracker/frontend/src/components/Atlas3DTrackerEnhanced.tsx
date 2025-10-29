@@ -176,12 +176,31 @@ export function Atlas3DTrackerEnhanced({
       lastTimeRef.current = now;
 
       setCurrentIndex((prevIndex) => {
-        const increment = speed * deltaTime * 2.0; // Adjust multiplier for desired speed
-        const nextIndex = prevIndex + increment;
+        // Time-based interpolation for smoother comet trajectory
+        const increment = speed * deltaTime * 2.0;
+        let nextIndex = prevIndex + increment;
 
         // Loop back to start if we reach the end
         if (nextIndex >= atlasData.length - 1) {
           return 0;
+        }
+
+        // Check for discontinuities in the data (> 0.3 AU jumps)
+        const previousFrame = Math.floor(prevIndex);
+        const followingFrame = Math.min(previousFrame + 1, atlasData.length - 1);
+        const prevData = atlasData[previousFrame];
+        const nextData = atlasData[followingFrame];
+
+        if (prevData && nextData) {
+          const dx = Math.abs(nextData.position.x - prevData.position.x);
+          const dy = Math.abs(nextData.position.y - prevData.position.y);
+          const dz = Math.abs(nextData.position.z - prevData.position.z);
+          const delta = dx + dy + dz;
+
+          // If discontinuity detected (> 0.3 AU), slow down interpolation
+          if (delta > 0.3) {
+            nextIndex = THREE.MathUtils.lerp(prevIndex, followingFrame, 0.5);
+          }
         }
 
         return nextIndex;
