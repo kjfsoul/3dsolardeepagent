@@ -137,14 +137,17 @@ async function loadObjectData({
       }));
 
       // Apply smoothing to fix Sept 7 and Nov 14 discontinuities
+      console.log('[Solar System] 📊 BEFORE smoothing - checking for discontinuities...');
+      const beforeCount = vectors.length;
       vectors = smoothEphemerisData(vectors);
       console.log('[Solar System] 🔧 Applied discontinuity smoothing to 3I/ATLAS trajectory');
+      console.log('[Solar System] ✅ Smoothed', beforeCount, 'frames for Atlas comet');
     } else if (objKey === 'sun') {
       // Sun is at origin - create static data
       const startDateObj = new Date(startDate);
       const endDateObj = new Date(endDate);
       const daysDiff = Math.ceil((endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24));
-      
+
       vectors = Array.from({ length: daysDiff }, (_, i) => {
         const date = new Date(startDateObj);
         date.setDate(date.getDate() + i);

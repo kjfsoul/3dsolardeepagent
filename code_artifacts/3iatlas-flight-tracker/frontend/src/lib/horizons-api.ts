@@ -308,6 +308,7 @@ export function parseVectorData(horizonsResult: string[]): VectorData[] {
  */
 export function smoothEphemerisData<T extends { date: string; position: { x: number; y: number; z: number } }>(vectors: T[]): T[] {
   const SMOOTH_DATES = ['2025-09-07', '2025-11-14'];
+  let smoothedCount = 0;
 
   for (let i = 1; i < vectors.length; i++) {
     const prev = vectors[i - 1];
@@ -322,23 +323,40 @@ export function smoothEphemerisData<T extends { date: string; position: { x: num
     const dz = Math.abs(curr.position.z - prev.position.z);
     const delta = Math.max(dx, dy, dz);
 
-    // Smooth if date matches known gaps OR sudden jump detected (> 0.3 AU)
-    if (
+    // More aggressive smoothing: lower threshold to 0.1 AU and smooth surrounding dates too
+    const needsSmoothing = 
       SMOOTH_DATES.includes(prevDate) ||
       SMOOTH_DATES.includes(currDate) ||
-      delta > 0.3
-    ) {
-      vectors[i].position.x = (curr.position.x + prev.position.x) / 2;
-      vectors[i].position.y = (curr.position.y + prev.position.y) / 2;
-      vectors[i].position.z = (curr.position.z + prev.position.z) / 2;
-      console.warn(
-        "[Horizons] Smoothed discontinuity near",
-        prevDate,
-        "→",
-        currDate,
-        `(Δ=${delta.toFixed(3)} AU)`
-      );
+      prevDate.includes('2025-09-06') || currDate.includes('2025-09-06') ||
+      prevDate.includes('2025-09-08') || currDate.includes('2025-09-08') ||
+      prevDate.includes('2025-11-13') || currDate.includes('2025-11-13') ||
+      prevDate.includes('2025-11-15') || currDate.includes('2025-11-15') ||
+      delta > 0.1; // Lowered from 0.3
+
+    if (needsSmoothing) {
+      // Apply weighted average favoring more recent data
+      const weight = 0.6; // Bias toward current
+      vectors[i].position.x = prev.position.x * (1 - weight) + curr.position.x * weight;
+      vectors[i].position.y = prev.position.y * (1 - weight) + curr.position.y * weight;
+      vectors[i].position.z = prev.position.z * (1 - weight) + curr.position.z * weight;
+      smoothedCount++;
+      
+      if (delta > 0.05) { // Only log significant smoothing
+        console.warn(
+          "[Horizons] 🔧 Smoothed frame",
+          i,
+          "near",
+          prevDate,
+          "→",
+          currDate,
+          `(Δ=${delta.toFixed(4)} AU)`
+        );
+      }
     }
+  }
+
+  if (smoothedCount > 0) {
+    console.log(`[Horizons] ✅ Applied smoothing to ${smoothedCount} frames`);
   }
 
   return vectors;
