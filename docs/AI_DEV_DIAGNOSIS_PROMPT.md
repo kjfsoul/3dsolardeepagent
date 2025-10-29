@@ -15,12 +15,14 @@ User mentioned these dates are "approximately 67 to 68 days from the origin" whi
 ## What's Been Tried
 
 ### Attempt 1: Data Smoothing (FAILED)
+
 - Added `smoothEphemerisData()` function in `horizons-api.ts` (lines 309-363)
 - Integrated smoothing into atlas data loading pipeline in `solar-system-data.ts` (line 140)
 - Targeted Sept 7, Nov 14 and surrounding dates with aggressive interpolation
 - **Result**: Still skipping
 
 ### Attempt 2: Planet Index Modulo Fix (PARTIAL)
+
 - **File:** `SceneContent.tsx` line 119
 - **Changed from:** `const planetIndex = Math.floor((idx / 4) % trajectory.length);`
 - **Changed to:** `const clampedIndex = Math.min(planetIndex, trajectory.length - 1);`
@@ -28,6 +30,7 @@ User mentioned these dates are "approximately 67 to 68 days from the origin" whi
 - **Result**: Slight improvement but still skipping
 
 ### Attempt 3: Removed Complex Interpolation (FAILED)
+
 - Simplified frame advancement logic in `Atlas3DTrackerEnhanced.tsx`
 - Removed delta-checking and lerp smoothing that was added earlier
 - **Result**: No change
@@ -35,6 +38,7 @@ User mentioned these dates are "approximately 67 to 68 days from the origin" whi
 ## Current Code Structure
 
 ### Data Loading
+
 - **File:** `solar-system-data.ts`
 - Planet data fetched from `/public/data/SOLAR_SYSTEM_POSITIONS.json`
 - Comet data fetched from `/public/data/3I_ATLAS_positions_parsed.json`
@@ -42,7 +46,9 @@ User mentioned these dates are "approximately 67 to 68 days from the origin" whi
 - Comet data is **6-hourly** (4 entries per day)
 
 ### Index Calculation
+
 - **File:** `SceneContent.tsx` lines 112-127
+
 ```typescript
 function getPlanetPos(trajectory: VectorData[], idx: number): [number, number, number] {
   const planetIndex = Math.floor(idx / 4);  // Convert 6-hourly comet index to daily planet index
@@ -53,7 +59,9 @@ function getPlanetPos(trajectory: VectorData[], idx: number): [number, number, n
 ```
 
 ### Animation Loop
+
 - **File:** `Atlas3DTrackerEnhanced.tsx` lines 180-190
+
 ```typescript
 setCurrentIndex((prevIndex) => {
   const increment = speed * deltaTime * 2.0;
@@ -85,10 +93,12 @@ setCurrentIndex((prevIndex) => {
 ## Data Structure
 
 ### JSON Data Files
+
 - `/public/data/SOLAR_SYSTEM_POSITIONS.json` - Planet ephemeris
 - `/public/data/3I_ATLAS_positions_parsed.json` - Comet ephemeris
 
 Both use this format:
+
 ```json
 {
   "date": "A.D. 2025-Sep-07 00:00:00.0000",
@@ -109,6 +119,7 @@ The skip likely occurs because:
 ## Debugging Instructions
 
 ### Step 1: Verify Data Integrity
+
 ```bash
 cd code_artifacts/3iatlas-flight-tracker/frontend/public/data
 jq '[.[] | select(.object == "Earth (399)" and (.date | contains("2025-Sep-07")))]' SOLAR_SYSTEM_POSITIONS.json
@@ -117,20 +128,26 @@ jq '[.[] | select(.object == "Earth (399)" and (.date | contains("2025-Sep-07"))
 Should return exactly ONE entry for Earth on Sept 7.
 
 ### Step 2: Add Console Logging
+
 Add this to `SceneContent.tsx` getPlanetPos() function:
+
 ```typescript
 const planetIndex = Math.floor(idx / 4);
 console.log(`[DEBUG] Comet idx: ${idx}, Planet idx: ${planetIndex}, Date: ${trajectory[planetIndex]?.date}`);
 ```
 
 ### Step 3: Check Render Frequency
+
 Add to `Atlas3DTrackerEnhanced.tsx` animation loop:
+
 ```typescript
 console.log(`[ANIMATION] currentIndex: ${nextIndex}, speed: ${speed}, deltaTime: ${deltaTime}`);
 ```
 
 ### Step 4: Visual Inspection
+
 Open browser console and watch the logs while scrubbing to Sept 7 and Nov 14. Look for:
+
 - Multiple renders with different indices
 - Index jumping backwards
 - Data lookup returning undefined
@@ -155,6 +172,7 @@ Earth should move smoothly in its orbit, appearing at ONE consistent position pe
 ## Additional Context
 
 User also mentioned:
+
 - Countdown correction to Oct 29 instead of Oct 28
 - Enhanced lighting for perihelion
 - Post-processing effects
@@ -184,6 +202,7 @@ Playback controls (bottom control bar) **do not appear in default view** but mag
 ## Current Implementation
 
 ### CSS (globals.css)
+
 ```css
 .controls-overlay {
   position: absolute;
@@ -196,11 +215,13 @@ Playback controls (bottom control bar) **do not appear in default view** but mag
 ```
 
 ### Usage
+
 Controls are rendered inside `<Atlas3DTrackerEnhanced>` component.
 
 ## Suspected Root Cause
 
 Controls might be:
+
 1. **Inside the 3D Canvas context** - affected by 3D camera transformations
 2. **Z-index issue** - hidden behind 3D scene
 3. **Overflow hidden** - clipped by parent containers
@@ -222,6 +243,7 @@ Controls might be:
 ## Debugging Steps
 
 ### Step 1: Verify DOM Structure
+
 ```javascript
 // In browser console on live site:
 document.querySelector('.controls-overlay')
@@ -232,6 +254,7 @@ getComputedStyle(document.querySelector('.controls-overlay'))
 ```
 
 ### Step 2: Check Parent Overflow
+
 ```javascript
 document.querySelector('.layout-container').style.overflow
 document.querySelector('.main-content').style.overflow
@@ -239,6 +262,7 @@ document.querySelector('.main-content').style.overflow
 ```
 
 ### Step 3: Verify 3D Canvas Position
+
 ```javascript
 document.querySelector('canvas')
 // Check if it overlays controls
@@ -247,6 +271,7 @@ document.querySelector('canvas')
 ## Hypothesis
 
 Controls are likely:
+
 - Rendered INSIDE the Canvas element or its container
 - The Canvas has `position: absolute` and covers everything
 - Controls have lower stacking order than 3D scene
@@ -254,6 +279,7 @@ Controls are likely:
 ## Potential Fixes
 
 ### Option 1: Move controls outside Canvas container
+
 ```tsx
 <div className="layout-container">
   <Canvas>{/* 3D scene */}</Canvas>
@@ -264,6 +290,7 @@ Controls are likely:
 ```
 
 ### Option 2: Increase z-index
+
 ```css
 .controls-overlay {
   z-index: 9999; /* Much higher */
@@ -271,6 +298,7 @@ Controls are likely:
 ```
 
 ### Option 3: Check parent overflow
+
 ```css
 .layout-container {
   overflow: visible !important;
@@ -291,3 +319,45 @@ Controls are likely:
 ---
 
 **Combined Mission:** Fix BOTH the Earth position skipping AND controls visibility issues with minimal, clean solutions.
+
+---
+
+# CRITICAL UPDATE: Modulo Fix Already Applied!
+
+## Status: PARTIAL FIX ALREADY IN CODE
+
+The planet indexing logic fix was **already committed** in commit `b160d65` on branch `feature/instructions-fixes`:
+
+- ✅ Removed modulo operator from `getPlanetPos()` in `SceneContent.tsx`
+- ✅ Added clamping with `Math.min(planetIndex, trajectory.length - 1)`
+- ✅ Fixed in `Atlas3DTrackerEnhanced.tsx` `bodyPositionAt()` function
+
+**However:** User reports skipping STILL HAPPENS despite this fix.
+
+## This Means:
+
+The modulo wrapping was NOT the root cause, or there are MULTIPLE issues:
+
+### Hypothesis A: Rendering Race Condition
+- Multiple renders with stale indices
+- React state updates not synced with 3D rendering
+- Need to verify how `currentIndex` propagates to planet rendering
+
+### Hypothesis B: Data Consistency Issue
+- Missing or duplicate data entries in JSON files
+- Date parsing mismatch between comet and planet data
+- Check if both datasets span the same date range
+
+### Hypothesis C: Another Index Calculation Location
+- There may be MORE places calculating planet positions
+- Check ALL calls to `getPlanetPos()` and `bodyPositionAt()`
+- Search for other division-by-4 calculations
+
+## New Focus Areas:
+
+1. **Verify the fix is actually running** - Add console logs to see what indices are being used
+2. **Check React re-renders** - Too many renders might cause flicker
+3. **Data integrity** - Verify Earth has consistent data for Sept 7 and Nov 14
+4. **Search for other planet position calculations** - Might be multiple code paths
+
+The modulo fix was good thinking but insufficient. Need deeper investigation.
