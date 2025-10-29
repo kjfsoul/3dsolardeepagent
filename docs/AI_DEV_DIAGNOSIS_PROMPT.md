@@ -166,3 +166,128 @@ Focus ONLY on the Earth position skipping issue.
 
 **Your mission:** Root cause the Earth position skipping and provide a minimal fix that ensures Earth appears at one consistent position per date.
 
+---
+
+# SECOND ISSUE: Playback Controls Visibility
+
+## Problem
+
+Playback controls (bottom control bar) **do not appear in default view** but magically appear when the user zooms out the browser window. This should NEVER happen - controls should always be visible regardless of viewport zoom level.
+
+## Expected Behavior
+
+- Controls should be **permanently visible** at the bottom of the screen
+- No interaction with 3D camera scale context
+- Fixed to viewport, not affected by zoom levels
+- Always clickable/interactive
+
+## Current Implementation
+
+### CSS (globals.css)
+```css
+.controls-overlay {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  pointer-events: auto;
+}
+```
+
+### Usage
+Controls are rendered inside `<Atlas3DTrackerEnhanced>` component.
+
+## Suspected Root Cause
+
+Controls might be:
+1. **Inside the 3D Canvas context** - affected by 3D camera transformations
+2. **Z-index issue** - hidden behind 3D scene
+3. **Overflow hidden** - clipped by parent containers
+4. **Positioning conflict** - absolute within wrong container
+
+## Files to Check
+
+1. **`code_artifacts/3iatlas-flight-tracker/frontend/src/components/Atlas3DTrackerEnhanced.tsx`**
+   - Where `<PlaybackControls>` is rendered
+   - Parent container structure
+
+2. **`code_artifacts/3iatlas-flight-tracker/frontend/src/App.tsx`**
+   - Layout structure
+   - How Canvas and controls are positioned
+
+3. **`code_artifacts/3iatlas-flight-tracker/frontend/src/styles/globals.css`**
+   - Lines 19-45: layout-container, main-content, controls-overlay
+
+## Debugging Steps
+
+### Step 1: Verify DOM Structure
+```javascript
+// In browser console on live site:
+document.querySelector('.controls-overlay')
+// Should exist and be visible
+
+getComputedStyle(document.querySelector('.controls-overlay'))
+// Check: z-index, position, display, visibility, opacity
+```
+
+### Step 2: Check Parent Overflow
+```javascript
+document.querySelector('.layout-container').style.overflow
+document.querySelector('.main-content').style.overflow
+// Should NOT be 'hidden' or 'clip'
+```
+
+### Step 3: Verify 3D Canvas Position
+```javascript
+document.querySelector('canvas')
+// Check if it overlays controls
+```
+
+## Hypothesis
+
+Controls are likely:
+- Rendered INSIDE the Canvas element or its container
+- The Canvas has `position: absolute` and covers everything
+- Controls have lower stacking order than 3D scene
+
+## Potential Fixes
+
+### Option 1: Move controls outside Canvas container
+```tsx
+<div className="layout-container">
+  <Canvas>{/* 3D scene */}</Canvas>
+  <div className="controls-overlay"> {/* OUTSIDE Canvas */}
+    <PlaybackControls />
+  </div>
+</div>
+```
+
+### Option 2: Increase z-index
+```css
+.controls-overlay {
+  z-index: 9999; /* Much higher */
+}
+```
+
+### Option 3: Check parent overflow
+```css
+.layout-container {
+  overflow: visible !important;
+}
+.main-content {
+  overflow: visible !important;
+}
+```
+
+## Success Criteria
+
+- [ ] Controls visible on page load at default zoom
+- [ ] Controls visible when browser zoom changes
+- [ ] Controls clickable regardless of viewport state
+- [ ] Controls stay fixed to bottom of viewport
+- [ ] No magic appearing/disappearing
+
+---
+
+**Combined Mission:** Fix BOTH the Earth position skipping AND controls visibility issues with minimal, clean solutions.
