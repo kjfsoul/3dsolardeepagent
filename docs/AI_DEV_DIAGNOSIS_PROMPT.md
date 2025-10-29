@@ -322,7 +322,7 @@ Controls are likely:
 
 ---
 
-# CRITICAL UPDATE: Modulo Fix Already Applied!
+# CRITICAL UPDATE: Modulo Fix Already Applied
 
 ## Status: PARTIAL FIX ALREADY IN CODE
 
@@ -334,26 +334,29 @@ The planet indexing logic fix was **already committed** in commit `b160d65` on b
 
 **However:** User reports skipping STILL HAPPENS despite this fix.
 
-## This Means:
+## This Means
 
 The modulo wrapping was NOT the root cause, or there are MULTIPLE issues:
 
 ### Hypothesis A: Rendering Race Condition
+
 - Multiple renders with stale indices
 - React state updates not synced with 3D rendering
 - Need to verify how `currentIndex` propagates to planet rendering
 
 ### Hypothesis B: Data Consistency Issue
+
 - Missing or duplicate data entries in JSON files
 - Date parsing mismatch between comet and planet data
 - Check if both datasets span the same date range
 
 ### Hypothesis C: Another Index Calculation Location
+
 - There may be MORE places calculating planet positions
 - Check ALL calls to `getPlanetPos()` and `bodyPositionAt()`
 - Search for other division-by-4 calculations
 
-## New Focus Areas:
+## New Focus Areas
 
 1. **Verify the fix is actually running** - Add console logs to see what indices are being used
 2. **Check React re-renders** - Too many renders might cause flicker
