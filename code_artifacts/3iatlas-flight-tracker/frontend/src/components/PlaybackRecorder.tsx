@@ -24,7 +24,7 @@ export function PlaybackRecorder({
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const startTimeRef = useRef<number>(0);
-  const intervalRef = useRef<number | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const startRecording = async () => {
     setIsRecording(true);

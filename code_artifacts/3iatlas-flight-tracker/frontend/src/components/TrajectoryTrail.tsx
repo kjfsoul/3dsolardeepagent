@@ -33,8 +33,6 @@ export function TrajectoryTrail({
     );
 
     let prevX = 0;
-    let prevY = 0;
-    let prevZ = 0;
 
     for (let i = 0; i < endIndex; i++) {
       const frame = trajectoryData[i];
@@ -57,8 +55,6 @@ export function TrajectoryTrail({
 
         // Store for next iteration
         prevX = x;
-        prevY = y;
-        prevZ = z;
       }
     }
 
@@ -107,8 +103,6 @@ export function FullTrajectoryLine({
   const points = useMemo(() => {
     const pts: THREE.Vector3[] = [];
     let prevX = 0;
-    let prevY = 0;
-    let prevZ = 0;
 
     for (let i = 0; i < trajectoryData.length; i++) {
       const frame = trajectoryData[i];
@@ -128,8 +122,6 @@ export function FullTrajectoryLine({
 
       // Store for next iteration
       prevX = x;
-      prevY = y;
-      prevZ = z;
     }
 
     return pts;
