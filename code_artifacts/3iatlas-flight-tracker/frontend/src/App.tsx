@@ -14,12 +14,14 @@ function App() {
   const initialViewMode = (urlParams.get('view') as /* 'explorer' | */ 'true-scale' | 'ride-atlas') || 'ride-atlas'; // Explorer commented out
 
   return (
-    <div className="App">
-      <Atlas3DTrackerEnhanced
-        autoPlay={autoPlay}
-        initialSpeed={initialSpeed}
-        initialViewMode={initialViewMode}
-      />
+    <div className="layout-container">
+      <main className="main-content">
+        <Atlas3DTrackerEnhanced
+          autoPlay={autoPlay}
+          initialSpeed={initialSpeed}
+          initialViewMode={initialViewMode}
+        />
+      </main>
     </div>
   );
 }

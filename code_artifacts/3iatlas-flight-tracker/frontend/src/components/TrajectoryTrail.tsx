@@ -32,18 +32,29 @@ export function TrajectoryTrail({
       trajectoryData.length
     );
 
+    let prevX = 0;
+
     for (let i = 0; i < endIndex; i++) {
       const frame = trajectoryData[i];
       if (frame) {
+        const { x, y, z } = frame.position;
+
+        // Frame-skip guard: validate finite values
+        if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {
+          continue;
+        }
+
+        // Frame-skip guard: skip outliers (sudden teleports > 5M km)
+        if (i > 0 && Math.abs(x - prevX) > 5e6) {
+          continue;
+        }
+
         // Convert from Horizons coordinates to Three.js coordinates
         // Horizons: X, Y, Z -> Three.js: X, Z, -Y
-        pts.push(
-          new THREE.Vector3(
-            frame.position.x,
-            frame.position.z,
-            -frame.position.y
-          )
-        );
+        pts.push(new THREE.Vector3(x, z, -y));
+
+        // Store for next iteration
+        prevX = x;
       }
     }
 
@@ -91,15 +102,26 @@ export function FullTrajectoryLine({
 }: FullTrajectoryLineProps) {
   const points = useMemo(() => {
     const pts: THREE.Vector3[] = [];
+    let prevX = 0;
 
-    for (const frame of trajectoryData) {
-      pts.push(
-        new THREE.Vector3(
-          frame.position.x,
-          frame.position.z,
-          -frame.position.y
-        )
-      );
+    for (let i = 0; i < trajectoryData.length; i++) {
+      const frame = trajectoryData[i];
+      const { x, y, z } = frame.position;
+
+      // Frame-skip guard: validate finite values
+      if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) {
+        continue;
+      }
+
+      // Frame-skip guard: skip outliers (sudden teleports > 5M km)
+      if (i > 0 && Math.abs(x - prevX) > 5e6) {
+        continue;
+      }
+
+      pts.push(new THREE.Vector3(x, z, -y));
+
+      // Store for next iteration
+      prevX = x;
     }
 
     return pts;

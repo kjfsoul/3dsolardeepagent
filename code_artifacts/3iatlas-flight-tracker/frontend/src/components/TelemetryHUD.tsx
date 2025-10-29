@@ -7,6 +7,7 @@
 
 import { VectorData } from '@/types/trajectory';
 import { useMemo } from 'react';
+import Countdown from "./Countdown";
 
 type TelemetryVariant = 'panel' | 'overlay';
 
@@ -72,12 +73,12 @@ export function TelemetryHUD({ currentFrame, className = '', variant = 'panel' }
 
       <div className="space-y-2">
         <div>
-          <span className={labelClass}>Date:</span>{' '}
+          <span className={labelClass}>Date:</span>{" "}
           <span className="text-white font-semibold">
-            {new Date(telemetry.date).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
+            {new Date(telemetry.date).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
             })}
           </span>
         </div>
@@ -105,6 +106,11 @@ export function TelemetryHUD({ currentFrame, className = '', variant = 'panel' }
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Perihelion Countdown */}
+      <div className="mt-3 pt-3 border-t border-gray-600">
+        <Countdown />
       </div>
 
       <div className={footerClass}>Real-time trajectory data</div>
