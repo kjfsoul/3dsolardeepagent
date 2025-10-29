@@ -91,12 +91,36 @@ export function Atlas3DTrackerEnhanced({
   const animationFrameRef = useRef<number>();
   const lastTimeRef = useRef<number>(Date.now());
 
-  // Helper function to get body position at index
-  function bodyPositionAt(trajectory: any[] | undefined, idx: number) {
-    if (!trajectory || trajectory.length === 0) return null;
-    // Clamp index to valid range (no modulo wrapping!)
-    const clampedIdx = Math.min(Math.floor(idx), trajectory.length - 1);
-    const f = trajectory[clampedIdx];
+  // Helper function to get body position by date string
+  function bodyPositionAtDate(
+    trajectory: any[] | undefined,
+    dateIso: string | undefined
+  ) {
+    if (!trajectory || trajectory.length === 0 || !dateIso) return null;
+    const target = dateIso.includes("T") ? dateIso.split("T")[0] : dateIso.split(" ")[0];
+    let match = trajectory.findIndex((f) => {
+      const d = f?.date || "";
+      const p = d.includes("T") ? d.split("T")[0] : d.split(" ")[0];
+      return p === target;
+    });
+    if (match < 0) {
+      // nearest neighbor fallback
+      const targetTime = new Date(target).getTime();
+      let best = 0;
+      let bestDt = Number.POSITIVE_INFINITY;
+      for (let i = 0; i < trajectory.length; i++) {
+        const d = trajectory[i]?.date || "";
+        const p = d.includes("T") ? d.split("T")[0] : d.split(" ")[0];
+        const t = new Date(p).getTime();
+        const dt = Math.abs(t - targetTime);
+        if (dt < bestDt) {
+          bestDt = dt;
+          best = i;
+        }
+      }
+      match = best;
+    }
+    const f = trajectory[match];
     if (!f) return null;
     return new THREE.Vector3(f.position.x, f.position.z, -f.position.y);
   }
@@ -225,17 +249,17 @@ export function Atlas3DTrackerEnhanced({
     const cands = [
       {
         name: "Mars",
-        pos: bodyPositionAt(trajectoryData.mars, currentIndex / 4),
+        pos: bodyPositionAtDate(trajectoryData.mars, currentFrame?.date),
         r: 0.2,
       },
       {
         name: "Earth",
-        pos: bodyPositionAt(trajectoryData.earth, currentIndex / 4),
+        pos: bodyPositionAtDate(trajectoryData.earth, currentFrame?.date),
         r: 0.15,
       },
       {
         name: "Jupiter",
-        pos: bodyPositionAt(trajectoryData.jupiter, currentIndex / 8),
+        pos: bodyPositionAtDate(trajectoryData.jupiter, currentFrame?.date),
         r: 0.4,
       },
     ];
