@@ -87,6 +87,42 @@ export class HorizonsAPIError extends Error {
 }
 
 // ============================================================================
+// CACHING LAYER
+// ============================================================================
+
+/**
+ * In-memory cache to avoid unnecessary API calls
+ * Cache expires after 7 days (604800000 ms)
+ */
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+const horizonsCache = new Map<string, CacheEntry<unknown>>();
+
+function getCached<T>(key: string): T | null {
+  const entry = horizonsCache.get(key);
+  if (!entry) return null;
+  
+  // Check if cache expired
+  if (Date.now() - entry.timestamp > CACHE_TTL) {
+    horizonsCache.delete(key);
+    return null;
+  }
+  
+  return entry.data as T;
+}
+
+function setCache<T>(key: string, data: T): void {
+  horizonsCache.set(key, {
+    data,
+    timestamp: Date.now(),
+  });
+}
+
+// ============================================================================
 // API FUNCTIONS
 // ============================================================================
 
@@ -98,6 +134,10 @@ export async function lookupObject(
   searchString: string,
   group?: 'ast' | 'com' | 'pln' | 'sat' | 'sct' | 'mb' | 'sb'
 ): Promise<HorizonsLookupResult> {
+  // Check cache first
+  const cacheKey = `lookup:${searchString}:${group || 'all'}`;
+  const cached = getCached<HorizonsLookupResult>(cacheKey);
+  if (cached) return cached;
   const params = new URLSearchParams({
     sstr: searchString,
     format: 'json',
@@ -120,6 +160,10 @@ export async function lookupObject(
     }
 
     const data: HorizonsLookupResult = await response.json();
+    
+    // Cache the result
+    setCache(cacheKey, data);
+    
     return data;
   } catch (error) {
     if (error instanceof HorizonsAPIError) {
@@ -138,6 +182,11 @@ export async function lookupObject(
 export async function getEphemerisVectors(
   params: HorizonsQueryParams
 ): Promise<HorizonsResponse> {
+  // Check cache first
+  const cacheKey = `ephemeris:${params.COMMAND}:${params.START_TIME}:${params.STOP_TIME}:${params.STEP_SIZE}`;
+  const cached = getCached<HorizonsResponse>(cacheKey);
+  if (cached) return cached;
+
   const queryParams = new URLSearchParams();
 
   // Add all parameters
@@ -160,6 +209,10 @@ export async function getEphemerisVectors(
     }
 
     const data: HorizonsResponse = await response.json();
+    
+    // Cache the result
+    setCache(cacheKey, data);
+    
     return data;
   } catch (error) {
     if (error instanceof HorizonsAPIError) {
