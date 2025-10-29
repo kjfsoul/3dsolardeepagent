@@ -23,6 +23,7 @@ import {
 } from "@/lib/solar-system-data";
 import { TrajectoryData, VectorData } from "@/types/trajectory";
 import { PlanetLocators } from "./PlanetLocators";
+import { interpolatePosition } from "@/lib/interpolation";
 
 type OrbitControlsWithState = OrbitControlsImpl & { userIsInteracting?: boolean };
 
@@ -31,6 +32,7 @@ type ViewMode = /* "explorer" | */ "true-scale" | "ride-atlas";
 interface SceneContentProps {
   trajectoryData: TrajectoryData;
   planetData: Record<string, VectorData[]>;
+  currentDate: Date | null;
   currentIndex: number;
   currentFrame: VectorData | null;
   viewMode: ViewMode;
@@ -52,6 +54,7 @@ interface SceneContentProps {
 export function SceneContent({
   trajectoryData,
   planetData,
+  currentDate,
   currentIndex,
   currentFrame: _currentFrame,
   viewMode,
@@ -107,55 +110,6 @@ export function SceneContent({
     // Keep things from going hilariously huge near camera
     const clampMax = viewMode === "ride-atlas" ? base * 1.1 : base * 3.0;
     return Math.min(r, clampMax);
-  }
-
-  // Build date -> index maps for fast lookup
-  const planetDateIndexMaps = useMemo(() => {
-    const buildMap = (traj?: VectorData[]) => {
-      const m = new Map<string, number>();
-      if (!traj) return m;
-      for (let i = 0; i < traj.length; i++) {
-        const d = traj[i]?.date || "";
-        const datePart = d.includes("T") ? d.split("T")[0] : d.split(" ")[0];
-        if (datePart) m.set(datePart, i);
-      }
-      return m;
-    };
-    return {
-      earth: buildMap(planetData.Earth),
-      mars: buildMap(planetData.Mars),
-      jupiter: buildMap(planetData.Jupiter),
-    };
-  }, [planetData]);
-
-  function getPlanetPosByDate(
-    name: "Earth" | "Mars" | "Jupiter",
-    trajectory: VectorData[],
-    dateIso?: string
-  ): [number, number, number] {
-    if (!trajectory || trajectory.length === 0 || !dateIso) return [0, 0, 0];
-    const datePart = dateIso.includes("T") ? dateIso.split("T")[0] : dateIso.split(" ")[0];
-    const idxMap = name === "Earth" ? planetDateIndexMaps.earth : name === "Mars" ? planetDateIndexMaps.mars : planetDateIndexMaps.jupiter;
-    let idx = idxMap.get(datePart);
-    if (idx === undefined) {
-      const targetTime = new Date(datePart).getTime();
-      let best = 0;
-      let bestDt = Number.POSITIVE_INFINITY;
-      for (let i = 0; i < trajectory.length; i++) {
-        const d = trajectory[i]?.date || "";
-        const p = d.includes("T") ? d.split("T")[0] : d.split(" ")[0];
-        const t = new Date(p).getTime();
-        const dt = Math.abs(t - targetTime);
-        if (dt < bestDt) {
-          bestDt = dt;
-          best = i;
-        }
-      }
-      idx = best;
-    }
-    const frame = trajectory[idx];
-    if (!frame) return [0, 0, 0];
-    return [frame.position.x, frame.position.z, -frame.position.y];
   }
 
   // Calculate comet scale with smooth hysteresis
@@ -353,20 +307,17 @@ export function SceneContent({
         const planet = SOLAR_SYSTEM_OBJECTS[key as SolarSystemObjectKey];
         if (!planet || key === 'atlas' || positions.length === 0) return null;
 
+        const planetPosition = interpolatePosition(currentDate ?? new Date(), positions);
         return (
           <Planet
             key={key}
             name={planet.name}
             trajectoryData={positions}
-            currentIndex={currentIndex}
+            position={planetPosition.toArray()}
             radius={sizeForView(
               planet.name,
               planet.size,
-              getPlanetPosByDate(
-                planet.name as "Earth" | "Mars" | "Jupiter",
-                positions,
-                _currentFrame?.date
-              )
+              planetPosition.toArray() as [number, number, number]
             )}
             color={`#${planet.color.toString(16).padStart(6, '0')}`}
             showOrbit={true}

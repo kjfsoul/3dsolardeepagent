@@ -60,7 +60,9 @@ export function Atlas3DTrackerEnhanced({
     {}
   );
   const [events, setEvents] = useState<TimelineEvent[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentDate, setCurrentDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [speed, setSpeed] = useState(initialSpeed);
   // Removed followMode - always use free cam with zoom/pan/rotate
@@ -140,6 +142,15 @@ export function Atlas3DTrackerEnhanced({
         console.log("✅ Trajectory data loaded:", Object.keys(trajectoryJson));
         setTrajectoryData(trajectoryJson);
 
+        const atlasData = trajectoryJson.atlas || trajectoryJson["3iatlas"];
+        if (atlasData && atlasData.length > 0) {
+          const firstDate = new Date(atlasData[0].date);
+          const lastDate = new Date(atlasData[atlasData.length - 1].date);
+          setStartDate(firstDate);
+          setEndDate(lastDate);
+          setCurrentDate(firstDate);
+        }
+
         // Load events
         const eventsResponse = await fetch("/data/timeline_events.json");
         console.log("📡 Events response:", eventsResponse.status);
@@ -188,11 +199,7 @@ export function Atlas3DTrackerEnhanced({
 
   // Animation loop
   useEffect(() => {
-    if (!isPlaying || !trajectoryData) {
-      return;
-    }
-    const atlasData = trajectoryData.atlas || trajectoryData["3iatlas"];
-    if (!atlasData || atlasData.length === 0) {
+    if (!isPlaying || !trajectoryData || !startDate || !endDate) {
       return;
     }
 
@@ -201,16 +208,17 @@ export function Atlas3DTrackerEnhanced({
       const deltaTime = (now - lastTimeRef.current) / 1000; // seconds
       lastTimeRef.current = now;
 
-      setCurrentIndex((prevIndex) => {
-        const increment = speed * deltaTime * 2.0;
-        const nextIndex = prevIndex + increment;
+      setCurrentDate((prevDate) => {
+        if (!prevDate) return prevDate;
+        const newTime = prevDate.getTime() + speed * deltaTime * 1000 * 3600 * 24; // speed is in days per second
+        const newDate = new Date(newTime);
 
-        // Loop back to start if we reach the end
-        if (nextIndex >= atlasData.length - 1) {
-          return 0;
+        if (newDate >= endDate) {
+          setIsPlaying(false);
+          return endDate;
         }
 
-        return nextIndex;
+        return newDate;
       });
 
       animationFrameRef.current = requestAnimationFrame(animate);
@@ -224,7 +232,28 @@ export function Atlas3DTrackerEnhanced({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isPlaying, speed, trajectoryData]);
+  }, [isPlaying, speed, trajectoryData, startDate, endDate]);
+
+  const currentIndex = useMemo(() => {
+    if (!currentDate || !trajectoryData) return 0;
+    const atlasData = trajectoryData.atlas || trajectoryData["3iatlas"];
+    if (!atlasData || atlasData.length === 0) return 0;
+
+    const currentTime = currentDate.getTime();
+    let minDiff = Infinity;
+    let closestIndex = 0;
+
+    for (let i = 0; i < atlasData.length; i++) {
+      const frameDate = new Date(atlasData[i].date).getTime();
+      const diff = Math.abs(frameDate - currentTime);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = i;
+      }
+    }
+
+    return closestIndex;
+  }, [currentDate, trajectoryData]);
 
   // Get current frame data
   const currentFrame = useMemo(() => {
@@ -464,19 +493,11 @@ export function Atlas3DTrackerEnhanced({
   const handleMissionSelect = useCallback(
     (id: MissionId) => {
       if (!trajectoryData) return;
-      const atlasData = trajectoryData.atlas || trajectoryData["3iatlas"] || [];
-      if (!atlasData.length) return;
-
       const mission = events.find((event) => event.id === id);
       if (!mission) return;
 
       const missionDate = new Date(mission.date);
-      const eventIndex = atlasData.findIndex(
-        (frame) => new Date(frame.date) >= missionDate
-      );
-      if (eventIndex === -1) return;
-
-      setCurrentIndex(eventIndex);
+      setCurrentDate(missionDate);
       setIsPlaying(false);
 
       const isSpecial =
@@ -639,15 +660,14 @@ export function Atlas3DTrackerEnhanced({
       <PlaybackControls
         isPlaying={isPlaying}
         speed={speed}
-        currentIndex={currentIndex}
-        maxIndex={
-          (trajectoryData.atlas || trajectoryData["3iatlas"] || []).length - 1
-        }
+        currentDate={currentDate}
+        startDate={startDate}
+        endDate={endDate}
         viewMode={viewMode}
         onPlayPause={() => setIsPlaying(!isPlaying)}
-        onReset={() => setCurrentIndex(0)}
+        onReset={() => setCurrentDate(startDate)}
         onSpeedChange={setSpeed}
-        onSeek={setCurrentIndex}
+        onSeek={setCurrentDate}
         onViewModeChange={setViewMode}
         layout="inline"
       />
