@@ -390,10 +390,13 @@ export function Atlas3DTrackerEnhanced({
     const formatDate = (value: string | undefined, fallback: string) => {
       if (!value) return fallback;
       try {
+        // Force UTC to avoid timezone off-by-one (e.g., showing Oct 28 instead of Oct 29)
+        const utcDate = new Date(value.includes('T') ? value : `${value}T00:00:00Z`);
         const formatted = new Intl.DateTimeFormat("en-US", {
           month: "short",
           day: "numeric",
-        }).format(new Date(value));
+          timeZone: "UTC",
+        }).format(utcDate);
         return formatted;
       } catch (err) {
         console.warn("Failed to format date", value, err);
