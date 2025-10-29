@@ -49,18 +49,12 @@ interface HistoricalFlightViewProps {
 }
 ```
 
-**Key Components:**
-- `TrajectoryTrail`: Renders green path line showing comet's trajectory up to current position
-- `Sun`: Static yellow sphere at origin [0,0,0] with emissive material
-- `Planet`: Dynamic spheres for Earth and Mars with trajectory-based movement
-- `Comet`: 3I/ATLAS representation with red sphere and orange tail cone
-- `FollowCamera`: Camera that follows the comet's position
-- `Scene`: Main 3D scene with lighting, stars, and controls
+
 
 **Motion Elements:**
 - **Sun**: Static at origin `[0,0,0]`
 - **Earth**: Moves via `trajectoryData.earth` array
-- **Mars**: Moves via `trajectoryData.mars` array  
+- **Mars**: Moves via `trajectoryData.mars` array
 - **3I/ATLAS**: Moves via `atlasData` prop
 - **Trajectory Trail**: Green line showing comet path
 - **Camera**: Follows comet via `FollowCamera` component
