@@ -7,8 +7,12 @@
 import { useEffect, useState } from 'react';
 
 export default function Countdown() {
+<<<<<<< HEAD
   // Perihelion: 07:45 EDT / 11:45 UTC on October 29, 2025
   const target = new Date('2025-10-29T11:45:00Z').getTime();
+=======
+  const target = new Date('2025-10-29T19:10:00Z').getTime();
+>>>>>>> ae36007a29498034f4a9a6854a09d4f0e60aac27
   const [remaining, setRemaining] = useState('');
 
   useEffect(() => {
