@@ -1,0 +1,421 @@
+---
+description: Strict workflow protocol — mandatory checks before every action
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# STRICT WORKFLOW PROTOCOL
+
+## 🚨 MANDATORY PROTOCOL CHECK (PERFORM BEFORE EVERY ACTION)
+
+**BEFORE ANY CODE CHANGE, DEPLOYMENT, OR GIT OPERATION, TYPE THIS EXACTLY:**
+
+```
+🚨 MANDATORY PROTOCOL CHECK:
+
+1. AM I ON FEATURE BRANCH? [YES/NO]
+   Current branch: [actual branch name]
+
+2. DO I HAVE USER APPROVAL? [YES/NO]
+   Approved action: [specific action]
+
+3. AM I DEPLOYING TO STAGING FIRST? [YES/NO]
+   Deployment target: [staging/production/none]
+
+4. VERIFICATION RULES:
+   - [ ] I will NOT claim a fix works without testing it
+   - [ ] I will provide evidence of the fix working
+   - [ ] I will acknowledge when fixes don't work
+   - [ ] I have read documentation first
+   - [ ] I have explicit permission for this action
+
+IF ANY CHECK FAILS: STOP. ASK PERMISSION. WAIT.
+```
+
+---
+
+## ⚠️ EXPLICIT CONSEQUENCES
+
+### Protocol Violations (IMMEDIATE TERMINATION)
+- ❌ Pushing to `main` branch without approval
+- ❌ Deploying without user approval
+- ❌ Not using feature branch for changes
+- ❌ Skipping mandatory protocol check
+- ❌ Claiming success without evidence
+- ❌ Fabricating test results
+
+### Success Rewards
+- ✅ Following protocol = Continued work
+- ✅ Getting user approval = Production deployment
+- ✅ Using feature branch = Safe development
+- ✅ Staging first = User trust
+- ✅ Evidence-based completion = Credibility
+
+---
+
+## 📋 MANDATORY WORKFLOW (NO EXCEPTIONS)
+
+### Step-by-Step Process
+
+**STEP 1: Read Documentation (10 minutes minimum)**
+```bash
+# Required reading before ANY work
+cat PROJECT_MEMORY.md
+cat 3iatlasapps/docs/PROJECT_MEMORY.md
+cat docs/CURRENT_STATE.md  # if exists
+git log --oneline -10
+```
+
+**STEP 2: Perform Mandatory Protocol Check**
+- Type the full check above
+- Verify each item
+- Wait for approval if needed
+
+**STEP 3: Create/Verify Feature Branch**
+```bash
+# Check current branch
+git branch --show-current
+
+# If on main, create feature branch
+git checkout -b feature/[descriptive-name]
+```
+
+**STEP 4: Make Specific Changes**
+- One concern per commit
+- Test after each change
+- Document what changed
+
+**STEP 5: Test & Validate**
+```bash
+# For 3iatlasapps/
+cd 3iatlasapps
+npm run build
+npm run typecheck
+npm run lint
+
+# For code_artifacts/3iatlas-flight-tracker/
+cd code_artifacts/3iatlas-flight-tracker/frontend
+npm run build
+npm run lint
+```
+
+**STEP 6: Provide Evidence**
+- Show test output
+- Show build success
+- Show linter passing
+- Demonstrate feature working
+
+**STEP 7: WAIT for User Approval**
+- Ask explicitly: "May I [action]?"
+- Do not assume permission
+- Wait for explicit YES
+
+**STEP 8: Deploy Only After Approval**
+- Staging first (if applicable)
+- Production only after staging validated
+
+**SKIPPING ANY STEP = IMMEDIATE TERMINATION**
+
+---
+
+## 🔒 EXPLICIT PERMISSION REQUIREMENTS
+
+### Before ANY Action, Ask:
+"May I [specific action] on [specific branch]?"
+
+### Examples:
+- ✅ "May I create a feature branch for planet integration fixes?"
+- ✅ "May I deploy to staging for testing?"
+- ✅ "May I push to GitHub after user approval?"
+- ✅ "May I modify `Atlas3DTracker.tsx` to fix camera jitter?"
+- ❌ "I'll now make these changes..." (NO ASSUMPTION)
+
+### No Assumptions. No Implied Permission. EXPLICIT ASK ONLY.
+
+---
+
+## 🔍 VERIFICATION COMMANDS
+
+### Run Before Every Action
+
+```bash
+# Check current branch
+git branch --show-current
+
+# Verify not on main
+if [[ $(git branch --show-current) != "main" ]]; then
+  echo "✅ On feature branch"
+else
+  echo "❌ ON MAIN BRANCH - STOP"
+fi
+
+# Check git status
+git status
+
+# Verify no uncommitted changes to main files
+git diff --name-only
+
+# Check for user approval
+echo "Do I have explicit user approval for this action? [YES/NO]"
+```
+
+---
+
+## 🚨 EMERGENCY STOP PROTOCOL
+
+### If You Realize Protocol Violation:
+
+1. **STOP IMMEDIATELY**
+2. Type: `🚨 EMERGENCY STOP - PROTOCOL VIOLATION DETECTED`
+3. Explain what you were about to do wrong
+4. Ask user for permission before proceeding
+5. Wait for explicit approval
+
+### Example:
+```
+🚨 EMERGENCY STOP - PROTOCOL VIOLATION DETECTED
+
+I was about to push changes to main branch without:
+- Creating a feature branch
+- Getting user approval
+- Testing the changes
+
+May I instead:
+1. Create feature branch: feature/fix-camera-jitter
+2. Make changes on that branch
+3. Test and show you results
+4. Wait for approval before merging?
+```
+
+---
+
+## ✅ COMPLIANCE CHECKLIST
+
+### Before Proceeding with ANY Action:
+
+- [ ] I am on a feature branch (not `main`)
+- [ ] I have explicit user approval for this specific action
+- [ ] I am deploying to staging first (if deployment)
+- [ ] I have performed the mandatory protocol check
+- [ ] I have asked permission before proceeding
+- [ ] I am following the established workflow
+- [ ] I have read relevant documentation
+- [ ] I can provide evidence my changes work
+- [ ] I have not broken any existing features
+
+**ALL ITEMS MUST BE CHECKED ✅ BEFORE PROCEEDING**
+
+---
+
+## 🎯 MANDATORY VERIFICATION RULES
+
+### Never Claim Success Without Evidence
+
+**BAD:**
+- "I've fixed the camera jitter issue." (no evidence)
+- "The build should now pass." (untested)
+- "This will resolve the problem." (speculation)
+
+**GOOD:**
+- "I've fixed the camera jitter. Here's the test output showing 60fps sustained: [output]"
+- "The build passes. Here's the npm run build output: [output]"
+- "Here's a video/screenshot showing the fix working: [evidence]"
+
+### Honesty About Failures
+
+**When fixes don't work:**
+- ✅ Admit it immediately
+- ✅ Show error messages
+- ✅ Ask for help or alternative approach
+- ❌ Try random things hoping something works
+- ❌ Pretend it works
+- ❌ Make excuses
+
+### 30-Minute Rule
+
+**If stuck for >30 minutes:**
+1. Stop trying random fixes
+2. Document exactly what was tried
+3. Update docs/CURRENT_STATE.md with:
+   - Exact error messages
+   - What was attempted
+   - Why it didn't work
+   - Time spent
+4. Request handoff with full context
+
+---
+
+## 📁 Project-Specific Rules
+
+### For `3dsolardeepagent` Repo:
+
+**Primary Documentation:**
+- `PROJECT_MEMORY.md` (root)
+- `3iatlasapps/docs/PROJECT_MEMORY.md`
+- `.cursor/rules/*.mdc`
+
+**Key Constraints:**
+- NO mock data, stubs, or hardcoded values
+- NO TypeScript `any` type
+- NO linting errors
+- NO breaking Printify integration
+- Real NASA Horizons data ONLY
+- Sun fixed at origin [0,0,0]
+- Coordinate conversion: [x, y, z] → [x, z, -y]
+
+**Testing Requirements:**
+```bash
+# Always run before claiming completion
+npm run build        # Must pass
+npm run typecheck    # Must pass
+npm run lint         # Must pass
+
+# Verify no mocks/stubs
+grep -r "mock\|placeholder\|fake" src/ --exclude-dir=__tests__
+grep -r "TODO\|FIXME\|STUB\|NOT IMPLEMENTED" src/
+```
+
+---
+
+## 🎓 Communication Protocol
+
+### How to Communicate
+
+**DO:**
+- Use clear, technical language
+- Be direct and specific
+- Provide evidence for claims
+- Ask explicit questions
+- Wait for confirmation
+
+**DON'T:**
+- Use filler phrases ("Great!", "Certainly!", "Okay!")
+- Assume user intent
+- Skip protocol checks
+- Claim success without proof
+- Make changes without permission
+
+---
+
+## 📊 Success Indicators
+
+### Good Session Checklist:
+- ✅ Protocol check performed before every action
+- ✅ Feature branch used
+- ✅ User approval obtained
+- ✅ Tests pass with evidence
+- ✅ Documentation updated
+- ✅ No broken features
+- ✅ Clear next steps
+
+### Bad Session Indicators:
+- ❌ Skipped protocol checks
+- ❌ Changed code on main branch
+- ❌ No evidence of testing
+- ❌ Broke existing features
+- ❌ Undocumented changes
+- ❌ No clear next steps
+
+---
+
+## 🔄 Memory Update Protocol
+
+### After Completing Any Work:
+
+Update `PROJECT_MEMORY.md` with:
+
+```markdown
+## Memory Update: [Date/Time]
+
+### Files Changed
+- /path/to/file.ts - [what changed and why]
+
+### What Works Now ✅
+- [Feature that now works with evidence]
+
+### What's Broken ❌
+- [Feature still broken, if any]
+
+### Learned
+- [Key lesson from this work]
+
+### Next Steps
+1. [Specific actionable task]
+2. [With validation criteria]
+```
+
+---
+
+## 🚦 Git Workflow Rules
+
+### Branch Management
+
+```bash
+# ALWAYS work on feature branches
+git checkout -b feature/descriptive-name
+
+# NEVER commit directly to main
+# NEVER push to main without approval
+# NEVER force push without explicit permission
+```
+
+### Commit Standards
+
+```bash
+# Commit message format
+feat: Add perihelion countdown widget
+fix: Resolve camera jitter in Ride mode
+chore: Update dependencies
+docs: Add workflow protocol documentation
+test: Add unit tests for trajectory calculator
+refactor: Extract camera logic to separate component
+```
+
+### Before Pushing
+
+```bash
+# Verify branch
+git branch --show-current  # Must not be "main"
+
+# Verify changes
+git diff --cached
+
+# Verify builds pass
+npm run build && npm run lint
+
+# Get explicit approval
+echo "Ready to push. Awaiting user approval..."
+```
+
+---
+
+## 🎯 Quick Reference
+
+### Every Response Must Start With:
+
+```
+🚨 MANDATORY PROTOCOL CHECK:
+1. AM I ON FEATURE BRANCH? [answer]
+2. DO I HAVE USER APPROVAL? [answer]
+3. AM I DEPLOYING TO STAGING FIRST? [answer]
+```
+
+### If Any Check Fails:
+**STOP. ASK PERMISSION. WAIT.**
+
+### Remember:
+- Read docs first (10 min)
+- Feature branches only
+- Test everything
+- Provide evidence
+- Get explicit approval
+- Update documentation
+- Be honest about failures
+
+---
+
+**This protocol is NON-NEGOTIABLE. Violations = Immediate termination.**
+
+---
+alwaysApply: true
+---

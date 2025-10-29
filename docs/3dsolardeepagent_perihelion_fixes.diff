@@ -1,0 +1,82 @@
+diff --git a/code_artifacts/3iatlas-flight-tracker/frontend/src/components/Atlas3DTrackerEnhanced.tsx b/code_artifacts/3iatlas-flight-tracker/frontend/src/components/Atlas3DTrackerEnhanced.tsx
+@@ -560,6 +560,12 @@
+           <ambientLight intensity={0.3} />
+           <PerspectiveCamera
+             makeDefault
+             position={viewMode === "true-scale" ? [2, 2, 5] : [6, 4, 6]}
+             fov={viewMode === "true-scale" ? 45 : 50}
+           />
++
++          {/* Additional lighting for comet and solar interaction */}
++          <directionalLight position={[10, 5, 10]} intensity={2.2} color="#fff8e1" />
++          <pointLight position={[0, 0, 0]} intensity={3.5} distance={25} color="#ffd180" />
++          <spotLight position={[0, 10, 10]} intensity={1.6} angle={0.3} penumbra={0.4} color="#b388ff" />
++          <ambientLight intensity={0.25} />
+diff --git a/code_artifacts/3iatlas-flight-tracker/frontend/src/components/SceneContent.tsx b/code_artifacts/3iatlas-flight-tracker/frontend/src/components/SceneContent.tsx
+@@ -18,6 +18,34 @@
+   return (
+     <>
+       <Sun />
+       <Starfield />
+       <OrbitControls />
++
++      {/* --- Comet Brightness & Opacity Adjustments --- */}
++      {cometRef.current && (
++        (() => {
++          const now = new Date();
++          const distanceAU = Math.max(1.0, cometRef.current.userData.distanceAU || 1.5);
++
++          let emissiveIntensity = 0.8;
++          if (distanceAU < 2.0) emissiveIntensity = 1.0;
++          if (distanceAU < 1.5) emissiveIntensity = 1.3;
++          if (distanceAU < 1.4) emissiveIntensity = 1.6; // perihelion flare
++
++          const inConjunction =
++            now >= new Date('2025-10-15') && now <= new Date('2025-11-05');
++          const material = cometRef.current.material;
++
++          if (material) {
++            material.opacity = inConjunction ? 0.35 : 0.85;
++            material.emissiveIntensity = emissiveIntensity;
++          }
++
++          if (now >= new Date('2025-11-06')) {
++            material.emissiveIntensity = Math.min(1.5, emissiveIntensity * 1.2);
++          }
++        })()
++      )}
++
+       <CinematicCamera />
+     </>
+   );
+diff --git a/code_artifacts/3iatlas-flight-tracker/frontend/src/lib/horizons-api.ts b/code_artifacts/3iatlas-flight-tracker/frontend/src/lib/horizons-api.ts
+@@ -270,6 +270,24 @@ export function parseVectorData(horizonsResult: string[]): VectorData[] {
+     vectors.push({ jd: currentJD, date: currentDate, x, y, z });
+   }
+   return vectors;
+ }
++
++// --- Discontinuity smoothing for problematic Horizons segments ---
++export function smoothEphemerisData(vectors: VectorData[]): VectorData[] {
++  const SMOOTH_DATES = ['2025-09-07', '2025-11-14'];
++  for (let i = 1; i < vectors.length; i++) {
++    const prev = vectors[i - 1];
++    const curr = vectors[i];
++
++    const prevDate = prev.date.split(' ')[0];
++    const currDate = curr.date.split(' ')[0];
++
++    const dx = Math.abs(curr.x - prev.x);
++    const dy = Math.abs(curr.y - prev.y);
++    const dz = Math.abs(curr.z - prev.z);
++    const delta = Math.max(dx, dy, dz);
++
++    if (SMOOTH_DATES.includes(prevDate) || SMOOTH_DATES.includes(currDate) || delta > 0.3) {
++      vectors[i].x = (curr.x + prev.x) / 2;
++      vectors[i].y = (curr.y + prev.y) / 2;
++      vectors[i].z = (curr.z + prev.z) / 2;
++      console.warn('[Horizons] Smoothed discontinuity near', prevDate, currDate);
++    }
++  }
++  return vectors;
++}

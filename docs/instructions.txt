@@ -1,0 +1,137 @@
+
+🚀 Code-Level Enhancements
+1. Fix: Bottom Controls Clipped
+Inside pages/index.tsx (or parent container CSS):
+<div className="layout-container">
+  <main className="main-content">
+    <FlightPathScene />
+    <TelemetryHUD />
+  </main>
+</div>
+CSS / Tailwind
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 2rem;
+}
+✅ Panels now fully visible on all screens.
+
+2. Improve: Camera Movement Smoothing
+In CameraRig.tsx:
+useFrame(({ camera, clock }) => {
+  const t = (clock.getElapsedTime() * 0.1) % 1;
+  const curve = new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.1);
+  const position = curve.getPointAt(t);
+  const lookAt = curve.getPointAt((t + 0.01) % 1);
+
+  camera.position.lerp(position, 0.05);
+  camera.lookAt(lookAt);
+});
+✅ Eliminates abrupt camera jumps, especially at outlier frames like Sept 7 and Nov 14.
+
+3. Add: Frame-Skip Guard
+In FlightPathScene.tsx where data points are mapped:
+if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) return;
+if (i > 0 && Math.abs(x - prevX) > 5e6) continue; // skip outliers
+✅ Prevents sudden “teleports” caused by corrupted or sparse Horizons data.
+
+4. Add: Perihelion Countdown Widget
+Create src/components/Countdown.tsx:
+import { useEffect, useState } from 'react';
+
+export default function Countdown() {
+  const target = new Date('2025-10-29T19:10:00Z').getTime();
+  const [remaining, setRemaining] = useState('');
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const diff = target - Date.now();
+      if (diff <= 0) return setRemaining('☀️ Perihelion Reached!');
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      setRemaining(`${days}d ${hours}h ${mins}m ${secs}s`);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="countdown">
+      <h3>Perihelion Countdown</h3>
+      <p>{remaining}</p>
+    </div>
+  );
+}
+Place inside TelemetryHUD.tsx:
+<div className="telemetry">
+  <TelemetryData />
+  <Countdown />
+</div>
+✅ Real-time countdown updates.
+
+5. Remove: ATLAS Directive Block
+Delete or comment out in index.tsx:
+{/* <section id="atlas-directive"> ... </section> */}
+
+6. Enhance: SEO + GEO Metadata
+In pages/_document.tsx:
+<Head>
+  <meta name="description"
+        content="Track interstellar comet 3I/ATLAS live using NASA Horizons data rendered in 3D."/>
+  <meta name="keywords"
+        content="3I ATLAS comet tracker, NASA Horizons, interstellar object, real-time orbit visualization"/>
+  <meta property="og:title" content="3I/ATLAS Flightpath — Live Comet Tracker"/>
+  <meta property="og:image" content="/3I_Atlas.png"/>
+  <meta property="og:url" content="https://3iatlas.mysticarcana.com"/>
+  <meta name="geo.region" content="US-FL"/>
+  <meta name="geo.position" content="28.5383;-81.3792"/>
+</Head>
+✅ Adds OpenGraph + GEO data for AI engines and search.
+
+7. Optimize: NASA Horizons Usage
+In lib/horizons.ts:
+// cache results to avoid unnecessary API calls
+const cache = new Map();
+
+export async function getHorizonsData(date: string) {
+  if (cache.has(date)) return cache.get(date);
+  const res = await fetch(`/api/horizons?date=${date}`);
+  const data = await res.json();
+  cache.set(date, data);
+  return data;
+}
+✅ Reduces latency and API throttling.
+
+8. Post-Processing Enhancement
+Inside FlightPathScene.tsx:
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
+
+<EffectComposer>
+  <Bloom intensity={1.1} />
+  <Vignette eskil={false} offset={0.1} darkness={0.8} />
+</EffectComposer>
+✅ Adds cinematic glow to the comet.
+
+9. Deployment Prep
+Run before next push:
+npm audit fix
+npm run lint --fix
+npm run build
+vercel --prod
+
+🌟 Summary
+These patches achieve:
+•	Fully visible panel layout
+•	Smooth, cinematic camera
+•	Skipping fix on critical data days
+•	Perihelion countdown widget
+•	SEO & GEO discoverability
+•	NASA Horizons caching
+•	Visual polish
+You can paste these changes directly into your existing repo and deploy with zero backend schema modification.

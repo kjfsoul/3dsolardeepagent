@@ -324,7 +324,7 @@ export function smoothEphemerisData<T extends { date: string; position: { x: num
     const delta = Math.max(dx, dy, dz);
 
     // More aggressive smoothing: lower threshold to 0.1 AU and smooth surrounding dates too
-    const needsSmoothing = 
+    const needsSmoothing =
       SMOOTH_DATES.includes(prevDate) ||
       SMOOTH_DATES.includes(currDate) ||
       prevDate.includes('2025-09-06') || currDate.includes('2025-09-06') ||
@@ -340,7 +340,7 @@ export function smoothEphemerisData<T extends { date: string; position: { x: num
       vectors[i].position.y = prev.position.y * (1 - weight) + curr.position.y * weight;
       vectors[i].position.z = prev.position.z * (1 - weight) + curr.position.z * weight;
       smoothedCount++;
-      
+
       if (delta > 0.05) { // Only log significant smoothing
         console.warn(
           "[Horizons] 🔧 Smoothed frame",

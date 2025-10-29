@@ -66,31 +66,31 @@ export function Comet3D({
     // Enhanced distance-reactive emissive intensity with perihelion flare
     const dist = Math.max(0.2, comet.distanceTo(sun));
     const distanceAU = dist / 149.6; // Convert to AU (1 AU ≈ 149.6 million km in our scale)
-    
+
     const mesh = groupRef.current.children[0] as THREE.Mesh;
     const m = mesh.material as THREE.MeshPhysicalMaterial;
-    
+
     // Base emissive intensity from distance
     let emissiveIntensity = THREE.MathUtils.clamp(2 / dist, 0.25, 1.25);
-    
+
     // Perihelion brightness boost based on distance
     if (distanceAU < 2.0) emissiveIntensity = Math.max(emissiveIntensity, 1.0);
     if (distanceAU < 1.5) emissiveIntensity = Math.max(emissiveIntensity, 1.3);
     if (distanceAU < 1.4) emissiveIntensity = Math.max(emissiveIntensity, 1.6); // perihelion flare
-    
+
     // Date-based visibility adjustments
     const now = new Date();
     const inConjunction = now >= new Date('2025-10-15') && now <= new Date('2025-11-05');
     const postConjunction = now >= new Date('2025-11-06');
-    
+
     // Reduce opacity during solar conjunction (harder to observe)
     m.opacity = inConjunction ? 0.35 : 0.85;
-    
+
     // Post-conjunction brightening (emerging from Sun's glare)
     if (postConjunction) {
       emissiveIntensity = Math.min(1.5, emissiveIntensity * 1.2);
     }
-    
+
     m.emissiveIntensity = emissiveIntensity;
   });
 
