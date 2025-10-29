@@ -358,7 +358,7 @@ export function Atlas3DTrackerEnhanced({
   const missionHighlights = useMemo(() => {
     const missionDates: Record<string, string> = {
       discovery: "Jun 30",
-      perihelion: "Oct 28",
+      perihelion: "Oct 29",
       mars_flyby: "Oct 2",
       jupiter_approach: "Mar 15",
     };
