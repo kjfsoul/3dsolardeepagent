@@ -14,6 +14,7 @@
 
 import { PerspectiveCamera } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 
@@ -525,6 +526,12 @@ export function Atlas3DTrackerEnhanced({
               setCinematicEvent={setCinematicEvent}
               cinematicEvent={cinematicEvent}
             />
+            
+            {/* Post-processing effects for cinematic quality */}
+            <EffectComposer>
+              <Bloom intensity={1.1} luminanceThreshold={0.2} luminanceSmoothing={0.9} />
+              <Vignette eskil={false} offset={0.1} darkness={0.8} />
+            </EffectComposer>
           </Suspense>
         </Canvas>
 
