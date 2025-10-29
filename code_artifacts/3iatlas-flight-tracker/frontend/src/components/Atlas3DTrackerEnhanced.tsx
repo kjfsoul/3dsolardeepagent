@@ -94,7 +94,9 @@ export function Atlas3DTrackerEnhanced({
   // Helper function to get body position at index
   function bodyPositionAt(trajectory: any[] | undefined, idx: number) {
     if (!trajectory || trajectory.length === 0) return null;
-    const f = trajectory[Math.floor(idx)];
+    // Clamp index to valid range (no modulo wrapping!)
+    const clampedIdx = Math.min(Math.floor(idx), trajectory.length - 1);
+    const f = trajectory[clampedIdx];
     if (!f) return null;
     return new THREE.Vector3(f.position.x, f.position.z, -f.position.y);
   }

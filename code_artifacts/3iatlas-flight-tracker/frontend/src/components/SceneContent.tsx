@@ -116,8 +116,12 @@ export function SceneContent({
   ): [number, number, number] {
     // Calculate the correct index based on the trajectory length
     // Planet data is daily, comet data is 6-hourly
-    const planetIndex = Math.floor((idx / 4) % trajectory.length);
-    const frame = trajectory[planetIndex];
+    const planetIndex = Math.floor(idx / 4);
+    
+    // Clamp to valid range instead of wrapping with modulo
+    const clampedIndex = Math.min(planetIndex, trajectory.length - 1);
+    const frame = trajectory[clampedIndex];
+    
     if (!frame) return [0, 0, 0];
     return [frame.position.x, frame.position.z, -frame.position.y];
   }
