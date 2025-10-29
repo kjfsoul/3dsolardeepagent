@@ -182,7 +182,7 @@ export function Sun({ radius = 2.0, viewMode = "true-scale" }: SunProps) {
 interface PlanetProps {
   name: string;
   trajectoryData: VectorData[];
-  currentIndex: number;
+  position: [number, number, number];
   radius: number;
   color: string;
   showOrbit?: boolean;
@@ -191,7 +191,7 @@ interface PlanetProps {
 export function Planet({
   name,
   trajectoryData,
-  currentIndex,
+  position,
   radius,
   color,
   showOrbit = true,
@@ -199,18 +199,6 @@ export function Planet({
   const { map, normal, clouds, rings } = usePlanetTextures(name);
 
   if (trajectoryData.length === 0) return null;
-
-  // Get current position
-  const frameIndex = Math.floor(currentIndex) % trajectoryData.length;
-  const frame = trajectoryData[frameIndex];
-
-  if (!frame) return null;
-
-  const position: [number, number, number] = [
-    frame.position.x,
-    frame.position.z,
-    -frame.position.y,
-  ];
 
   return (
     <>

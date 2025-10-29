@@ -6,6 +6,9 @@
     "postinstall": "npm --prefix code_artifacts/3iatlas-flight-tracker/frontend ci || npm --prefix code_artifacts/3iatlas-flight-tracker/frontend install"
   },
   "dependencies": {
-    "@genkit-ai/mcp": "^1.21.0"
+    "@genkit-ai/mcp": "^1.21.0",
+    "@playwright/test": "^1.56.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
