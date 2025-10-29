@@ -129,7 +129,7 @@ export function PlaybackControls({
         </div>
 
         {/* Control Buttons */}
-        <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 ${isFloating ? '' : 'max-w-full mx-auto px-2 sm:px-4'}`}>
+        <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 ${isFloating ? '' : 'max-w-full mx-auto px-2 sm:px-4'} overflow-x-auto`}>
           <button
             type="button"
             onClick={onReset}
@@ -217,8 +217,8 @@ export function PlaybackControls({
           </div>
 
           {/* Zoom Controls */}
-          <div className="flex flex-col items-center gap-0.5 mb-1">
-            <div className={`text-xs font-medium ${zoomEnabled ? 'text-white' : 'text-gray-400'}`}>
+          <div className="flex flex-col items-center gap-0.5 mb-1 flex-shrink-0">
+            <div className={`text-xs font-medium whitespace-nowrap ${zoomEnabled ? 'text-white' : 'text-gray-400'}`}>
               <span className="hidden sm:inline">Zoom</span>
               <span className="sm:hidden">Z</span>
             </div>
